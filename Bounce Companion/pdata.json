@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "avian-pact-256404",
+  "private_key_id": "00ed7be7991d070082f009aa6c5a99d55e8b8f8b",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCw7jYMP5tLoq2u\n+d5LlPgmZzsmvD0YzaMBQzS3Ck2tJuC6gAIZ0mUrvdIrK0PD/aW79bm62JHAS04N\nblOtCkkWpzAE3T1ycmI8W+C2Y/X8tuinEYnloQxcdLLU87s4cSHAQxXZsHwJ3Ioj\noJh2Goj3P7M2sMNVjUaSBiuJ3q+PvLk3FZaDdtQv8OrMkRfJgRjVhr5Sr4zHsTiH\nWf8g2TisEFFqsq3/jl7JEhKpwq4zrJIHUyINZcRTHW17XymedMtqoiIJgzLHGf65\nTU1T4+ijNWofa3SUJsunFktNa8CVyaGOlBT+gR60z4MdoDtKVZ2uPMNlxl/op6Xp\n3/fUZUY3AgMBAAECggEAWCC3DB/Mlv53O44bExOnDN3jgTZGyml3FWRnx/paWXJh\ngpPLOBhrqz94BWed7+wSFs7dDbvc0WbRAHChPjI+2Ik7KlkWx8BAvSbYhZDB0Hg8\n5yadxKKUuSKphtfGO+Vh9dWUdyNojTLsHbXa6wzphxoUBpxCF4VwjsCDBD/Gu7Vl\ngf0Nx740dsuSWpViiFlGCodYEKRF3o3U3r3mwelxBO/kxEOKCrWXpNvSc0sYLDSE\nD4/Kqu3jDXFyoVlOPQFSCV7pUTw107RwkXdbOkJM7ZnFsKR6gbvc5SB+mVismw/+\nCSWTD8YAreo6C/qXs5R5jAnpNAZdEyPxTrGNp12DzQKBgQDbQT2b3uC+Yhrwz4aZ\n8YL8JlhD0PIc8fUiziMZmmkI/UVh7mM7IDuOpY5xeE3cHnUi3B79bszSbGeNgs++\nsOnvosDRdF/Z98Z85bydHh9vKAX54x0qYle3oT3aRqVIM6ty1K8j97IvbZJZh36o\niRJ2GliRghilj72JJkUyWMJXRQKBgQDOlR3F/cfe0FlZeJoyYyHVpnw/9tOlajIV\npf6o08YCS+PpXwxgBX2rHZnySBjAmZzVQ1ns6PgskBujznKVtYhDLA/ceurJrEXh\nBlk74mRSlYyuWOPBRjUuEzSoRNNG74yM4THygo4rYNxFa8sdTKxmsUDWg+53HYNM\n3h7XPxOxSwKBgACV4QM8ih8YBfhkpXhdw7rGo2+y7CKVptDr+f4EgolKm9fSGiO7\nR01vNb0p1BNlZWytZ8vHcvaQ4YnoMoPQ1x8TsS4eAG+FkNsehe1pei4CzllHePl2\n/8L2xEKD88cIlEmfNcSD0c78nOpuSTFMBGeaVGg3D7fJdXkbSA4FXKd9AoGAWImg\nURMLbnttT+NYcu/5uE+6QM/Qtbxl6tFR65mX67QK4iJSc3Tm/0eYizZLJYCwrtZG\n3Dqc4ryAnBwHEBLVa7Set6gWqIilCmRmKjxFMv/VY4PFWTh14mFo2BVnV6ejXV3G\nwmEh/YVt4nLogo4x9XFSkJ3KvlJvy6oHHcly7zECgYBQ4SJsEiuAO2ZSLdNcMrpG\n0XKEERSLECB7UytAwM4G2gL/e+2dgJUvjNcHhQ60vdjr0oYNRG8nhwqDFp0+mvly\nQWm4t0lMR717GSCKD6NogLLuZZ7FP6m6oMrNK/9Qu+RquxLuBv0zmAWCUs3kA+2i\nQd8BsY8nVjh1KIwgfi5AZQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "playerdata@avian-pact-256404.iam.gserviceaccount.com",
+  "client_id": "110818044622253561292",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/playerdata%40avian-pact-256404.iam.gserviceaccount.com"
+}

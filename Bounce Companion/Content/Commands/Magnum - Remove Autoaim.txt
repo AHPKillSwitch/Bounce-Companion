@@ -1,0 +1,13 @@
+﻿KeyBindButton:10
+LeftButtonText:Apply
+RightButtonText:Disable
+EnableModTextOutPut:AutoAim Removed!
+DisableModTextOutPut:AutoAim Restored!
+Enable:/objects\weapons\pistol\magnum\magnum.weap.Autoaim Angle=0
+Enable:/objects\weapons\pistol\magnum\magnum.weap.Autoaim Range=0
+Enable:/objects\weapons\pistol\magnum\magnum.weap.Magnetism Angle=0
+Enable:/objects\weapons\pistol\magnum\magnum.weap.Magnetism Range=0
+Disable:/objects\weapons\pistol\magnum\magnum.weap.Autoaim Angle=3
+Disable:/objects\weapons\pistol\magnum\magnum.weap.Autoaim Range=12
+Disable:/objects\weapons\pistol\magnum\magnum.weap.Magnetism Angle=6
+Disable:/objects\weapons\pistol\magnum\magnum.weap.Magnetism Range=16

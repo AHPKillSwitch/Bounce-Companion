@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32630.192
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bounce Companion", "Bounce Companion\Bounce Companion.csproj", "{EED4C56B-E2F6-4213-899A-3B1279786893}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release - Memory|Any CPU = Release - Memory|Any CPU
+		Release - Memory|x64 = Release - Memory|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EED4C56B-E2F6-4213-899A-3B1279786893}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EED4C56B-E2F6-4213-899A-3B1279786893}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EED4C56B-E2F6-4213-899A-3B1279786893}.Debug|x64.ActiveCfg = Debug|x64
+		{EED4C56B-E2F6-4213-899A-3B1279786893}.Debug|x64.Build.0 = Debug|x64
+		{EED4C56B-E2F6-4213-899A-3B1279786893}.Release - Memory|Any CPU.ActiveCfg = Release - Memory|Any CPU
+		{EED4C56B-E2F6-4213-899A-3B1279786893}.Release - Memory|Any CPU.Build.0 = Release - Memory|Any CPU
+		{EED4C56B-E2F6-4213-899A-3B1279786893}.Release - Memory|x64.ActiveCfg = Release - Memory|x64
+		{EED4C56B-E2F6-4213-899A-3B1279786893}.Release - Memory|x64.Build.0 = Release - Memory|x64
+		{EED4C56B-E2F6-4213-899A-3B1279786893}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EED4C56B-E2F6-4213-899A-3B1279786893}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EED4C56B-E2F6-4213-899A-3B1279786893}.Release|x64.ActiveCfg = Release|x64
+		{EED4C56B-E2F6-4213-899A-3B1279786893}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0C31648C-DA79-4AEB-8696-BE0492CAD455}
+	EndGlobalSection
+EndGlobal

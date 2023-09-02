@@ -1,0 +1,9 @@
+﻿KeyBindButton:0x70
+LeftButtonText:Apply
+RightButtonText:Disable
+EnableModTextOutPut:Projectile Swapped!
+DisableModTextOutPut:Projectile Restored!
+Enable:/objects\weapons\support_low\brute_shot\projectiles\grenade\grenade.proj.Initial Velocity=2
+Enable:/objects\weapons\support_low\brute_shot\projectiles\grenade\grenade.proj.Final Velocity=8
+Enable:/objects\weapons\pistol\magnum\magnum.weap.[Barrels:0].Projectile=objects\weapons\support_low\brute_shot\projectiles\grenade\grenade.proj
+Disable:/objects\weapons\pistol\magnum\magnum.weap.[Barrels:0].Projectile=objects\weapons\pistol\magnum\projectiles\magnum_bullet.proj

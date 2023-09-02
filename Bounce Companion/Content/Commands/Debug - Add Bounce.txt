@@ -1,0 +1,7 @@
+﻿KeyBindButton:
+LeftButtonText:Add Bounce
+RightButtonText:Clear Bounces
+EnableModTextOutPut:
+DisableModTextOutPut:
+Enable://AddBounce
+Disable://ClearBounce

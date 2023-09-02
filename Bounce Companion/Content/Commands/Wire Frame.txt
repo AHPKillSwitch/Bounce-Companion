@@ -1,0 +1,7 @@
+﻿KeyBindButton:
+LeftButtonText:Enable
+RightButtonText:Disable
+EnableModTextOutPut:Wireframe Enabled.
+DisableModTextOutPut:Wireframe Disabled.
+Enable://WireFrame
+Disable://WireFrame

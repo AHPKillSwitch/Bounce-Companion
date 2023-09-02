@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin game="Halo2" baseSize="0x10">
+	<revisions>
+		<revision author="Lord Zedd" version="1">ayy lmao</revision>
+	</revisions>
+	<tagblock name="Decals Palette" offset="0x0" visible="true" elementSize="0x8">
+		<tagRef name="Decal" offset="0x0" visible="true" />
+	</tagblock>
+	<tagblock name="Decals" offset="0x8" visible="true" elementSize="0x10">
+		<int16 name="Palette Index" offset="0x0" visible="true" />
+		<int8 name="Yaw" offset="0x2" visible="true" />
+		<int8 name="Pitch" offset="0x3" visible="true" />
+		<point3 name="Position" offset="0x4" visible="true" />
+	</tagblock>
+</plugin>

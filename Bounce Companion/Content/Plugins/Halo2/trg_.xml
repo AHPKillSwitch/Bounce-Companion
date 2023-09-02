@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin game="Halo2" baseSize="0x10">
+	<revisions>
+		<revision author="Lord Zedd" version="1">ayy lmao</revision>
+	</revisions>
+	<tagblock name="Kill Trigger Volumes" offset="0x0" visible="true" elementSize="0x44">
+		<stringid name="Name" offset="0x0" visible="true" />
+		<int16 name="Object Name Index" offset="0x4" visible="true" />
+		<int16 name="Node Index" offset="0x6" visible="true" />
+		<stringid name="Node Name" offset="0x8" visible="true" />
+		<vector3 name="Forward" offset="0xC" visible="true" />
+		<vector3 name="Up" offset="0x18" visible="true" />
+		<point3 name="Position" offset="0x24" visible="true" />
+		<point3 name="Extents" offset="0x30" visible="true" />
+		<float32 name="Unknown" offset="0x3C" visible="true" />
+		<int16 name="Kill Trigger Volume Index" offset="0x40" visible="true" />
+		<int16 name="Unknown" offset="0x42" visible="false" />
+	</tagblock>
+	<tagblock name="Object Names" offset="0x8" visible="true" elementSize="0x24">
+		<ascii name="Name" offset="0x0" visible="true" size="0x20" />
+		<enum16 name="Type" offset="0x20" visible="true">
+			<option name="Null" value="0xFFFF" />
+			<option name="Biped" value="0x0" />
+			<option name="Vehicle" value="0x1" />
+			<option name="Weapon" value="0x2" />
+			<option name="Equipment" value="0x3" />
+			<option name="Garbage" value="0x4" />
+			<option name="Projectile" value="0x5" />
+			<option name="Scenery" value="0x6" />
+			<option name="Machine" value="0x7" />
+			<option name="Control" value="0x8" />
+			<option name="Light Fixture" value="0x9" />
+			<option name="Sound Scenery" value="0xA" />
+			<option name="Crate" value="0xB" />
+			<option name="Creature" value="0xC" />
+		</enum16>
+		<int16 name="Placement Index" offset="0x22" visible="true" />
+	</tagblock>
+</plugin>

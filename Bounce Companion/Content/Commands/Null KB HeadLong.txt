@@ -1,0 +1,7 @@
+﻿KeyBindButton:
+LeftButtonText:Disable K/barriers
+RightButtonText:Enable K/barriers
+EnableModTextOutPut:Kill Barriers Removed!
+DisableModTextOutPut:Kill Barriers Restored!
+Enable:/scenarios\multi\headlong\headlong.scnr.[Scenario Kill Triggers:0].clear=null
+Disable:/scenarios\multi\headlong\headlong.scnr.[Scenario Kill Triggers:0].Set=5

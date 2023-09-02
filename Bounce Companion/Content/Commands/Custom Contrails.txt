@@ -1,0 +1,6 @@
+KeyBindButton:10
+LeftButtonText:Apply
+RightButtonText:Disable
+EnableModTextOutPut:Contrails Applied - Note. Kill yourself to see contrails.
+DisableModTextOutPut:Contrails Disabled - Note. Kill yourself to see contrails.
+Enable://CustomContrails

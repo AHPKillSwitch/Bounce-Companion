@@ -1,0 +1,71 @@
+﻿<Window x:Class="Bounce_Companion.GameOverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Bounce_Companion"
+        mc:Ignorable="d"
+        Title="GameOverlayWindow" Height="450" Width="800" WindowStyle="None" AllowsTransparency="True" Background="Transparent" WindowState="Normal" Topmost="True" SizeChanged="Window_SizeChanged">
+
+    <Canvas x:Name="grid_Overlay" SizeChanged="GridOverlay_SizeChanged">
+        
+        <Viewbox Canvas.Left="0" Canvas.Top="0" Width="{Binding ActualWidth, ElementName=grid_Overlay}" Height="{Binding ActualHeight, ElementName=grid_Overlay}" Stretch="Uniform">
+            <Grid Height="452" Width="803">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label x:Name="label_Vert_Vel2" Height="32" Width="70" FontSize="10" Background="{x:Null}" Foreground="White" HorizontalAlignment="Center" Visibility="Visible" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
+                <Label x:Name="label_P_NamePlate" Height="32" Width="70" FontSize="10" Background="{x:Null}" Foreground="White" HorizontalAlignment="Center" Visibility="Visible" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
+                <Image x:Name="AimTextChat" Height="60" Width="22" PreviewMouseLeftButtonDown="PreviewDown" PreviewMouseLeftButtonUp="PreviewUp" MouseMove="MoveMouse" HorizontalAlignment="Center" VerticalAlignment="Top" Visibility="Hidden" Margin="0,254,0,0" OpacityMask="#FF585656" Source="/CrossHair.png"/>
+                <Slider x:Name="slider_HorX_Vel" Minimum="-15" Maximum="15" Width="150" Margin="160,0,0,74" VerticalAlignment="Bottom" Visibility="Hidden" HorizontalAlignment="Left" />
+
+                <Label x:Name="label_HorX_Vel" Height="32" Width="150" Margin="160,0,0,42" Background="#99262626" Foreground="White" FontSize="14" FontWeight="Bold" HorizontalContentAlignment="Center" Visibility="Hidden" VerticalAlignment="Bottom" HorizontalAlignment="Left" >
+                    <Label.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Label.RenderTransform>
+                </Label>
+                <Slider x:Name="slider_HorY_Vel" Minimum="-15" Maximum="15"  Width="150" Margin="10,0,0,74" VerticalAlignment="Bottom" Visibility="Hidden" HorizontalAlignment="Left" />
+                <Label x:Name="label_HorY_Vel" Height="32" Width="150" Margin="10,0,0,42" Background="#99262626" Foreground="White" FontSize="14" FontWeight="Bold" HorizontalContentAlignment="Center" Visibility="Hidden" VerticalAlignment="Bottom" HorizontalAlignment="Left" >
+                    <Label.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Label.RenderTransform>
+                </Label>
+                <Label x:Name="label_Vert_Vel"  Height="32" Width="78" Margin="10,0,0,0" FontSize="8" Background="#99262626" Foreground="White" HorizontalAlignment="Left" Visibility="Hidden" VerticalAlignment="Center" />
+                <Slider x:Name="slider_Vert_Vel" Minimum="-25" Maximum="25" Width="228" RenderTransformOrigin="0.5,0.5" Margin="-14,0,0,0" HorizontalAlignment="Left" Visibility="Hidden" VerticalAlignment="Center" >
+                    <Slider.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform/>
+                            <RotateTransform Angle="-89.94"/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Slider.RenderTransform>
+                </Slider>
+            </Grid>
+        </Viewbox>
+        <StackPanel x:Name="stackPanelPlayerInfo"  Width="120" HorizontalAlignment="Right" VerticalAlignment="Top" Background="#99262626" PreviewMouseLeftButtonDown="PreviewDown" PreviewMouseLeftButtonUp="PreviewUp" MouseMove="MoveMouse" Canvas.Left="669" Canvas.Top="10">
+            <Label x:Name="LabelPlayerInfo" Content="Player Info:" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Width="147" Foreground="White"/>
+            <Label x:Name="labelBounceCount" Content="Bounce Count: 0" Width="147" Foreground="White" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+            <Label x:Name="labelCrouchState" Content="Crouch State: WIP" Width="147" Foreground="White" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+            <Label x:Name="labelXLocation" Content="X: 0.0" Width="147" Foreground="White" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+            <Label x:Name="labelYLocation" Content="Y: 0.0" Width="147" Foreground="White" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+            <Label x:Name="labelZLocation" Content="Z: 0.0" Width="147" Foreground="White" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+            <Label x:Name="labelVolocity" Content="Velocity: 0" Width="147" Foreground="White" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+            <Label x:Name = "label_Tickrate" Content="Tickrate: 60" Foreground="White"/>
+        </StackPanel>
+        
+    </Canvas>
+</Window>

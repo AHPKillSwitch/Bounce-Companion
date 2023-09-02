@@ -1,0 +1,7 @@
+﻿LeftButtonText:Save
+RightButtonText:Load
+KeyBindButton:
+EnableModTextOutPut:Check Point Saved!
+DisableModTextOutPut:Check Point Loaded!
+Enable://SaveState
+Disable://SaveState

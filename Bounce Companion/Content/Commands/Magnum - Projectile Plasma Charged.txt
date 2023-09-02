@@ -1,0 +1,7 @@
+﻿KeyBindButton:0x70
+LeftButtonText:Apply
+RightButtonText:Disable
+EnableModTextOutPut:Projectile Swapped!
+DisableModTextOutPut:Projectile Restored!
+Enable:/objects\weapons\pistol\magnum\magnum.weap.[Barrels:0].Projectile=objects\weapons\pistol\plasma_pistol\projectiles\plasma_pistol_charged_bolt.proj
+Disable:/objects\weapons\pistol\magnum\magnum.weap.[Barrels:0].Projectile=objects\weapons\pistol\magnum\projectiles\magnum_bullet.proj

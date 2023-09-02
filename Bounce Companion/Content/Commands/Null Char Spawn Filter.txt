@@ -1,0 +1,7 @@
+﻿KeyBindButton:
+LeftButtonText:Null Function
+RightButtonText:Enable Function
+EnableModTextOutPut:Char Filter Function Nulled
+DisableModTextOutPut:Char Filter Function Restored
+Enable://NullCharFilter
+Disable://NullCharFilter

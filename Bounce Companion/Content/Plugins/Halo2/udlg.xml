@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<plugin game="Halo2" baseSize="0x18">
+	<!-- Automatically generated plugin -->
+	<revisions>
+		<revision author="Iron_Forge" version="1">Added basic layout of plugin...</revision>
+		<revision author="XZodia" version="2">Completed</revision>
+	</revisions>
+	<tagRef name="Global Dialogue Info" offset="0x0" visible="true" />
+	<flags32 name="Flags" offset="0x8" visible="true">
+		<bit name="Female" index="0" />
+	</flags32>
+	<tagblock name="Vocalizations" offset="0xC" visible="true" elementSize="0x10">
+		<flags16 name="Flags" offset="0x0" visible="true">
+			<bit name="New Vocalization" index="0" />
+		</flags16>
+		<int16 name="Unknown" offset="0x2" visible="false" />
+		<stringId name="Vocalization" offset="0x4" visible="true" />
+		<tagRef name="Sound" offset="0x8" visible="true" />
+	</tagblock>
+	<stringid name="Mission Dialogue Designator" offset="0x14" visible="true" tooltip="3-letter mission dialogue designator name" />
+</plugin>

@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<plugin game="Halo2" baseSize="0x70">
+	<!-- Automatically generated plugin -->
+	<revisions>
+		<revision author="Iron_Forge" version="1">Added basic layout of plugin...</revision>
+		<revision author="XZodia" version="2">Completed</revision>
+	</revisions>
+	<comment title="LIQUID" />
+	<int16 name="Unknown" offset="0x0" visible="false" />
+	<enum16 name="Type" offset="0x2" visible="true">
+		<option name="Standard" value="0x0" />
+		<option name="Weapon To Projectile" value="0x1" />
+		<option name="Projectile From Weapon" value="0x2" />
+	</enum16>
+	<stringId name="Attachment Marker Name" offset="0x4" visible="true" />
+	<undefined name="Unknown" offset="0x8" visible="false" />
+	<undefined name="Unknown" offset="0xC" visible="false" />
+	<undefined name="Unknown" offset="0x10" visible="false" />
+	<undefined name="Unknown" offset="0x14" visible="false" />
+	<undefined name="Unknown" offset="0x18" visible="false" />
+	<undefined name="Unknown" offset="0x1C" visible="false" />
+	<undefined name="Unknown" offset="0x20" visible="false" />
+	<undefined name="Unknown" offset="0x24" visible="false" />
+	<undefined name="Unknown" offset="0x28" visible="false" />
+	<undefined name="Unknown" offset="0x2C" visible="false" />
+	<undefined name="Unknown" offset="0x30" visible="false" />
+	<undefined name="Unknown" offset="0x34" visible="false" />
+	<undefined name="Unknown" offset="0x38" visible="false" />
+	<undefined name="Unknown" offset="0x3C" visible="false" />
+	<float32 name="Falloff Distance From Camera" offset="0x40" visible="true" />
+	<float32 name="Cutoff Distance From Camera" offset="0x44" visible="true" />
+	<undefined name="Unknown" offset="0x48" visible="false" />
+	<undefined name="Unknown" offset="0x4C" visible="false" />
+	<undefined name="Unknown" offset="0x50" visible="false" />
+	<undefined name="Unknown" offset="0x54" visible="false" />
+	<undefined name="Unknown" offset="0x58" visible="false" />
+	<undefined name="Unknown" offset="0x5C" visible="false" />
+	<undefined name="Unknown" offset="0x60" visible="false" />
+	<undefined name="Unknown" offset="0x64" visible="false" />
+	<tagblock name="Arcs" offset="0x68" visible="true" elementSize="0xEC">
+		<comment title="LIQUID ARC">Note that if the type is not STANDARD, then the 'collide_with_stuff' and material effects will not have any effect. In addition, the 'natural_length' will not have an effect except as a means to compute the collision fraction.</comment>
+		<flags16 name="Flags" offset="0x0" visible="true">
+			<bit name="Basis Marker-Relative" index="0" />
+			<bit name="Spread By External Input" index="1" />
+			<bit name="Collide With Stuff" index="2" />
+			<bit name="No Perspective Midpoints" index="3" />
+		</flags16>
+		<enum16 name="Sprite Count" offset="0x2" visible="true">
+			<option name="4 Sprites" value="0x0" />
+			<option name="8 Sprites" value="0x1" />
+			<option name="16 Sprites" value="0x2" />
+			<option name="32 Sprites" value="0x3" />
+			<option name="64 Sprites" value="0x4" />
+			<option name="128 Sprites" value="0x5" />
+			<option name="256 Sprites" value="0x6" />
+		</enum16>
+		<float32 name="Natural Length" offset="0x4" visible="true" />
+		<int16 name="Instances" offset="0x8" visible="true" />
+		<int16 name="Unknown" offset="0xA" visible="false" />
+		<degree name="Instance Spread Angle" offset="0xC" visible="true" />
+		<float32 name="Instance Rotation Period" offset="0x10" visible="true" />
+		<undefined name="Unknown" offset="0x14" visible="false" />
+		<undefined name="Unknown" offset="0x18" visible="false" />
+		<tagRef name="Material Effects" offset="0x1C" visible="true" />
+		<tagRef name="Bitmap" offset="0x24" visible="true" />
+		<undefined name="Unknown" offset="0x2C" visible="false" />
+		<undefined name="Unknown" offset="0x30" visible="false" />
+		<dataRef name="Horizontal Range Function" offset="0x34" visible="true" tooltip="In world units, how far the noise extends horizontally. By default the horizontal range is along the world XY plane." />
+		<dataRef name="Vertical Range Function" offset="0x3C" visible="true" tooltip="In world units, how far the noise extends vertically. By default the vertical range is along the world Z axis (up)." />
+		<float32 name="Vertical Negative Scale" offset="0x44" visible="true" />
+		<dataRef name="Roughness Function" offset="0x48" visible="true" tooltip="Roughness controls how the different 'octaves' of noise get scaled. Usually it is in the range [0,1] but it can be slightly higher or lower and still make sense (zero is actually a pretty decent value). The mathematical equation used is 2^(-k*(1-r)) where 'k' is the octave index starting at 0 and 'r' is the roughness value." />
+		<undefined name="Unknown" offset="0x50" visible="false" />
+		<undefined name="Unknown" offset="0x54" visible="false" />
+		<undefined name="Unknown" offset="0x58" visible="false" />
+		<undefined name="Unknown" offset="0x5C" visible="false" />
+		<undefined name="Unknown" offset="0x60" visible="false" />
+		<undefined name="Unknown" offset="0x64" visible="false" />
+		<undefined name="Unknown" offset="0x68" visible="false" />
+		<undefined name="Unknown" offset="0x6C" visible="false" />
+		<undefined name="Unknown" offset="0x70" visible="false" />
+		<undefined name="Unknown" offset="0x74" visible="false" />
+		<undefined name="Unknown" offset="0x78" visible="false" />
+		<undefined name="Unknown" offset="0x7C" visible="false" />
+		<undefined name="Unknown" offset="0x80" visible="false" />
+		<undefined name="Unknown" offset="0x84" visible="false" />
+		<undefined name="Unknown" offset="0x88" visible="false" />
+		<undefined name="Unknown" offset="0x8C" visible="false" />
+		<comment title="NOISE FREQUENCIES">4 sprites is 3 octaves
+8 sprites is 4 octaves
+16 sprites is 5 octaves
+32 sprites is 6 octaves
+64 sprites is 7 octaves
+128 sprites is 8 octaves
+256 sprites is 9 octaves, etc.</comment>
+		<float32 name="Octave 1 Frequency" offset="0x90" visible="true" />
+		<float32 name="Octave 2 Frequency" offset="0x94" visible="true" />
+		<float32 name="Octave 3 Frequency" offset="0x98" visible="true" />
+		<float32 name="Octave 4 Frequency" offset="0x9C" visible="true" />
+		<float32 name="Octave 5 Frequency" offset="0xA0" visible="true" />
+		<float32 name="Octave 6 Frequency" offset="0xA4" visible="true" />
+		<float32 name="Octave 7 Frequency" offset="0xA8" visible="true" />
+		<float32 name="Octave 8 Frequency" offset="0xAC" visible="true" />
+		<float32 name="Octave 9 Frequency" offset="0xB0" visible="true" />
+		<undefined name="Unknown" offset="0xB4" visible="false" />
+		<undefined name="Unknown" offset="0xB8" visible="false" />
+		<undefined name="Unknown" offset="0xBC" visible="false" />
+		<undefined name="Unknown" offset="0xC0" visible="false" />
+		<undefined name="Unknown" offset="0xC4" visible="false" />
+		<undefined name="Unknown" offset="0xC8" visible="false" />
+		<undefined name="Unknown" offset="0xCC" visible="false" />
+		<flags16 name="Octave Flags" offset="0xD0" visible="true">
+			<bit name="Octave 1" index="0" />
+			<bit name="Octave 2" index="1" />
+			<bit name="Octave 3" index="2" />
+			<bit name="Octave 4" index="3" />
+			<bit name="Octave 5" index="4" />
+			<bit name="Octave 6" index="5" />
+			<bit name="Octave 7" index="6" />
+			<bit name="Octave 8" index="7" />
+			<bit name="Octave 9" index="8" />
+		</flags16>
+		<int16 name="Unknown" offset="0xD2" visible="false" />
+		<tagblock name="Cores" offset="0xD4" visible="true" elementSize="0x38">
+			<undefined name="Unknown" offset="0x0" visible="false" />
+			<undefined name="Unknown" offset="0x4" visible="false" />
+			<undefined name="Unknown" offset="0x8" visible="false" />
+			<int16 name="Bitmap Index" offset="0xC" visible="true" />
+			<int16 name="Unknown" offset="0xE" visible="false" />
+			<dataRef name="Thickness" offset="0x10" visible="true" tooltip="In world units." />
+			<dataRef name="Color" offset="0x18" visible="true" />
+			<dataRef name="Brightness/Time" offset="0x20" visible="true" tooltip="Periodic function based on time." />
+			<dataRef name="Brightness/Facing" offset="0x28" visible="true" tooltip="Brightness when facing perpendicular versus parallel." />
+			<dataRef name="Along-Axis Scale" offset="0x30" visible="true" tooltip="Scale along-axis. Default should be 1." />
+		</tagblock>
+		<dataRef name="Range-Collision Scale" offset="0xDC" visible="true" tooltip="Scales range (amplitude) by collision fraction. The input to the function will be 1 if there is no collision, and 0 if the collision occurs at the origin." />
+		<dataRef name="Brightness-Collision Scale" offset="0xE4" visible="true" tooltip="Scales brightness by collision fraction." />
+	</tagblock>
+</plugin>

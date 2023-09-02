@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<plugin game="Halo2" baseSize="0xC">
+	<!-- Automatically generated plugin -->
+	<revisions>
+		<revision author="Iron_Forge" version="1">Added basic layout of plugin...</revision>
+		<revision author="Iron_Forge" version="2">Completed...</revision>
+	</revisions>
+	<tagblock name="Item Permutations" offset="0x0" visible="true" elementSize="0x10">
+		<float32 name="Weight" offset="0x0" visible="true" tooltip="relatively how likely this item will be chosen" />
+		<tagRef name="Item" offset="0x4" visible="true" tooltip="which item to" />
+		<stringId name="Variant Name" offset="0xC" visible="true" />
+	</tagblock>
+	<int16 name="Spawn Time" offset="0x8" visible="true" tooltip="in seconds, 0 = default" />
+	<int16 name="Unknown" offset="0xA" visible="false" />
+</plugin>
