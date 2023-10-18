@@ -41,6 +41,7 @@ namespace Bounce_Companion
     public partial class MainWindow : Window
     {
         //GameOverlayWindow overlayWindow = new GameOverlayWindow();
+        public string currentVersion = "0.3.23"; // Change this to your current application version
         public Mem m = new Mem();
         public Process p;
         public RuntimeMemory rm;
@@ -149,47 +150,53 @@ namespace Bounce_Companion
         {
 
             //attempt to attach
-            await CheckForNewVersion();
-            AttachToProcess();
-            GetCommansFromFile();
-            SetupConfig();
-
-            if (attached)
+            if (await CheckForNewVersion())
             {
-                LabStatus.Content = "Process: Attached";
-                GOW = new GameOverlayWindow(this);
-                GOW.EnablePlayerInfoTab(false);
-                GOW.Show();
-                if (settingsWindow == null)
-                {
-                    settingsWindow = new Settings(this);
-                    settingsWindow.Closed += SettingsWindow_Closed; // Handle window closed event
-                }
-                replaySystem = new ReplaySystem(m, this);
-                SetWindowPos();
-                // Attach an event handler to the GotFocus event of the "Camera Tool" tab
-                TabItem_CameraTool.GotFocus += TabItem_CameraTool_GotFocus;
 
-                // Attach an event handler to the LostFocus event of the "Camera Tool" tab
-                TabItem_CameraTool.LostFocus += TabItem_CameraTool_LostFocus;
-                //GetCommansFromFile();
             }
             else
             {
-                LabStatus.Content = "Process: Not Attached";
                 AttachToProcess();
-            }
-            UpdateTimer.Interval = TimeSpan.FromMilliseconds(150);
-            CheckerTimer.Interval = TimeSpan.FromMilliseconds(10);
+                GetCommansFromFile();
+                SetupConfig();
 
-            GetLocationData();
-            //GetPlayerData();
-            LoadSFXFromXml();
-            SetCameraFlySpeeds();
-            ParseCommandsFromFile();
-            SetCameraAddresses();
-            StartUpdateTask();
-            isAppLoading = false;
+                if (attached)
+                {
+                    LabStatus.Content = "Process: Attached";
+                    GOW = new GameOverlayWindow(this);
+                    GOW.EnablePlayerInfoTab(false);
+                    GOW.Show();
+                    if (settingsWindow == null)
+                    {
+                        settingsWindow = new Settings(this);
+                        settingsWindow.Closed += SettingsWindow_Closed; // Handle window closed event
+                    }
+                    replaySystem = new ReplaySystem(m, this);
+                    SetWindowPos();
+                    // Attach an event handler to the GotFocus event of the "Camera Tool" tab
+                    TabItem_CameraTool.GotFocus += TabItem_CameraTool_GotFocus;
+
+                    // Attach an event handler to the LostFocus event of the "Camera Tool" tab
+                    TabItem_CameraTool.LostFocus += TabItem_CameraTool_LostFocus;
+                    //GetCommansFromFile();
+                }
+                else
+                {
+                    LabStatus.Content = "Process: Not Attached";
+                    AttachToProcess();
+                }
+                UpdateTimer.Interval = TimeSpan.FromMilliseconds(150);
+                CheckerTimer.Interval = TimeSpan.FromMilliseconds(10);
+
+                GetLocationData();
+                //GetPlayerData();
+                LoadSFXFromXml();
+                SetCameraFlySpeeds();
+                ParseCommandsFromFile();
+                SetCameraAddresses();
+                StartUpdateTask();
+                isAppLoading = false;
+            }
             
         }
 
@@ -198,17 +205,22 @@ namespace Bounce_Companion
             PrintToConsole("Checking for newer Versions.");
             string owner = "AHPKillSwitch";
             string repo = "Bounce-Companion";
-            string currentVersion = "0.1.23"; // Change this to your current application version
 
             bool isNewVersionAvailable = await CompanionUpdater.UpdateChecker.IsNewVersionAvailable(owner, repo, currentVersion);
             if (isNewVersionAvailable)
             {
                 MessageBoxResult result = MessageBox.Show("A new version is available. Do you want to download it now?", "Update Available", MessageBoxButton.YesNo);
-
+                PrintToConsole("New Version Found!");
                 if (result == MessageBoxResult.Yes)
                 {
-                    // Code to open the download page or initiate the download process
-                    // You can open a browser window or start a download manager, for example.
+                    CompanionUpdater.UpdateChecker.DownloadLatestZipRelease(owner, repo);
+                    PrintToConsole("New Version .Zip can be found in your current Bounce Companion root folder, Its called Bounce Companion v new version number");
+                }
+                else
+                {
+                    PrintToConsole("Update Denied!");
+                    return false;
+
                 }
             }
             else
