@@ -21,7 +21,7 @@ namespace Bounce_Companion
                 {
                     // Get the latest release
                     var latestRelease = releases.First();
-                    var latestVersion = latestRelease.TagName;
+                    var latestVersion = latestRelease.TagName.Split('v')[1];
 
                     // Compare versions
                     if (new Version(latestVersion) > new Version(currentVersion))

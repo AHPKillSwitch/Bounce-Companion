@@ -145,11 +145,11 @@ namespace Bounce_Companion
 
 
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
 
             //attempt to attach
-            CheckForNewVersion();
+            await CheckForNewVersion();
             AttachToProcess();
             GetCommansFromFile();
             SetupConfig();
@@ -193,7 +193,7 @@ namespace Bounce_Companion
             
         }
 
-        private async void CheckForNewVersion()
+        private async Task<bool> CheckForNewVersion()
         {
             PrintToConsole("Checking for newer Versions.");
             string owner = "AHPKillSwitch";
@@ -213,8 +213,9 @@ namespace Bounce_Companion
             }
             else
             {
-                PrintToConsole("Current Version is latest.");
+                PrintToConsole("Version is up-to date!");
             }
+            return isNewVersionAvailable;
         }
 
         private async void StartUpdateTask()
