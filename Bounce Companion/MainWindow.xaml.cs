@@ -14,7 +14,6 @@ using HtmlAgilityPack;
 using Memory;
 using System.Globalization;
 using System.IO;
-using CSCore.CoreAudioAPI;
 using System.Text.RegularExpressions;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Sheets.v4;
@@ -23,12 +22,10 @@ using Newtonsoft.Json;
 using System.Windows.Interop;
 using WebSocketSharp;
 using System.Windows.Media.Imaging;
-using System.Numerics;
 using SharpDX.XInput;
 using System.Windows.Controls;
 using Reloaded.Injector;
 using MathNet.Numerics.Interpolation;
-using MathNet.Numerics.LinearAlgebra;
 using Microsoft.Win32;
 using System.Xml;
 
@@ -87,6 +84,7 @@ namespace Bounce_Companion
         public DispatcherTimer UpdateTimer = new DispatcherTimer();
         public DispatcherTimer CheckerTimer = new DispatcherTimer();
         public DispatcherTimer PlayerMonitorTimer = new DispatcherTimer();
+        public GameVolumeGetter volumeGetter = new GameVolumeGetter();
         private List<ImageData> imageDataList; // Store the image data
         private Controller xboxController;
         Injector injector;
@@ -103,6 +101,7 @@ namespace Bounce_Companion
             imageDataList = new List<ImageData>();
 
             InitializeXboxController();
+            //GetVolume();
             //WebSocketServer();
         }
         public static class ToolSetting
@@ -150,6 +149,7 @@ namespace Bounce_Companion
         {
 
             //attempt to attach
+            CheckForNewVersion();
             AttachToProcess();
             GetCommansFromFile();
             SetupConfig();
@@ -167,6 +167,11 @@ namespace Bounce_Companion
                 }
                 replaySystem = new ReplaySystem(m, this);
                 SetWindowPos();
+                // Attach an event handler to the GotFocus event of the "Camera Tool" tab
+                TabItem_CameraTool.GotFocus += TabItem_CameraTool_GotFocus;
+
+                // Attach an event handler to the LostFocus event of the "Camera Tool" tab
+                TabItem_CameraTool.LostFocus += TabItem_CameraTool_LostFocus;
                 //GetCommansFromFile();
             }
             else
@@ -185,7 +190,33 @@ namespace Bounce_Companion
             SetCameraAddresses();
             StartUpdateTask();
             isAppLoading = false;
+            
         }
+
+        private async void CheckForNewVersion()
+        {
+            PrintToConsole("Checking for newer Versions.");
+            string owner = "AHPKillSwitch";
+            string repo = "Bounce-Companion";
+            string currentVersion = "0.1.23"; // Change this to your current application version
+
+            bool isNewVersionAvailable = await CompanionUpdater.UpdateChecker.IsNewVersionAvailable(owner, repo, currentVersion);
+            if (isNewVersionAvailable)
+            {
+                MessageBoxResult result = MessageBox.Show("A new version is available. Do you want to download it now?", "Update Available", MessageBoxButton.YesNo);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    // Code to open the download page or initiate the download process
+                    // You can open a browser window or start a download manager, for example.
+                }
+            }
+            else
+            {
+                PrintToConsole("Current Version is latest.");
+            }
+        }
+
         private async void StartUpdateTask()
         {
             ;
@@ -437,7 +468,7 @@ namespace Bounce_Companion
 
         private async Task HandleBounces(float p_X, float p_Y, float p_Z, float p_X_Vel, float p_Y_Vel, float p_Z_Vel, int p_Airbourne)
         {
-            if (bounceCount > 0 && p_Airbourne == 0)
+            if (bounceCount > 0 && p_Airbourne == 0 && !debug)
             {
                 bounceCount = 0;
                 HoochCheck = false;
@@ -531,7 +562,11 @@ namespace Bounce_Companion
             string locationAndType = LocationCheck(p_X, p_Y);
             string location = locationAndType.Split(':')[0];
             string bounceTypeRequirement = locationAndType.Split(':')[1];
-            if (bounceTypeRequirement != bouncetype) location = "null";
+            if (bounceTypeRequirement != "null")
+            {
+                float requiredvelocity = float.Parse(bounceTypeRequirement);
+                if (p_Z_Vel! >= requiredvelocity) location = "null"; // Check if player velocity meets the required number, if not they didnt hit the bounce.
+            }
             postBounceFilter = true;
             if (checkbox_DisableOverlay.IsChecked != true)
             {
@@ -565,7 +600,7 @@ namespace Bounce_Companion
                 $"Triggered at location X: {p_X} Y: {p_Y} Z: {p_Z} \n" +
                 $"Trigged Velocity - X: {p_X_Vel} Y: {p_Y_Vel} Z: {p_Z_Vel}\n" +
                 $"Pre Bounce Velocity - X: {prev_P_X_Vel} Y: {prev_P_Y_Vel} Z: {prev_P_Z_Vel} \n" +
-                $"Bounce Type: {bouncetype} \n \n";
+                $"Bounce Type: {bouncetype} \n";
 
             PrintToConsole(details);
         }
@@ -739,7 +774,7 @@ namespace Bounce_Companion
             }
         }
 
-        List<int> bouncenumber = new List<int> { 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+        List<int> bouncenumber = new List<int> { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 
         public async Task Announcements(int count, string location, string type)
         {
@@ -750,8 +785,9 @@ namespace Bounce_Companion
                 if (location != "null")
                 {
                     PrintToConsole(location + " Bounce Hit");
-                    bounceSFX = "null";
-                    await PlayLocationalAudioShowEmblem(location, location);
+                    bounceSFX = GetBounceSFX(11);
+                    //await PlayLocationalAudioShowEmblem(location, location);
+                    await PlayMultiAudioShowEmblem("null", location, bounceSFX);
                     //await Task.Delay(1000);
                 }
                 foreach (int number in bouncenumber)
@@ -761,7 +797,7 @@ namespace Bounce_Companion
                         string bounceText = string.Empty;
                         if (type.Contains("slant")) location = type;
                         else
-                        { 
+                        {
                             bounceText = GetBounceText(number);
                             if (bounceSFX != "null") bounceSFX = GetBounceSFX(number);
                         }
@@ -771,6 +807,11 @@ namespace Bounce_Companion
                         break;
                     }
                 }
+                if (count > 10)
+                {
+                    bounceSFX = GetBounceSFX(2);
+                    await PlayMultiAudioShowEmblem(count.ToString(), count.ToString(), bounceSFX);
+                }
 
             }
 
@@ -778,33 +819,31 @@ namespace Bounce_Companion
         }
         private async Task PlayMultiAudioShowEmblem(string bounceNumber, string bounceText, string bounceSFX)
         {
+            _ = GOW.ShowEmblem(bounceNumber, bounceText);
             if (!string.IsNullOrEmpty(bounceSFX))
             {
-                PlaySFX(audio_Player_Effect_1, "Content/Audio/SFX/", bounceSFX);
-                //await Task.Delay(150);
+                PlaySFX(audio_Player_Effect_1, "Content/Audio/SFX/", bounceSFX, volumeGetter.GetGameVolumeLevel(this));
+                await Task.Delay((int)settingsWindow.Slider_DelayAudio.Value);
             }
-            PlaySFX(audio_Player_Main, "Content/Audio/MultiBounces/", bounceNumber);
-            await GOW.ShowEmblem(bounceNumber, bounceText);
-
+            PlaySFX(audio_Player_Main, "Content/Audio/MultiBounces/", bounceNumber, volumeGetter.GetGameVolumeLevel(this));
         }
 
-        private void PlaySFX(MediaPlayer audio_Player,string filePath, string bounceNumber)
+        private void PlaySFX(MediaPlayer audio_Player,string filePath, string bounceNumber, float audioLevel)
         {
             audio_Player.Open(new Uri(filePath + bounceNumber + ".wav", UriKind.Relative));
-            audio_Player.Volume = 0.4;
+
+            audio_Player.Volume = audioLevel;
             audio_Player.Play();
         }
 
         private async Task PlayLocationalAudioShowEmblem(string bounceNumber, string bounceText)
         {
-
             audio_Player_Main = new MediaPlayer();
             audio_Player_Main.Open(new Uri("Content/Audio/Locational/" + bounceText.ToLower() + ".wav", UriKind.Relative));
             audio_Player_Main.Volume = 0.4;
-            PlaySniperAudio();
+            //PlaySniperAudio();
             audio_Player_Main.Play();
-            await GOW.ShowEmblem(bounceText, bounceText);
-
+            //await GOW.ShowEmblem(bounceText, bounceText);
         }
         private void PlaySniperAudio()
         {
@@ -1193,49 +1232,27 @@ namespace Bounce_Companion
 
         }
 
-        private void GetVolume()
-        {
-            int i = 0;
-            using (var sessionManager = GetDefaultAudioSessionManager2(DataFlow.Render))
-            {
-                using (var sessionEnumerator = sessionManager.GetSessionEnumerator())
-                {
-                    foreach (var session in sessionEnumerator)
-                    {
-                        string name = session.DisplayName;
-                        using (var simpleVolume = session.QueryInterface<SimpleAudioVolume>())
-                        {
-                            rm.outPutStrings.Add("- - - - - - index: " + i.ToString() + ". - - - - - -\nBase Pointer: " + simpleVolume.BasePtr.ToString() + "\n" +
-                                "Volume: " + simpleVolume.MasterVolume.ToString());
-                            //Assert.IsNotNull(simpleVolume);
-                            simpleVolume.ToString();
-                            float volume = simpleVolume.MasterVolume;
-                            simpleVolume.MasterVolume = 1.0f;
-                            simpleVolume.MasterVolume = 0.0f;
-                            simpleVolume.MasterVolume = volume;
+        //private void GetVolume()
+        //{
+        //    // Identify the game's process (replace "GameProcessName" with the actual process name).
+        //    var gameProcess = Process.GetProcessesByName("halo2").FirstOrDefault();
 
-                            bool muted = simpleVolume.IsMuted;
-                            simpleVolume.IsMuted = !muted;
-                            simpleVolume.IsMuted = muted;
-                        }
-                        i++;
-                    }
-                }
-            }
+        //    if (gameProcess != null)
+        //    {
+        //        // Access the audio device.
+        //        var enumerator = new MMDeviceEnumerator();
+        //        var defaultDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
 
-        }
-        private AudioSessionManager2 GetDefaultAudioSessionManager2(DataFlow dataFlow)
-        {
-            using (var enumerator = new MMDeviceEnumerator())
-            {
-                using (var device = enumerator.GetDefaultAudioEndpoint(dataFlow, Role.Multimedia))
-                {
-                    Debug.WriteLine("DefaultDevice: " + device.FriendlyName);
-                    var sessionManager = AudioSessionManager2.FromMMDevice(device);
-                    return sessionManager;
-                }
-            }
-        }
+        //        // Get the game's volume level.
+        //        var volume = defaultDevice.AudioEndpointVolume.MasterVolumeLevelScalar;
+
+        //        // Set your application's volume to match the game's volume.
+        //        var yourAppVolume = 0.5f; // Set this to your desired volume level.
+        //        defaultDevice.AudioEndpointVolume.MasterVolumeLevelScalar = yourAppVolume;
+        //    }
+
+        //}
+
         public static string ConvertByteToHex(byte[] byteData)
         {
             string hexValues = BitConverter.ToString(byteData).Replace("-", "");
@@ -1428,7 +1445,7 @@ namespace Bounce_Companion
             }
 
         }
-
+        public bool debug = false;
         private void ApplyGameMod(string command, bool on)
         {
             string prefix = string.Empty;
@@ -1441,6 +1458,7 @@ namespace Bounce_Companion
             {
                 case "//addbounce":
                     {
+                        debug = true;
                         bounceCount++;
                         PrintToConsole("+1 Added to bounce count.");
                         _ = Announcements(bounceCount, "null", "standard");
@@ -1448,6 +1466,7 @@ namespace Bounce_Companion
                     }
                 case "//clearbounce":
                     {
+                        debug = false;
                         bounceCount = 0;
                         PrintToConsole("Bounce count reset.");
                         break;
@@ -2631,113 +2650,128 @@ namespace Bounce_Companion
 
             //MoveCamera(xAxisInput, yAxisInput);
         }
+        private void TabItem_CameraTool_GotFocus(object sender, RoutedEventArgs e)
+        {
+            // The "Camera Tool" tab has been selected
+            isCameraToolOpen = true;
+        }
+
+        private void TabItem_CameraTool_LostFocus(object sender, RoutedEventArgs e)
+        {
+            // The "Camera Tool" tab has been unselected
+            isCameraToolOpen = false;
+        }
         private const float DeadbandThreshold = 0.5f;
+        private bool isCameraToolOpen = false;
         private async Task HandleXboxControllerInputAsync()
         {
             await Task.Run(async () =>
             {
                 while (true)
                 {
-                    if (xboxController.IsConnected)
+                    if (isCameraToolOpen)
                     {
-                        State controllerState = xboxController.GetState();
-
-                        if (controllerState.PacketNumber != 0)
+                        if (xboxController.IsConnected)
                         {
-                            float xAxisInput = ApplyDeadzone(controllerState.Gamepad.LeftThumbX / (float)short.MaxValue, 0.2f);
-                            float yAxisInput = -ApplyDeadzone(controllerState.Gamepad.LeftThumbY / (float)short.MaxValue, 0.2f); // Invert Y-axis for camera movement
-                            float yawAxisInput = ApplyDeadzone(controllerState.Gamepad.RightThumbX / (float)short.MaxValue, 0.2f);
-                            float pitchAxisInput = -ApplyDeadzone(controllerState.Gamepad.RightThumbY / (float)short.MaxValue, 0.2f);
-                            float leftTrigger = ApplyDeadzone(controllerState.Gamepad.LeftTrigger / (float)byte.MaxValue, 0.1f);
-                            float rightTrigger = ApplyDeadzone(controllerState.Gamepad.RightTrigger / (float)byte.MaxValue, 0.1f);
+                            State controllerState = xboxController.GetState();
 
-                            bool leftShoulderPressed = controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder);
-                            bool rightShoulderPressed = controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.RightShoulder);
-                            if (xAxisInput != 0 || yAxisInput != 0 || yawAxisInput != 0 || pitchAxisInput != 0 || leftTrigger != 0 || rightTrigger != 0 || leftShoulderPressed || rightShoulderPressed)
+                            if (controllerState.PacketNumber != 0)
                             {
+                                float xAxisInput = ApplyDeadzone(controllerState.Gamepad.LeftThumbX / (float)short.MaxValue, 0.2f);
+                                float yAxisInput = -ApplyDeadzone(controllerState.Gamepad.LeftThumbY / (float)short.MaxValue, 0.2f); // Invert Y-axis for camera movement
+                                float yawAxisInput = ApplyDeadzone(controllerState.Gamepad.RightThumbX / (float)short.MaxValue, 0.2f);
+                                float pitchAxisInput = -ApplyDeadzone(controllerState.Gamepad.RightThumbY / (float)short.MaxValue, 0.2f);
+                                float leftTrigger = ApplyDeadzone(controllerState.Gamepad.LeftTrigger / (float)byte.MaxValue, 0.1f);
+                                float rightTrigger = ApplyDeadzone(controllerState.Gamepad.RightTrigger / (float)byte.MaxValue, 0.1f);
 
-                                if (!rollCamera) await MoveCameraPositionAsync(xAxisInput, yAxisInput, yawAxisInput, pitchAxisInput, leftTrigger, rightTrigger, leftShoulderPressed, rightShoulderPressed);
-                            }
-                            // Check D-pad and button presses
-                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadUp))
-                            {
-                                Application.Current.Dispatcher.Invoke(() =>
+                                bool leftShoulderPressed = controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder);
+                                bool rightShoulderPressed = controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.RightShoulder);
+                                if (xAxisInput != 0 || yAxisInput != 0 || yawAxisInput != 0 || pitchAxisInput != 0 || leftTrigger != 0 || rightTrigger != 0 || leftShoulderPressed || rightShoulderPressed)
                                 {
-                                    CallDllFunction();
-                                });
-                            }
 
-                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadDown))
-                            {
-                                // D-pad Down button is pressed
-                                // Perform your action here
-                            }
-
-                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadLeft))
-                            {
-                                // D-pad Left button is pressed
-                                // Perform your action here
-                            }
-
-                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadRight))
-                            {
-                                // D-pad Right button is pressed
-                                // Perform your action here
-                            }
-                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Start))
-                            {
-                                Application.Current.Dispatcher.Invoke(() =>
+                                    if (!rollCamera) await MoveCameraPositionAsync(xAxisInput, yAxisInput, yawAxisInput, pitchAxisInput, leftTrigger, rightTrigger, leftShoulderPressed, rightShoulderPressed);
+                                }
+                                // Check D-pad and button presses
+                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadUp))
                                 {
-                                    _ = StartCameraRoll();
-                                });
-                            }
+                                    Application.Current.Dispatcher.Invoke(() =>
+                                    {
+                                        CallDllFunction();
+                                    });
+                                }
 
-                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Back))
-                            {
-                                Application.Current.Dispatcher.Invoke(() =>
+                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadDown))
                                 {
-                                    rollCamera = false;
-                                });
-                            }
+                                    // D-pad Down button is pressed
+                                    // Perform your action here
+                                }
 
-                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.A))
-                            {
-                                // A button is pressed
-                                // Perform your action here
-                            }
-
-                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.X))
-                            {
-                                Application.Current.Dispatcher.Invoke(() =>
+                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadLeft))
                                 {
-                                    CaptureScene();
-                                });
-                            }
+                                    // D-pad Left button is pressed
+                                    // Perform your action here
+                                }
 
-                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.B))
-                            {
-
-
-                            }
-
-                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Y))
-                            {
-                                Application.Current.Dispatcher.Invoke(() =>
+                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadRight))
                                 {
-                                    replaySystem.StartRecording();
-                                });
+                                    // D-pad Right button is pressed
+                                    // Perform your action here
+                                }
+                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Start))
+                                {
+                                    Application.Current.Dispatcher.Invoke(() =>
+                                    {
+                                        _ = StartCameraRoll();
+                                    });
+                                }
+
+                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Back))
+                                {
+                                    Application.Current.Dispatcher.Invoke(() =>
+                                    {
+                                        rollCamera = false;
+                                    });
+                                }
+
+                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.A))
+                                {
+                                    // A button is pressed
+                                    // Perform your action here
+                                }
+
+                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.X))
+                                {
+                                    Application.Current.Dispatcher.Invoke(() =>
+                                    {
+                                        CaptureScene();
+                                    });
+                                }
+
+                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.B))
+                                {
+
+
+                                }
+
+                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Y))
+                                {
+                                    Application.Current.Dispatcher.Invoke(() =>
+                                    {
+                                        replaySystem.StartRecording();
+                                    });
+                                }
+
+                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder))
+                                {
+                                }
+                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.RightShoulder))
+                                {
+                                    // D-pad Down button is pressed
+                                    // Perform your action here
+                                }
                             }
-                        
-                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder))
-                            {
-                            }
-                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.RightShoulder))
-                            {
-                                // D-pad Down button is pressed
-                                // Perform your action here
-                            }
+
                         }
-
                     }
                     Thread.Sleep(32); // Delay between controller state checks
                 }

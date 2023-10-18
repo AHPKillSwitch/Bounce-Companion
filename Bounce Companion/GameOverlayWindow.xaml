@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Bounce_Companion"
         mc:Ignorable="d"
-        Title="GameOverlayWindow" Height="450" Width="800" WindowStyle="None" AllowsTransparency="True" Background="Transparent" WindowState="Normal" Topmost="True" SizeChanged="Window_SizeChanged">
+        Title="GameOverlayWindow" WindowStyle="None" AllowsTransparency="True" Height="450" Width="800" Background="{x:Null}" WindowState="Normal" Topmost="True" SizeChanged="Window_SizeChanged">
 
-    <Canvas x:Name="grid_Overlay" SizeChanged="GridOverlay_SizeChanged">
+    <Canvas x:Name="oldGridOverlay" SizeChanged="GridOverlay_SizeChanged">
         
         <Viewbox Canvas.Left="0" Canvas.Top="0" Width="{Binding ActualWidth, ElementName=grid_Overlay}" Height="{Binding ActualHeight, ElementName=grid_Overlay}" Stretch="Uniform">
-            <Grid Height="452" Width="803">
+            <Grid x:Name="grid_Overlay" Height="452" Width="803">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>

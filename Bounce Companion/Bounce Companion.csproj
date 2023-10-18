@@ -61,7 +61,7 @@
     <None Remove="Content\Medals\MultiBounce\BC.png" />
     <None Remove="Content\Medals\MultiBounce\BC1.png" />
     <None Remove="Content\Medals\MultiBounce\crane.png" />
-    <None Remove="Content\Medals\MultiBounce\palmtree.png" />
+    <None Remove="Content\Medals\MultiBounce\palm.png" />
     <None Remove="Content\Medals\MultiBounce\penguin.png" />
     <None Remove="CrossHair.png" />
     <None Remove="down arrow.jpg" />
@@ -84,12 +84,13 @@
 
   <ItemGroup>
     <PackageReference Include="CoreDX.vJoy.Wrapper" Version="1.2.3" />
-    <PackageReference Include="CSCore" Version="1.2.1.2" />
-    <PackageReference Include="Google.Apis.Sheets.v4" Version="1.60.0.2979" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
+    <PackageReference Include="Google.Apis.Sheets.v4" Version="1.62.0.3148" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.53" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
     <PackageReference Include="Memory.dll.x64" Version="1.2.24" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Octokit" Version="8.1.1" />
     <PackageReference Include="Reloaded.Injector" Version="1.2.5" />
     <PackageReference Include="SharpDX.XInput" Version="4.2.0" />
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
@@ -202,7 +203,7 @@
     <Resource Include="Content\Medals\MultiBounce\crane.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Content\Medals\MultiBounce\palmtree.png">
+    <Resource Include="Content\Medals\MultiBounce\palm.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Content\Medals\MultiBounce\penguin.png">
@@ -233,6 +234,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Content\Audio\Locational\palmtree.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\Audio\Locational\palm.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Content\Audio\Locational\penguin.wav">
@@ -275,7 +279,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Content\Commands\Debug - Add Bounce.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Content\Commands\Test Contrails.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -634,6 +638,14 @@
 
   <ItemGroup>
     <NativeLibs Remove="ReplaySystem.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <NativeLibs Remove="GameVolumeGetter.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <NativeLibs Remove="CompanionUpdater.cs" />
   </ItemGroup>
 
 </Project>

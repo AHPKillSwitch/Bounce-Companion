@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+//using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -33,6 +34,7 @@ namespace Bounce_Companion
 
         public static double canvasWidth = 0;
         public static double canvasHeight = 0;
+        public bool activeEmblem = false;
 
         public GameOverlayWindow(MainWindow Main)
         {
@@ -73,25 +75,54 @@ namespace Bounce_Companion
 
         public async Task ShowEmblem(string bounceNumber, string bounceName)
         {
-            double scaleX = SystemParameters.PrimaryScreenWidth / canvasWidth; // Adjust originalImageWidth with your actual image width
-            double scaleY = SystemParameters.PrimaryScreenHeight / canvasHeight; // Adjust originalImageHeight with your actual image height
-            double scale = Math.Min(scaleX, scaleY);
+            if (activeEmblem) 
+            { MoveLastEmblemDown(); }
+            double initialScaleX = grid_Overlay.Width / canvasWidth; // Use the initial window width
+            double initialScaleY = grid_Overlay.Height / canvasHeight; // Use the initial window height
+            double initialScale = Math.Min(initialScaleX, initialScaleY);
+
+            // Calculate the current scaling factor based on the current window size
+            double currentScaleX = this.Width / grid_Overlay.Width; // Use the initial window width (800 in your case)
+            double currentScaleY = this.Height / grid_Overlay.Height; // Use the initial window height (450 in your case)
+            double currentScale = Math.Min(currentScaleX, currentScaleY);
+
+            double scale = currentScale / initialScale; // Calculate the scaling factor
+
             if (bounceNumber == bounceName) bounceNumber = bounceNumber.ToLower();
             int g_children = grid_Overlay.Children.Count;
 
-            if (GetImageByName("emblemImage" + bounceNumber) == null)
+            Image cImg = new Image()
             {
-                AddImageToList(bounceNumber, bounceName);
-            }
+                Name = "emblemImage" + bounceNumber,
+                Width = scale * 80  ,
+                Height = scale * 80,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
+                //Margin = new Thickness(30 * scale, 30 * scale, 0, 0), // Position at the top-left corner
+                Source = new BitmapImage(new Uri("Content/Medals/MultiBounce/" + bounceNumber + ".png", UriKind.Relative))
+            };
 
-            Image cImg = GetImageByName("emblemImage" + bounceNumber);
-            Label cLabel = GetLabelByName("emblemText" + bounceNumber);
-
-            if (g_children >= 9)
+            Label cLabel = new Label()
             {
-                Canvas.SetTop(GetImageByName("emblemImage" + bounceNumber), 100);
-                Canvas.SetTop(GetLabelByName("emblemText" + bounceNumber), 100);
-            }
+                Name = "emblemText" + bounceNumber,
+                FontSize = 30 * scale,
+                Foreground = new SolidColorBrush(Color.FromRgb(138, 204, 242)),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
+                //Margin = new Thickness(85 * scale, 30 * scale, 0, 0), // Adjust margin for label
+                Content = bounceName,
+            };
+
+            StackPanel stackPanel = new StackPanel()
+            {
+                Name = "stackPanel" + bounceNumber,
+                Orientation = Orientation.Horizontal,
+                Width = 1000 * scale,
+                Height = 80 * scale,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+                Margin = new Thickness(20 * scale, 110 * scale, 0, 0), // Position at the top-left corner
+            };
 
             DoubleAnimation fadeIn = new DoubleAnimation
             {
@@ -99,12 +130,13 @@ namespace Bounce_Companion
                 To = 1,
                 Duration = new Duration(TimeSpan.FromMilliseconds(500)),
             };
+            
+            stackPanel.Children.Add(cImg);
+            stackPanel.Children.Add(cLabel);
+            grid_Overlay.Children.Add(stackPanel);
+            activeEmblem = true;
 
-            grid_Overlay.Children.Add(cImg);
-            grid_Overlay.Children.Add(cLabel);
-
-            cImg.BeginAnimation(OpacityProperty, fadeIn);
-            cLabel.BeginAnimation(OpacityProperty, fadeIn);
+            stackPanel.BeginAnimation(OpacityProperty, fadeIn);
 
             await Task.Delay(1500);
 
@@ -114,74 +146,35 @@ namespace Bounce_Companion
                 To = 0,
                 Duration = new Duration(TimeSpan.FromSeconds(1.5)),
             };
-            cImg.Width = 80 * scale;
-            cImg.Height = 80 * scale;
-            cImg.BeginAnimation(OpacityProperty, fadeOut);
-            cLabel.BeginAnimation(OpacityProperty, fadeOut);
+
+            stackPanel.BeginAnimation(OpacityProperty, fadeOut);
 
             await Task.Delay(1500);
 
-            grid_Overlay.Children.Remove(cImg);
-            grid_Overlay.Children.Remove(cLabel);
+            grid_Overlay.Children.Remove(stackPanel);
+            activeEmblem = false;
         }
 
-        private static void AddImageToList(string bounceNumber, string bounceName)
+        private void MoveLastEmblemDown()
         {
-            double scaleX = SystemParameters.PrimaryScreenWidth / canvasWidth; // Adjust originalImageWidth with your actual image width
-            double scaleY = SystemParameters.PrimaryScreenHeight / canvasHeight; // Adjust originalImageHeight with your actual image height
-            double scale = Math.Min(scaleX, scaleY);
-            Image emblemImage = new Image()
-            {
-                Name = "emblemImage" + bounceNumber,
-                Width = 80 * scale,
-                Height = 80 * scale,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Top,
-                Margin = new Thickness(30 * scale, 170 * scale, 0, 0),
-                Source = new BitmapImage(new Uri("Content/Medals/MultiBounce/" + bounceNumber + ".png", UriKind.Relative))
-            };
-            emblemImageArray.Add(emblemImage);
+            int lastIndex = grid_Overlay.Children.Count - 1;
+            UIElement lastChild = grid_Overlay.Children[lastIndex];
 
-            Label emblemText = new Label()
+            if (lastChild is StackPanel stackPanel)
             {
-                Name = "emblemText" + bounceNumber,
-                FontSize = 30,
-                Foreground = new SolidColorBrush(Color.FromRgb(138, 204, 242)),
-                Width = 500 * scale,
-                Height = 60 * scale,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Top,
-                Margin = new Thickness(100 * scale, 180 * scale, 0, 0),
-                Content = bounceName,
-            };
-            emblemTextArray.Add(emblemText);
-        }
-        private StackPanel GetStackPanelByName(string name)
-        {
-            foreach (UIElement child in grid_Overlay.Children)
-            {
-                if (child is StackPanel stackPanel && stackPanel.Name.ToLower() == name.ToLower())
-                    return stackPanel;
-            }
-            return null;
-        }
-        private Image GetImageByName(string name)
-        {
-            foreach (Image c_image in emblemImageArray)
-            {
-                if (c_image.Name.ToLower() == name.ToLower()) return c_image;
-            }
-            return null;
-        }
-        private Label GetLabelByName(string name)
-        {
+                double moveDownAmount = stackPanel.ActualHeight; // Get the height of the StackPanel
 
-            foreach (Label c_label in emblemTextArray)
-            {
-                if (c_label.Name == name) return c_label;
+                // Adjust the top margin to move it down by the height of the StackPanel
+                Thickness margin = stackPanel.Margin;
+                margin.Top += moveDownAmount;
+                margin.Left += 35;
+                stackPanel.Margin = margin;
+                //Image img = (Image)stackPanel.Children[1];
+                //img.Height -= 20;
+                //img.Width -= 20;
             }
-            return null;
         }
+
         public void UpdateStatusBar(int BC, float Vol, float X, float Y, float Z, int tr)
         {
             //string SSC = "";

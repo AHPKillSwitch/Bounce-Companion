@@ -72,5 +72,20 @@ namespace Bounce_Companion
         {
             main.replaySystem.ReplayPlayerMovements();
         }
+
+        private void SliderSFXChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            textbox_SliderSFX.Text = (Math.Round(Slider_SFXAudio.Value, 2).ToString());
+        }
+
+        private void SliderDelayChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            textbox_SliderDelay.Text = (Math.Round(Slider_DelayAudio.Value).ToString() + "ms");
+        }
+
+        private void SliderMainChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            textbox_SliderMain.Text = (Math.Round(Slider_MedalsAudio.Value, 2).ToString());
+        }
     }
 }

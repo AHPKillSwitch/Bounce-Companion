@@ -1,7 +1,7 @@
 ﻿KeyBindButton:
-LeftButtonText:Add Bounce
-RightButtonText:Clear Bounces
-EnableModTextOutPut:
-DisableModTextOutPut:
+LeftButtonText:Enable + Add
+RightButtonText:Disable + Reset
+EnableModTextOutPut:Debug Mode Active: Make sure you disable this debug after testing or your bounce count won`t reset!
+DisableModTextOutPut:Debug Mode Disabled!
 Enable://AddBounce
 Disable://ClearBounce
