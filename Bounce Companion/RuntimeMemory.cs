@@ -64,7 +64,8 @@ namespace Bounce_Companion
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             //throw new NotImplementedException();
-            Main.PrintToConsole("Tag Loading Complete!");
+            if (TH.tagTypeDict.Count > 0) Main.PrintToConsole("Tag Reading Complete.\n" +
+                                TH.tagTypeDict.Count + " Parent tags found "+ tagCount + " tags read and stored!");
             foreach (string line in outPutStrings)
             {
                 Main.PrintToConsole(line);
@@ -101,7 +102,7 @@ namespace Bounce_Companion
             mapTagBase = game + "0x14B68B8";
             SharedTagbase = game + "0x14B68A8";
             puginpath = "Content/Plugins/Halo2/";
-
+            Main.PrintToConsole_ContinueNextText("Tag Reading In Progress . . .  ");
             ParseTagInstanceList();
 
         }

@@ -20,9 +20,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="1000_F_279042185_4CCIpjJxnQTedWSdCRzxEPrxhgyD0ZXv %281%29.jpg" />
     <None Remove="BC2.png" />
-    <None Remove="blah.png" />
     <None Remove="camera Insert Left.png" />
     <None Remove="camera Insert Left1.png" />
     <None Remove="camera Insert Right.png" />
@@ -41,14 +39,7 @@
     <None Remove="Content\Audio\SFX\fire[grifle03].wav" />
     <None Remove="Content\Audio\SFX\fire[ruger21].wav" />
     <None Remove="Content\Audio\SFX\fire_burst[burst_br_new04].wav" />
-    <None Remove="Content\Audio\SFX\flak_fire[fire16].wav" />
     <None Remove="Content\Audio\SFX\magnum_fire[handgun2].wav" />
-    <None Remove="Content\Audio\SFX\phantom_turret_fire[phantom_fire].wav" />
-    <None Remove="Content\Audio\SFX\seefoe_upthere[1].wav" />
-    <None Remove="Content\Audio\SFX\seefoe_upthere[2].wav" />
-    <None Remove="Content\Audio\SFX\seefoe_upthere[4].wav" />
-    <None Remove="Content\Audio\SFX\shield_hits_frag_grenade[sheildhit2].wav" />
-    <None Remove="Content\Audio\SFX\water_burst[water_burst].wav" />
     <None Remove="Content\Medals\MultiBounce\10.png" />
     <None Remove="Content\Medals\MultiBounce\2.png" />
     <None Remove="Content\Medals\MultiBounce\3.png" />
@@ -63,10 +54,10 @@
     <None Remove="Content\Medals\MultiBounce\crane.png" />
     <None Remove="Content\Medals\MultiBounce\palm.png" />
     <None Remove="Content\Medals\MultiBounce\penguin.png" />
+    <None Remove="ControllerKeybindBackground v3.png" />
     <None Remove="CrossHair.png" />
     <None Remove="down arrow.jpg" />
     <None Remove="Loop Button.jpg" />
-    <None Remove="palmtree.png" />
     <None Remove="Play Button.jpg" />
     <None Remove="Stop Button.jpg" />
     <None Remove="Test CrossHair.png" />
@@ -84,23 +75,18 @@
 
   <ItemGroup>
     <PackageReference Include="CoreDX.vJoy.Wrapper" Version="1.2.3" />
-    <PackageReference Include="Google.Apis.Sheets.v4" Version="1.62.0.3148" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.53" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
     <PackageReference Include="Memory.dll.x64" Version="1.2.24" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Octokit" Version="8.1.1" />
+    <PackageReference Include="Octokit" Version="9.0.0" />
     <PackageReference Include="Reloaded.Injector" Version="1.2.5" />
     <PackageReference Include="SharpDX.XInput" Version="4.2.0" />
-    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
-    <PackageReference Include="WebSocketSharp-NonPreRelease" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="1000_F_279042185_4CCIpjJxnQTedWSdCRzxEPrxhgyD0ZXv (1).jpg" />
     <Resource Include="BC2.png" />
-    <Resource Include="blah.png" />
     <Resource Include="camera Insert Left1.png" />
     <Resource Include="camera Insert Right.png" />
     <Resource Include="camera.png" />
@@ -146,28 +132,10 @@
     <Content Include="Content\Audio\SFX\fire_burst[burst_br_new04].wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Audio\SFX\flak_fire[fire16].wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Content\Audio\SFX\magnum_fire[handgun2].wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Audio\SFX\phantom_turret_fire[phantom_fire].wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\SFX\seefoe_upthere[1].wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\SFX\seefoe_upthere[2].wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\SFX\seefoe_upthere[4].wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\SFX\shield_hits_frag_grenade[sheildhit2].wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\SFX\water_burst[water_burst].wav">
+    <Content Include="ControllerKeybindBackground v3.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Resource Include="Content\Medals\MultiBounce\10.png">
@@ -260,6 +228,9 @@
     <None Update="Content\Commands\Magnum - Projectile Rocket.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Content\Commands\9Key.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Content\Commands\PlayersContrails.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -274,6 +245,21 @@
     </None>
     <None Update="Content\Commands\Null KB HeadLong.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\Commands\Capture Camera.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\Commands\Enter Debug Camera.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\Commands\Stop Camera.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\Commands\Start Camera.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\Commands\Warp Fix.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Content\Commands\Wire Frame.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -590,6 +576,10 @@
     <None Update="pdata.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -600,7 +590,6 @@
     <Content Include="down arrow.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="palmtree.png" />
     <Content Include="uparrow.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -618,10 +607,6 @@
 
   <ItemGroup>
     <NativeLibs Remove="HandleChallenges.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <NativeLibs Remove="palmtree.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -646,6 +631,30 @@
 
   <ItemGroup>
     <NativeLibs Remove="CompanionUpdater.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <NativeLibs Remove="ControllerKeyBinds.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <NativeLibs Remove="ControllerKeyBinds.xaml.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <NativeLibs Remove="ControllerKeybindBackground v3.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <NativeLibs Remove="App.config" />
   </ItemGroup>
 
 </Project>

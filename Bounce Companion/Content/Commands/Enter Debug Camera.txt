@@ -1,0 +1,7 @@
+﻿KeyBindButton:
+LeftButtonText:Toggle
+RightButtonText:Toggle
+EnableModTextOutPut:Toggling Debug Mode.
+DisableModTextOutPut:Toggling Debug Mode.
+Enable://debugcamera
+Disable://debugcamera

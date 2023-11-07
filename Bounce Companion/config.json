@@ -1,11 +1,11 @@
 {
-  "mapspath": "H:\\Halo\\Halo 2 Project Cartographer\\maps",
-  "custommapspath": "C:\\Users\\daned\\OneDrive\\Documents\\My Games\\Halo 2\\Maps",
+  "mapspath": "",
+  "custommapspath": "",
   "serverPlaylistPath": "",
-  "moveSpeed": "25",
+  "moveSpeed": "15",
   "turnSpeed": "5",
   "pitchSpeed": "5",
-  "heightSpeed": "22",
+  "heightSpeed": "15",
   "rollSpeed": "5",
-  "globalTransitionTime": "4"
+  "globalTransitionTime": "2"
 }

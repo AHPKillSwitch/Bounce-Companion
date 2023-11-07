@@ -1,0 +1,7 @@
+﻿KeyBindButton:
+LeftButtonText:Enable
+RightButtonText:Disable
+EnableModTextOutPut:warpfix Enabled.
+DisableModTextOutPut:warpfix Disabled.
+Enable://warpfix
+Disable://warpfix

@@ -1,0 +1,7 @@
+﻿KeyBindButton:
+LeftButtonText:Start
+RightButtonText:Start
+EnableModTextOutPut:Camera Pathing Started.
+DisableModTextOutPut:Camera Pathing Started.
+Enable://startcamera
+Disable://startcamera

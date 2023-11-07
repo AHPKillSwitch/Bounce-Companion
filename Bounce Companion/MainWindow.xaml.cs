@@ -15,12 +15,12 @@ using Memory;
 using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Sheets.v4;
+//using Google.Apis.Auth.OAuth2;
+//using Google.Apis.Sheets.v4;
 using System.Text;
 using Newtonsoft.Json;
 using System.Windows.Interop;
-using WebSocketSharp;
+//using WebSocketSharp;
 using System.Windows.Media.Imaging;
 using SharpDX.XInput;
 using System.Windows.Controls;
@@ -28,6 +28,9 @@ using Reloaded.Injector;
 using MathNet.Numerics.Interpolation;
 using Microsoft.Win32;
 using System.Xml;
+using static Bounce_Companion.MainWindow;
+using static Bounce_Companion.ControllerKeyBinds;
+//using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 
 namespace Bounce_Companion
 {
@@ -41,8 +44,10 @@ namespace Bounce_Companion
     public partial class MainWindow : Window
     {
         //GameOverlayWindow overlayWindow = new GameOverlayWindow();
-        public string currentVersion = "0.3.23"; // Change this to your current application version
+        public string currentVersion = "0.9.23 "; // Change this to your current application version
+        public string newVersion = string.Empty;
         public Mem m = new Mem();
+        public Mem mp2 = new Mem();
         public Process p;
         public RuntimeMemory rm;
         CommandExecution CE;
@@ -51,6 +56,7 @@ namespace Bounce_Companion
         GameOverlayWindow GOW;
         public ReplaySystem replaySystem;
         public Settings settingsWindow;
+        public ControllerKeyBinds controllerKeyBindsWindow;
         public string currentGameMainWindow = string.Empty;
         bool attached;
         bool modsEnabled;
@@ -69,14 +75,15 @@ namespace Bounce_Companion
         public float c_rollSpeed = 0f;
         // Camera Transition speed
         public float c_GlobalTransitionTime = 0f;
+        public int loopDelayTime = 100;
 
         public bool tags_Loaded_Status;
         public bool enableDebug = false;
         public bool customContrails = false;
         private bool userTextChanged = true;
-        private bool isAppLoading = true;
+        public bool isAppLoading = true;
         public int obj_List_Address = 0;
-        public WebSocket ws;
+        //public WebSocket ws;
         private MediaPlayer audio_Player_Main = new MediaPlayer();
         private MediaPlayer audio_Player_Main_2 = new MediaPlayer();
         private MediaPlayer audio_Player_Effect_1 = new MediaPlayer();
@@ -88,6 +95,7 @@ namespace Bounce_Companion
         public GameVolumeGetter volumeGetter = new GameVolumeGetter();
         private List<ImageData> imageDataList; // Store the image data
         private Controller xboxController;
+        private System.Threading.Timer toggleTimer;
         Injector injector;
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
@@ -100,8 +108,11 @@ namespace Bounce_Companion
         {
             InitializeComponent();
             imageDataList = new List<ImageData>();
+            toggleTimer = new System.Threading.Timer(ToggleCallback, null, Timeout.Infinite, Timeout.Infinite);
+            _ = InitializeXboxController();
 
-            InitializeXboxController();
+            controllerKeyBindsWindow = new ControllerKeyBinds(this);
+            controllerKeyBindsWindow.Closed += Window_Closed;
             //GetVolume();
             //WebSocketServer();
         }
@@ -148,7 +159,8 @@ namespace Bounce_Companion
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-
+            LabStatus.Foreground = Brushes.Red;
+            bool no = false;
             //attempt to attach
             if (await CheckForNewVersion())
             {
@@ -156,12 +168,16 @@ namespace Bounce_Companion
             }
             else
             {
-                AttachToProcess();
+                AttachToProcess(0);
                 GetCommansFromFile();
+                PrintToConsole_ContinueNextText("Checking Config . . . ");
+                await CheckAndSetMapFiles();
                 SetupConfig();
+
 
                 if (attached)
                 {
+                    LabStatus.Foreground = Brushes.Green;
                     LabStatus.Content = "Process: Attached";
                     GOW = new GameOverlayWindow(this);
                     GOW.EnablePlayerInfoTab(false);
@@ -179,60 +195,68 @@ namespace Bounce_Companion
                     // Attach an event handler to the LostFocus event of the "Camera Tool" tab
                     TabItem_CameraTool.LostFocus += TabItem_CameraTool_LostFocus;
                     //GetCommansFromFile();
+
+                    GetLocationData();
+                    //GetPlayerData();
+                    LoadSFXFromXml();
+                    SetCameraFlySpeeds();
+                    ParseCommandsFromFile();
+                    SetCameraAddresses();
+                    StartUpdateTask();
+                    // Initialize key states
+                    foreach (ControllerKey key in Enum.GetValues(typeof(ControllerKey)))
+                    {
+                        keyStates[key] = false;
+                    }
                 }
                 else
                 {
+                    LabStatus.Foreground = Brushes.Red;
                     LabStatus.Content = "Process: Not Attached";
-                    AttachToProcess();
+                    AttachToProcess(0);
                 }
                 UpdateTimer.Interval = TimeSpan.FromMilliseconds(150);
-                CheckerTimer.Interval = TimeSpan.FromMilliseconds(10);
+                CheckerTimer.Interval = TimeSpan.FromMilliseconds(31);
 
-                GetLocationData();
-                //GetPlayerData();
-                LoadSFXFromXml();
-                SetCameraFlySpeeds();
-                ParseCommandsFromFile();
-                SetCameraAddresses();
-                StartUpdateTask();
                 isAppLoading = false;
             }
-            
+
         }
 
         private async Task<bool> CheckForNewVersion()
         {
-            PrintToConsole("Checking for newer Versions.");
+            PrintToConsole_ContinueNextText("Checking for newer Versions . . .  ");
             string owner = "AHPKillSwitch";
             string repo = "Bounce-Companion";
 
-            bool isNewVersionAvailable = await CompanionUpdater.UpdateChecker.IsNewVersionAvailable(owner, repo, currentVersion);
+            bool isNewVersionAvailable = await CompanionUpdater.UpdateChecker.IsNewVersionAvailable(owner, repo, currentVersion, this);
             if (isNewVersionAvailable)
             {
                 MessageBoxResult result = MessageBox.Show("A new version is available. Do you want to download it now?", "Update Available", MessageBoxButton.YesNo);
-                PrintToConsole("New Version Found!");
+
                 if (result == MessageBoxResult.Yes)
                 {
+                    PrintToConsole("Download Starting!");
                     CompanionUpdater.UpdateChecker.DownloadLatestZipRelease(owner, repo);
-                    PrintToConsole("New Version .Zip can be found in your current Bounce Companion root folder, Its called Bounce Companion v new version number");
+                    PrintToConsole("Download Complete: \n" +
+                        "New Version can be found in your current Bounce Companion root folder, Its called Bounce Companion " + newVersion + ".zip");
                 }
                 else
                 {
-                    PrintToConsole("Update Denied!");
+                    PrintToConsole("Update Found: User Denied!");
                     return false;
 
                 }
             }
             else
             {
-                PrintToConsole("Version is up-to date!");
+                PrintToConsole("Current Version is up-to date!");
             }
             return isNewVersionAvailable;
         }
 
         private async void StartUpdateTask()
         {
-            ;
             try
             {
                 await Task.Run(() => UpdateChecker());
@@ -312,6 +336,20 @@ namespace Bounce_Companion
 
             await UpdateConfig(config);
         }
+        public async Task UpdateCameraSpeedUI()
+        {
+            var config = await SetConfig();
+
+            // Add new options
+            settingsWindow.TextBox_FlySpeed.Text = config.MoveSpeed;
+            settingsWindow.TextBox_Turnspeed.Text = config.TurnSpeed;
+            settingsWindow.TextBox_Pitchspeed.Text = config.PitchSpeed;
+            settingsWindow.TextBox_Heightspeed.Text = config.HeightSpeed;
+            settingsWindow.TextBox_Rollspeed.Text = config.RollSpeed;
+
+            await UpdateConfig(config);
+        }
+
         public class ConfigJson
         {
             public string MapsPath { get; set; }
@@ -324,34 +362,139 @@ namespace Bounce_Companion
             public string RollSpeed { get; set; }
             public string globalTransitionTime { get; set; }
         }
-
-        public void AttachToProcess()
+        private async Task CheckAndSetMapFiles()
         {
+            ConfigJson config = await SetConfig();
+
+            if (string.IsNullOrWhiteSpace(config.MapsPath) || string.IsNullOrWhiteSpace(config.CustomMapsPath) || !config.MapsPath.Contains("maps") || !config.CustomMapsPath.Contains("maps"))
+            {
+                PrintToConsole("Invalid Config Found.");
+                // Show a custom dialog with a message and "Select Map Now" button
+                MessageBoxResult result = MessageBox.Show(
+                    "Invalid maps path found, Please select a .map file from the Halo 2 maps folder. \n" +
+                    "This can be found in your Halo 2 Project Cartographer install folder",
+                    "Configuration Invilid",
+                    MessageBoxButton.OKCancel);
+
+                if (result == MessageBoxResult.OK)
+                {
+                    // User clicked "Select Map Now," open the file dialog
+                    var openFileDialog = new OpenFileDialog
+                    {
+                        Title = "Select .map File",
+                        Filter = "Map Files|*.map",
+                        Multiselect = false,
+                    };
+
+                    if (openFileDialog.ShowDialog() == true)
+                    {
+                        string selectedFilePath = openFileDialog.FileName;
+                        string directoryPath = Path.GetDirectoryName(selectedFilePath);
+
+                        if (directoryPath.Contains("maps"))
+                        {
+                            PrintToConsole("Maps Folder Set");
+                            if (string.IsNullOrWhiteSpace(config.MapsPath))
+                            {
+                                config.MapsPath = directoryPath;
+                            }
+                            else if (string.IsNullOrWhiteSpace(config.CustomMapsPath))
+                            {
+                                config.CustomMapsPath = directoryPath;
+                            }
+
+                            await UpdateConfig(config);
+
+                            // Ask the user to select a .map file from the Custom Maps folder
+                            var customMapsDialogResult = MessageBox.Show(
+                                "Now, select a map file from the Custom Maps folder.",
+                                "Select Custom Map",
+                                MessageBoxButton.OKCancel);
+
+                            if (customMapsDialogResult == MessageBoxResult.OK)
+                            {
+                                var customMapsOpenFileDialog = new OpenFileDialog
+                                {
+                                    Title = "Select .map File",
+                                    Filter = "Map Files|*.map",
+                                    Multiselect = false,
+                                };
+
+                                if (customMapsOpenFileDialog.ShowDialog() == true)
+                                {
+                                    string customMapsSelectedFilePath = customMapsOpenFileDialog.FileName;
+                                    string customMapsDirectoryPath = Path.GetDirectoryName(customMapsSelectedFilePath);
+
+                                    if (customMapsDirectoryPath.Contains("maps"))
+                                    {
+                                        PrintToConsole("Custom Maps Folder Set");
+                                        config.CustomMapsPath = customMapsDirectoryPath;
+                                        await UpdateConfig(config);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Environment.Exit(0);
+                    }
+                }
+                else
+                {
+                    Environment.Exit(0);
+                }
+            }
+
+            PrintToConsole("Config Is Valid.");
+        }
+        public int selectedProcessindex = 0;
+        public void AttachToProcess(int selectedIndex)
+        {
+            attached = false;
+            if (attached) m.CloseProcess();
             try
             {
-                PrintToConsole("Attempting to attach to the Halo 2 game process.");
-                p = Process.GetProcessesByName("halo2")[0];
-                PrintToConsole("Successfully attached to the game process.");
-                m.OpenProcess("halo2.exe");
-                ToolSetting.currentGame = "halo2";
-                currentGameMainWindow = "halo2";
-                ToolSetting.currentGameDLL = "halo2";
-                attached = true;
-                injector = new Injector(p);
-                CheckerTimer.Start();
-                UpdateTimer.Start();
-                PlayerMonitorTimer.Start();
+                PrintToConsole_ContinueNextText("Attempting to attach to the Halo 2 game process . . .  ");
+                Process[] processes = Process.GetProcessesByName("halo2");
+                if (selectedIndex < processes.Length)
+                {
+                    selectedProcessindex = selectedIndex;
+                    p = processes[selectedIndex];
+                    PrintToConsole("Success.");
+                    m.OpenProcess(p.ProcessName);
+                    ToolSetting.currentGame = "halo2";
+                    currentGameMainWindow = "halo2";
+                    ToolSetting.currentGameDLL = "halo2";
+                    attached = true;
+                    injector = new Injector(p);
+                    CheckerTimer.Start();
+                    UpdateTimer.Start();
+                    PlayerMonitorTimer.Start();
+                    if (selectedIndex == 0)
+                    {
+                        p = processes[1];
+                        mp2.OpenProcess(p.ProcessName);
+                    }
+                    else
+                    {
+                        p = processes[0];
+                        mp2.OpenProcess(p.ProcessName);
+                    }
+
+                }
+                else
+                {
+                    PrintToConsole("Failed, the selected process does not exist.");
+                }
+                
             }
             catch
             {
-                PrintToConsole("\nCould`nt attach to process, make sure game is running");
+                PrintToConsole("Failed, make sure game is running");
             }
         }
-        private void UpdateTimer_Tick(object sender, EventArgs e)
-        {
-            UpdateTagStatus();
-            if (customContrails) _ = UpdatePlayerList();
-        }
+        public bool player2Attched = false;
         bool tagscurrentlyloaded;
         public bool UpdateTagStatus()
         {
@@ -363,11 +506,26 @@ namespace Bounce_Companion
             if (!tagscurrentlyloaded && tags_Loaded_Status) //Check if tags are loaded if not load them
             {
                 tagscurrentlyloaded = true;
-                rm = new RuntimeMemory(m, p, this, mapspath, customMapsPath);
-                CE = new CommandExecution(rm, m, this);
-                CH = new HandleChallenges(this); //challenge handler
+                PrintToConsole_ContinueNextText("Checking Game Session . . . ");
+                if (GameTypeValidCheck())
+                {
+                    PrintToConsole("Valid Session Found!");
+                    HideMods(false);
+                    rm = new RuntimeMemory(m, p, this, mapspath, customMapsPath);
+                    CE = new CommandExecution(rm, m, this);
+                    CH = new HandleChallenges(this); //challenge handler
+                    if (auto_warpFix) _ = ApplyGameMod("warpfix", true);
+                }
+                else
+                {
+                    PrintToConsole("Invalid Session Found! " +
+                        "Mods Disabled." +
+                        "This tool will only work in OGH2 or Glitch Lobbies!");
 
-                //Task.Run(() => GetVolume());
+                    HideMods(true);
+                }
+
+
             }
             else if (tagscurrentlyloaded && !tags_Loaded_Status)
             {
@@ -376,14 +534,49 @@ namespace Bounce_Companion
             }
             SetWindowPos();
 
+
+
             return tags_Loaded_Status;
+        }
+        private void HideMods(bool hide)
+        {
+            if (hide)
+            {
+                ComboBox_Mods.Visibility = Visibility.Hidden;
+                Bttn_on.Visibility = Visibility.Hidden;
+                Bttn_off.Visibility = Visibility.Hidden;
+                modsEnabledMaster = false;
+                _ = ApplyGameMod("//debugcamera", false);
+                button_DebugCamera.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                ComboBox_Mods.Visibility = Visibility.Visible;
+                Bttn_on.Visibility = Visibility.Visible;
+                Bttn_off.Visibility = Visibility.Visible;
+                modsEnabledMaster = true;
+                button_DebugCamera.Visibility = Visibility.Visible;
+            }
+        }
+
+        private bool GameTypeValidCheck()
+        {
+            string gameTypeName = m.ReadString("halo2.exe+97777C", "", 127, true, System.Text.Encoding.Unicode).ToLower();
+            if (gameTypeName.Contains("ogh2") || gameTypeName.Contains("glitch"))
+                return true;
+            else { return false; }
+
         }
         private async Task UpdateChecker()
         {
             while (true)
             {
-                if (!rollCamera || !debugCameraToggle)
+                if (!rollCamera || !debugCameraToggle && attached)
                 {
+                    if (Application.Current == null)
+                    {
+                        Environment.Exit(1); // You can choose an appropriate exit code
+                    }
                     bool tags_Loaded_Status = false;
                     Application.Current.Dispatcher.Invoke(() =>
                     {
@@ -411,7 +604,7 @@ namespace Bounce_Companion
                     float[] cameraPosition = GetCameraData(out byte[] cameraPositionArray);
                     UpdateUICameraCoordinates(cameraPosition[0], cameraPosition[1], cameraPosition[2], cameraPosition[3], cameraPosition[4], cameraPosition[5]);
                 });
-                await Task.Delay(30); // Milliseconds
+                await Task.Delay(33); // Milliseconds
             }
         }
         public int bounceCount = 0;
@@ -841,7 +1034,7 @@ namespace Bounce_Companion
             PlaySFX(audio_Player_Main, "Content/Audio/MultiBounces/", bounceNumber, volumeGetter.GetGameVolumeLevel(this));
         }
 
-        private void PlaySFX(MediaPlayer audio_Player,string filePath, string bounceNumber, float audioLevel)
+        private void PlaySFX(MediaPlayer audio_Player, string filePath, string bounceNumber, float audioLevel)
         {
             audio_Player.Open(new Uri(filePath + bounceNumber + ".wav", UriKind.Relative));
 
@@ -869,6 +1062,11 @@ namespace Bounce_Companion
         public void PrintToConsole(string input)
         {
             ConsoleOut.AppendText(input + "\n");
+            ConsoleOut.ScrollToEnd();
+        }
+        public void PrintToConsole_ContinueNextText(string input)
+        {
+            ConsoleOut.AppendText(input);
             ConsoleOut.ScrollToEnd();
         }
         bool follow;
@@ -976,7 +1174,7 @@ namespace Bounce_Companion
             public string value;
         }
 
-        public void GetCommands()
+        public async Task<bool> GetCommands()
         {
             string url = m.ReadString("halo2.exe+97777C", "", 127, true, System.Text.Encoding.Unicode);
 
@@ -1000,12 +1198,13 @@ namespace Bounce_Companion
                     result = PullCommands(pbinurl1);
                     if (result.Count == 0)
                     {
-                        return;
+                        return true;
                     }
                     foreach (string command in result)
                     {
                         GetCommandsFromString(consoleinput, command);
                     }
+                    return true;
                 }
                 catch
                 {
@@ -1018,7 +1217,7 @@ namespace Bounce_Companion
                     {
                         if (command.Contains("//"))
                         {
-                            ApplyGameMod(command, true);
+                            await ApplyGameMod(command, true);
                         }
                         else
                         {
@@ -1032,8 +1231,9 @@ namespace Bounce_Companion
                         GetCommandsFromString(consoleinput, command);
                     }
                 }
-
+                return false;
             }
+            return true;
             //else //LabPoking.Content = "Disabled";
 
         }
@@ -1163,7 +1363,7 @@ namespace Bounce_Companion
             }
             if (strcommand.Contains("//"))
             {
-                ApplyGameMod(consoleinput, true);
+                _ = ApplyGameMod(consoleinput, true);
             }
             else if (modsEnabled && modsEnabledMaster)
             {
@@ -1327,11 +1527,11 @@ namespace Bounce_Companion
 
         private void ApplyDDLModOn(object sender, RoutedEventArgs e)
         {
-            ApplyMods(true);
+            ApplyMods(true, ComboBox_Mods.SelectionBoxItem.ToString());
         }
         private void ApplyDDLModOff(object sender, RoutedEventArgs e)
         {
-            ApplyMods(false);
+            ApplyMods(false, ComboBox_Mods.SelectionBoxItem.ToString());
         }
 
 
@@ -1388,8 +1588,8 @@ namespace Bounce_Companion
 
             }
         }
-
-        private void ApplyMods(bool on)
+        List<Task> tasks = new List<Task>();
+        private async void ApplyMods(bool on, string modName)
         {
             string leftBttn = "N/A"; ;
             string rightBttn = "N/A";
@@ -1398,7 +1598,6 @@ namespace Bounce_Companion
             string disableModsTextOutput = "";
 
             List<string> result = new List<string>();
-            string modName = ComboBox_Mods.SelectionBoxItem.ToString();
             foreach (string line in System.IO.File.ReadLines("Content/Commands/" + modName + ".txt"))
             {
                 string command = CleanString(line);
@@ -1427,7 +1626,7 @@ namespace Bounce_Companion
                     {
                         if (command.Contains("//"))
                         {
-                            ApplyGameMod(command.Split("able:")[1], on);
+                            tasks.Add(ApplyGameMod(command.Split("able:")[1], on));
                         }
                         else
                         {
@@ -1444,7 +1643,7 @@ namespace Bounce_Companion
                     {
                         if (command.Contains("//"))
                         {
-                            ApplyGameMod(command.Split(':')[1], on);
+                            tasks.Add(ApplyGameMod(command.Split(':')[1], on));
                         }
                         else
                         {
@@ -1455,11 +1654,19 @@ namespace Bounce_Companion
                         PrintToConsole(enableModsTextOutput);
                     }
                 }
+                await Task.WhenAll(tasks);
             }
 
         }
+        [DllImport("user32.dll")]
+        public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
+
+        public const int KEYEVENTF_KEYDOWN = 0x0001; // Key down
+        public const int KEYEVENTF_KEYUP = 0x0002;   // Key up
+
+        public const byte VK_SPACE = 0x20; // The virtual key code for the spacebar
         public bool debug = false;
-        private void ApplyGameMod(string command, bool on)
+        private async Task<bool> ApplyGameMod(string command, bool on)
         {
             string prefix = string.Empty;
             if (command.Contains(" "))
@@ -1475,14 +1682,14 @@ namespace Bounce_Companion
                         bounceCount++;
                         PrintToConsole("+1 Added to bounce count.");
                         _ = Announcements(bounceCount, "null", "standard");
-                        break;
+                        return true;
                     }
                 case "//clearbounce":
                     {
                         debug = false;
                         bounceCount = 0;
                         PrintToConsole("Bounce count reset.");
-                        break;
+                        return true;
                     }
                 case "//wireframe":
                     {
@@ -1494,19 +1701,21 @@ namespace Bounce_Companion
                         {
                             m.WriteMemory("halo2.exe+468174", "Byte", "0x00", "");
                         }
-                        break;
+                        return true;
                     }
                 case "//savestate":
                     {
                         if (on)
                         {
+                            if (player2Attched) mp2.WriteMemory("halo2.exe+482250", "Byte", "0x01", "");
                             m.WriteMemory("halo2.exe+482250", "Byte", "0x01", "");
                         }
                         else
                         {
+                            if (player2Attched) mp2.WriteMemory("halo2.exe+48224F", "Byte", "0x01", "");
                             m.WriteMemory("halo2.exe+48224F", "Byte", "0x01", "");
                         }
-                        break;
+                        return true;
                     }
                 case "//nullcharfilter":
                     {
@@ -1518,7 +1727,7 @@ namespace Bounce_Companion
                         {
                             m.WriteMemory("halo2.exe+0030D3F8", "Bytes", "0x74 0x2F", "");
                         }
-                        break;
+                        return true;
                     }
                 case "//customcontrails":
                     {
@@ -1530,22 +1739,64 @@ namespace Bounce_Companion
                         {
                             customContrails = false;
                         }
-                        break;
-
-
+                        return true;
+                    }
+                case "//warpfix":
+                    {
+                        if (on)
+                        {
+                            m.WriteMemory("halo2.exe+4F958E", "Bytes", "0x80 0x40 0x00 0x00 0x00 0x40 0x40 0x00 0x00 0x20 0x41", "");
+                        }
+                        else
+                        {
+                            m.WriteMemory("halo2.exe+4F958E", "Bytes", "0x20 0x40 0x00 0x00 0x00 0x40 0x40 0x00 0x00 0xF0 0x40", "");
+                        }
+                        return true;
+                    }
+                case "//capturescene":
+                    {
+                        CaptureScene();
+                        return true;
+                    }
+                case "//startcamera":
+                    {
+                        await StartCameraRoll();
+                        return true;
+                    }
+                case "//stopcamera":
+                    {
+                        rollCamera = false;
+                        return true;
+                    }
+                case "//debugcamera":
+                    {
+                        ToggleDebugMode();
+                        return true;
+                    }
+                case "//9key":
+                    {
+                        keybd_event(VK_SPACE, 0, 0, (UIntPtr)0);
+                        await Task.Delay(100);
+                        keybd_event(VK_SPACE, 0, KEYEVENTF_KEYUP, (UIntPtr)0);
+                        return true;
+                    }
+                case "//Delay":
+                    {
+                        int time = int.Parse(prefix);
+                        await Task.Delay(time);
+                        return true;
                     }
                 case "//markposition"://MarkPosition Test Standard
                     {
-
                         string location = prefix.Split(':')[0];
                         string type = prefix.Split(':')[1];
 
                         MarkPlayerCoords(location, type);
-
-                        break;
+                        return true; ;
                     }
 
             }
+            return false;
         }
 
         private void PrintToConsole(List<string> outPutStrings)
@@ -1570,51 +1821,51 @@ namespace Bounce_Companion
                 PrintToConsole("Auto-Poking: Enabled");
             }
         }
-
-        static readonly string[] Scopes = { SheetsService.Scope.Spreadsheets };
-        static readonly string ApplicationName = "Bounce Companion";
-        static readonly string SpreadSheetId = "173PbslIHbVRguvREpgESeHO2e2MKK-haaH7_4xnUdIM";
-        static readonly string sheet = "PlayerData";
-
-        static SheetsService service;
-
-        static void GetPlayerData()
-        {
-            GoogleCredential credential;
-            using (var stream = new FileStream("pdata.json", FileMode.Open, FileAccess.Read))
-            {
-                credential = GoogleCredential.FromStream(stream)
-                    .CreateScoped(Scopes);
-            }
-
-            service = new SheetsService(new Google.Apis.Services.BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = ApplicationName,
-            });
-            ReadEntries();
-        }
         public static List<string> p_colour = new List<string>();
-        static void ReadEntries()
-        {
-            string p_colour_data = string.Empty;
-            var range = $"{sheet}!A1:D30";
-            var request = service.Spreadsheets.Values.Get(SpreadSheetId, range);
+        //static readonly string[] Scopes = { SheetsService.Scope.Spreadsheets };
+        //static readonly string ApplicationName = "Bounce Companion";
+        //static readonly string SpreadSheetId = "173PbslIHbVRguvREpgESeHO2e2MKK-haaH7_4xnUdIM";
+        //static readonly string sheet = "PlayerData";
 
-            var response = request.Execute();
-            var values = response.Values;
-            if (values != null && values.Count > 0)
-            {
-                foreach (var row in values)
-                {
-                    p_colour_data = (string)row[0] + ":";
-                    p_colour_data += (string)row[1] + ":";
-                    p_colour_data += (string)row[2] + ":";
-                    p_colour_data += (string)row[3];
-                    p_colour.Add(p_colour_data);
-                }
-            }
-        }
+        //static SheetsService service;
+
+        //static void GetPlayerData()
+        //{
+        //    GoogleCredential credential;
+        //    using (var stream = new FileStream("pdata.json", FileMode.Open, FileAccess.Read))
+        //    {
+        //        credential = GoogleCredential.FromStream(stream)
+        //            .CreateScoped(Scopes);
+        //    }
+
+        //    service = new SheetsService(new Google.Apis.Services.BaseClientService.Initializer()
+        //    {
+        //        HttpClientInitializer = credential,
+        //        ApplicationName = ApplicationName,
+        //    });
+        //    ReadEntries();
+        //}
+
+        //static void ReadEntries()
+        //{
+        //    string p_colour_data = string.Empty;
+        //    var range = $"{sheet}!A1:D30";
+        //    var request = service.Spreadsheets.Values.Get(SpreadSheetId, range);
+
+        //    var response = request.Execute();
+        //    var values = response.Values;
+        //    if (values != null && values.Count > 0)
+        //    {
+        //        foreach (var row in values)
+        //        {
+        //            p_colour_data = (string)row[0] + ":";
+        //            p_colour_data += (string)row[1] + ":";
+        //            p_colour_data += (string)row[2] + ":";
+        //            p_colour_data += (string)row[3];
+        //            p_colour.Add(p_colour_data);
+        //        }
+        //    }
+        //}
         public string prev_Command = string.Empty;
         private void SendCommands(object sender, RoutedEventArgs e)
         {
@@ -1741,30 +1992,30 @@ namespace Bounce_Companion
             UnregisterHotKey(new WindowInteropHelper(this).Handle, HOTKEY_ID);
             base.OnClosed(e);
         }
-        public void WebSocketServer()
-        {
-            try
-            {
-                using (ws = new WebSocket("ws://52.14.59.129:1171/MessageSocket")) // using the "using" clause to ensure the connection does correctly close in the case of a crash or error
-                {
-                    ws.Connect();
-                    ws.OnMessage += Ws_OnMessageReceived;
-                    PrintToConsole("Successfully connected to BounceBot websocket.");
-                    ws.Send("sm:Test Message");
-                }
-            }
-            catch
-            {
-                PrintToConsole("An Error occured while trying to connect to Bouncebot.");
-            }
+        //public void WebSocketServer()
+        //{
+        //    try
+        //    {
+        //        using (ws = new WebSocket("ws://52.14.59.129:1171/MessageSocket")) // using the "using" clause to ensure the connection does correctly close in the case of a crash or error
+        //        {
+        //            ws.Connect();
+        //            ws.OnMessage += Ws_OnMessageReceived;
+        //            PrintToConsole("Successfully connected to BounceBot websocket.");
+        //            ws.Send("sm:Test Message");
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        PrintToConsole("An Error occured while trying to connect to Bouncebot.");
+        //    }
 
-        }
+        //}
 
 
-        private void Ws_OnMessageReceived(object sender, MessageEventArgs e)
-        {
-            throw new NotImplementedException(); // e.Data = message info
-        }
+        //private void Ws_OnMessageReceived(object sender, MessageEventArgs e)
+        //{
+        //    throw new NotImplementedException(); // e.Data = message info
+        //}
 
         public class TimeLine
         {
@@ -1809,6 +2060,11 @@ namespace Bounce_Companion
         int debugCameraTogglebytes = 0;
         private void ToggleDebugCamera(object sender, RoutedEventArgs e)
         {
+            ToggleDebugMode();
+        }
+
+        private void ToggleDebugMode()
+        {
             debugCameraTogglebytes = m.ReadInt("halo2.exe+0x4A8870");
             if (m.ReadInt("halo2.exe+0x4A84B0") == debugCameraTogglebytes)
             {
@@ -1822,6 +2078,7 @@ namespace Bounce_Companion
                 debugCameraToggle = false;
             }
         }
+
         public int jumpToIndex = 0;
         ImageData selectedImageData = new ImageData();
         private void JumpToSceneButton_Click(object sender, RoutedEventArgs e)
@@ -2232,21 +2489,28 @@ namespace Bounce_Companion
 
         private async Task StartCameraRoll()
         {
-            try
+            if (!rollCamera)
             {
-                CheckBox_OffsetPlayer.IsChecked = false;
-                Offset_Selected_Player = false;
-                List<float[]> cameraPathList = new List<float[]>();
-                List<float> cameraTransitionTImeList = new List<float>();
-                for (int i = 0; i < imageDataList.Count; i++)
+                try
                 {
-                    var currentImageData = imageDataList[i];
-                    cameraPathList.Add(currentImageData.CameraPosition);
-                    cameraTransitionTImeList.Add(currentImageData.TransitionTime);
+                    CheckBox_OffsetPlayer.IsChecked = false;
+                    Offset_Selected_Player = false;
+                    List<float[]> cameraPathList = new List<float[]>();
+                    List<float> cameraTransitionTImeList = new List<float>();
+                    for (int i = 0; i < imageDataList.Count; i++)
+                    {
+                        var currentImageData = imageDataList[i];
+                        cameraPathList.Add(currentImageData.CameraPosition);
+                        cameraTransitionTImeList.Add(currentImageData.TransitionTime);
+                    }
+                    await Task.Run(async () =>
+                    {
+                        // This code will run on a separate thread.
+                        await MoveCameraSmoothly(cameraPathList, cameraTransitionTImeList);
+                    });
                 }
-                await MoveCameraSmoothly(cameraPathList, cameraTransitionTImeList);
+                catch (Exception ex) { MessageBox.Show("Error:" + ex.Message); }
             }
-            catch (Exception ex) { MessageBox.Show("Error:" + ex.Message); }
         }
 
         public List<float> transitionTimeList = new List<float>();
@@ -2264,6 +2528,8 @@ namespace Bounce_Companion
 
         public async Task MoveCameraSmoothly(List<float[]> positions, List<float> fixedSpeeds)
         {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
             SetCameraAddresses();
             rollCamera = true;
             double total_time = 0;
@@ -2312,6 +2578,8 @@ namespace Bounce_Companion
                 if (!rollCamera) return;
                 double t = currentTime;
 
+                stopwatch.Restart();
+
                 float currentX = (float)SplineX.Interpolate(t);
                 float currentY = (float)SplineY.Interpolate(t);
                 float currentZ = (float)SplineZ.Interpolate(t);
@@ -2323,34 +2591,96 @@ namespace Bounce_Companion
                 if (face_Selected_Player || selectedImageData.FacePlayer)
                 {
                     string salt = string.Empty;
-                    if (selectedImageData.FacePlayer) salt = ComboBox_SceneData_Playernames.Text.Split(':')[1];
-                    else salt = ComboBox_Playernames.Text.Split(':')[1];
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        if (selectedImageData.FacePlayer) salt = ComboBox_SceneData_Playernames.Text.Split(':')[1];
+                        else salt = ComboBox_Playernames.Text.Split(':')[1];
+                    });
                     int obj_List_Memory_Address;
                     float p_X, p_Y, p_Z, p_X_Vel, p_Y_Vel, p_Z_Vel, p_Shields;
                     ReadObjectXYZ(salt, out obj_List_Memory_Address, out p_X, out p_Y, out p_Z, out p_X_Vel, out p_Y_Vel, out p_Z_Vel, out p_Shields);
                     float[] blah = GetCameraData(out byte[] cameraPositionArray1);
                     float[] objectPosition = { p_X, p_Y, p_Z };
-                    UpdateCameraAngle(objectPosition, blah);
+                    UpdateCameraAngleinternal(objectPosition, blah, 1f);
                 }
+                MoveCameraAsyncinternal(currentX, currentY, currentZ, currentYaw, currentPitch, currentRoll);
 
-                await MoveCameraAsync(currentX, currentY, currentZ, currentYaw, currentPitch, currentRoll);
-                await Task.Delay(16);
+                await Task.Delay(33);
                 currentTime += 16.0;
                 c++;
-                UpdateUICameraCoordinates(currentX, currentY, currentZ, currentYaw, currentPitch, currentRoll);
             }
             if (positions.Count > 0)
             {
                 float[] finalPosition = positions[positions.Count - 1];
-                await MoveCameraAsync(finalPosition[0], finalPosition[1], finalPosition[2], finalPosition[3], finalPosition[4], finalPosition[5]);
-                UpdateUICameraCoordinates(finalPosition[0], finalPosition[1], finalPosition[2], finalPosition[3], finalPosition[4], finalPosition[5]);
+
+                MoveCameraAsyncinternal(finalPosition[0], finalPosition[1], finalPosition[2], finalPosition[3], finalPosition[4], finalPosition[5]);
             }
             rollCamera = false;
             if (loopCamera)
             {
                 //await MoveCameraAsync(positions[0][0], positions[0][1], positions[0][2], positions[0][3], positions[0][4], positions[0][5]);
-                await Task.Delay(100);
-                await StartCameraRoll();
+                await Task.Delay(loopDelayTime);
+                await Application.Current.Dispatcher.Invoke(async () =>
+                {
+                    await StartCameraRoll();
+                });
+            }
+            void MoveCameraAsyncinternal(float x, float y, float z, float yaw, float pitch, float roll)
+            {
+                if (selectedImageData.FacePlayer) face_Selected_Player = true;
+                // Write the camera position and rotation values to memory
+                m.WriteMemory(xAddress.ToString("X"), "float", x.ToString());
+                m.WriteMemory(yAddress.ToString("X"), "float", y.ToString());
+                m.WriteMemory(zAddress.ToString("X"), "float", z.ToString());
+
+                if (!face_Selected_Player) // if we are not facing the player, Set the camera anlge
+                {
+                    m.WriteMemory(yawAddress.ToString("X"), "float", yaw.ToString());
+                    m.WriteMemory(pitchAddress.ToString("X"), "float", pitch.ToString());
+                    m.WriteMemory(rollAddress.ToString("X"), "float", roll.ToString());
+                }
+            }
+            void UpdateCameraAngleinternal(float[] objectPosition, float[] a_CameraPosition, float t)
+            {
+                // Calculate the direction vector from the camera to the object
+                float dx = objectPosition[0] - a_CameraPosition[0];
+                float dy = objectPosition[1] - a_CameraPosition[1];
+                float dz = objectPosition[2] - a_CameraPosition[2];
+
+                // Calculate the target yaw angle (in radians)
+                float targetYaw = (float)Math.Atan2(dy, dx);
+
+                // Calculate the shortest angular distance between the current and target yaw angles
+                float yawDifference = targetYaw - a_CameraPosition[3];
+                if (yawDifference > Math.PI)
+                    yawDifference -= 2 * (float)Math.PI;
+                else if (yawDifference < -Math.PI)
+                    yawDifference += 2 * (float)Math.PI;
+
+                // Smoothly interpolate the yaw angle
+                float smoothedYaw = a_CameraPosition[3] + yawDifference * t; // Adjust the interpolation factor (0.1f) as desired
+
+                // Calculate the target pitch angle (in radians)
+                float targetPitch = (float)Math.Atan2(dz, Math.Sqrt(dx * dx + dy * dy));
+
+                // Calculate the shortest angular distance between the current and target pitch angles
+                float pitchDifference = targetPitch - a_CameraPosition[4];
+                if (pitchDifference > Math.PI)
+                    pitchDifference -= 2 * (float)Math.PI;
+                else if (pitchDifference < -Math.PI)
+                    pitchDifference += 2 * (float)Math.PI;
+
+                // Smoothly interpolate the pitch angle
+                float smoothedPitch = a_CameraPosition[4] + pitchDifference * t; // Adjust the interpolation factor (0.1f) as desired
+
+                // Convert the yaw, pitch, and roll angles to radians
+                float yawRad = smoothedYaw;
+                float pitchRad = smoothedPitch;
+
+                // Write the new camera angle to the memory address
+                m.WriteMemory(yawAddress.ToString("X"), "float", yawRad.ToString());
+                m.WriteMemory(pitchAddress.ToString("X"), "float", pitchRad.ToString());
+
             }
         }
 
@@ -2385,31 +2715,11 @@ namespace Bounce_Companion
             return startAngle + (float)t * (endAngle - startAngle);
         }
         public bool face_Selected_Player = false;
-        private async Task MoveCameraAsync(float x, float y, float z, float yaw, float pitch, float roll)
-        {
-            await Application.Current.Dispatcher.InvokeAsync(() =>
-            {
-                // Calculate the offsets for XYZ position and rotation values based on your game's memory structure
-
-
-                // Write the camera position and rotation values to memory
-                m.WriteMemory(xAddress.ToString("X"), "float", x.ToString());
-                m.WriteMemory(yAddress.ToString("X"), "float", y.ToString());
-                m.WriteMemory(zAddress.ToString("X"), "float", z.ToString());
-
-                if (!face_Selected_Player || !selectedImageData.FacePlayer) // if we are not facing the player, Set the camera anlge
-                {
-                    m.WriteMemory(yawAddress.ToString("X"), "float", yaw.ToString());
-                    m.WriteMemory(pitchAddress.ToString("X"), "float", pitch.ToString());
-                    m.WriteMemory(rollAddress.ToString("X"), "float", roll.ToString());
-                }
-            }, DispatcherPriority.Send);
-        }
 
         private void UpdateScene_Click(object sender, RoutedEventArgs e)
         {
             UpdateImageDataIndex(false);
-            
+
         }
         public static class Mathf
         {
@@ -2499,7 +2809,7 @@ namespace Bounce_Companion
         {
             return radians * (180f / (float)Math.PI);
         }
-        public void UpdateCameraAngle(float[] objectPosition, float[] a_CameraPosition)
+        public void UpdateCameraAngle(float[] objectPosition, float[] a_CameraPosition, float t)
         {
             // Calculate the direction vector from the camera to the object
             float dx = objectPosition[0] - a_CameraPosition[0];
@@ -2517,7 +2827,7 @@ namespace Bounce_Companion
                 yawDifference += 2 * (float)Math.PI;
 
             // Smoothly interpolate the yaw angle
-            float smoothedYaw = a_CameraPosition[3] + yawDifference * 0.1f; // Adjust the interpolation factor (0.1f) as desired
+            float smoothedYaw = a_CameraPosition[3] + yawDifference * t; // Adjust the interpolation factor (0.1f) as desired
 
             // Calculate the target pitch angle (in radians)
             float targetPitch = (float)Math.Atan2(dz, Math.Sqrt(dx * dx + dy * dy));
@@ -2530,7 +2840,7 @@ namespace Bounce_Companion
                 pitchDifference += 2 * (float)Math.PI;
 
             // Smoothly interpolate the pitch angle
-            float smoothedPitch = a_CameraPosition[4] + pitchDifference * 0.1f; // Adjust the interpolation factor (0.1f) as desired
+            float smoothedPitch = a_CameraPosition[4] + pitchDifference * t; // Adjust the interpolation factor (0.1f) as desired
 
             // Convert the yaw, pitch, and roll angles to radians
             float yawRad = smoothedYaw;
@@ -2624,10 +2934,26 @@ namespace Bounce_Companion
             cameraZ -= (leftTrigger - rightTrigger) * (c_heightSpeed / 100);
 
             // Write the updated camera position to memory
-            Application.Current.Dispatcher.Invoke(() =>
+
+            MoveCameraAsync(cameraX, cameraY, cameraZ, cameraYaw, cameraPitch, cameraRoll);
+
+            void MoveCameraAsync(float x, float y, float z, float yaw, float pitch, float roll)
             {
-                _ = MoveCameraAsync(cameraX, cameraY, cameraZ, cameraYaw, cameraPitch, cameraRoll);
-            });
+                // Calculate the offsets for XYZ position and rotation values based on your game's memory structure
+
+                // Write the camera position and rotation values to memory
+                m.WriteMemory(xAddress.ToString("X"), "float", x.ToString());
+                m.WriteMemory(yAddress.ToString("X"), "float", y.ToString());
+                m.WriteMemory(zAddress.ToString("X"), "float", z.ToString());
+
+                if (!face_Selected_Player || !selectedImageData.FacePlayer) // if we are not facing the player, Set the camera anlge
+                {
+                    m.WriteMemory(yawAddress.ToString("X"), "float", yaw.ToString());
+                    m.WriteMemory(pitchAddress.ToString("X"), "float", pitch.ToString());
+                    m.WriteMemory(rollAddress.ToString("X"), "float", roll.ToString());
+                }
+            }
+
         }
 
 
@@ -2676,119 +3002,244 @@ namespace Bounce_Companion
         }
         private const float DeadbandThreshold = 0.5f;
         private bool isCameraToolOpen = false;
+        Dictionary<ControllerKey, bool> keyStates = new Dictionary<ControllerKey, bool>();
+
+
+        public enum ControllerKey
+        {
+            RT,
+            X,
+            RB,
+            Start,
+            RightStick,
+            A,
+            Y,
+            B,
+            LB,
+            LT,
+            LeftStick,
+            DPadUp,
+            DPadLeft,
+            DPadRight,
+            DPadDown,
+            Back
+        }
         private async Task HandleXboxControllerInputAsync()
         {
             await Task.Run(async () =>
             {
                 while (true)
                 {
-                    if (isCameraToolOpen)
+                    if (xboxController.IsConnected)
                     {
-                        if (xboxController.IsConnected)
+                        State controllerState = xboxController.GetState();
+
+                        if (controllerState.PacketNumber != 0)
                         {
-                            State controllerState = xboxController.GetState();
+                            float xAxisInput = ApplyDeadzone(controllerState.Gamepad.LeftThumbX / (float)short.MaxValue, 0.2f);
+                            float yAxisInput = -ApplyDeadzone(controllerState.Gamepad.LeftThumbY / (float)short.MaxValue, 0.2f); // Invert Y-axis for camera movement
+                            float yawAxisInput = ApplyDeadzone(controllerState.Gamepad.RightThumbX / (float)short.MaxValue, 0.2f);
+                            float pitchAxisInput = -ApplyDeadzone(controllerState.Gamepad.RightThumbY / (float)short.MaxValue, 0.2f);
+                            float leftTrigger = ApplyDeadzone(controllerState.Gamepad.LeftTrigger / (float)byte.MaxValue, 0.1f);
+                            float rightTrigger = ApplyDeadzone(controllerState.Gamepad.RightTrigger / (float)byte.MaxValue, 0.1f);
 
-                            if (controllerState.PacketNumber != 0)
+                            bool leftShoulderPressed = controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder);
+                            bool rightShoulderPressed = controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.RightShoulder);
+                            if (xAxisInput != 0 || yAxisInput != 0 || yawAxisInput != 0 || pitchAxisInput != 0 || leftTrigger != 0 || rightTrigger != 0 || leftShoulderPressed || rightShoulderPressed)
                             {
-                                float xAxisInput = ApplyDeadzone(controllerState.Gamepad.LeftThumbX / (float)short.MaxValue, 0.2f);
-                                float yAxisInput = -ApplyDeadzone(controllerState.Gamepad.LeftThumbY / (float)short.MaxValue, 0.2f); // Invert Y-axis for camera movement
-                                float yawAxisInput = ApplyDeadzone(controllerState.Gamepad.RightThumbX / (float)short.MaxValue, 0.2f);
-                                float pitchAxisInput = -ApplyDeadzone(controllerState.Gamepad.RightThumbY / (float)short.MaxValue, 0.2f);
-                                float leftTrigger = ApplyDeadzone(controllerState.Gamepad.LeftTrigger / (float)byte.MaxValue, 0.1f);
-                                float rightTrigger = ApplyDeadzone(controllerState.Gamepad.RightTrigger / (float)byte.MaxValue, 0.1f);
-
-                                bool leftShoulderPressed = controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder);
-                                bool rightShoulderPressed = controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.RightShoulder);
-                                if (xAxisInput != 0 || yAxisInput != 0 || yawAxisInput != 0 || pitchAxisInput != 0 || leftTrigger != 0 || rightTrigger != 0 || leftShoulderPressed || rightShoulderPressed)
+                                if (!rollCamera && isCameraToolOpen)
                                 {
-
-                                    if (!rollCamera) await MoveCameraPositionAsync(xAxisInput, yAxisInput, yawAxisInput, pitchAxisInput, leftTrigger, rightTrigger, leftShoulderPressed, rightShoulderPressed);
-                                }
-                                // Check D-pad and button presses
-                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadUp))
-                                {
-                                    Application.Current.Dispatcher.Invoke(() =>
-                                    {
-                                        CallDllFunction();
-                                    });
-                                }
-
-                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadDown))
-                                {
-                                    // D-pad Down button is pressed
-                                    // Perform your action here
-                                }
-
-                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadLeft))
-                                {
-                                    // D-pad Left button is pressed
-                                    // Perform your action here
-                                }
-
-                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadRight))
-                                {
-                                    // D-pad Right button is pressed
-                                    // Perform your action here
-                                }
-                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Start))
-                                {
-                                    Application.Current.Dispatcher.Invoke(() =>
-                                    {
-                                        _ = StartCameraRoll();
-                                    });
-                                }
-
-                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Back))
-                                {
-                                    Application.Current.Dispatcher.Invoke(() =>
-                                    {
-                                        rollCamera = false;
-                                    });
-                                }
-
-                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.A))
-                                {
-                                    // A button is pressed
-                                    // Perform your action here
-                                }
-
-                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.X))
-                                {
-                                    Application.Current.Dispatcher.Invoke(() =>
-                                    {
-                                        CaptureScene();
-                                    });
-                                }
-
-                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.B))
-                                {
-
-
-                                }
-
-                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Y))
-                                {
-                                    Application.Current.Dispatcher.Invoke(() =>
-                                    {
-                                        replaySystem.StartRecording();
-                                    });
-                                }
-
-                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder))
-                                {
-                                }
-                                if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.RightShoulder))
-                                {
-                                    // D-pad Down button is pressed
-                                    // Perform your action here
+                                    await MoveCameraPositionAsync(xAxisInput, yAxisInput, yawAxisInput, pitchAxisInput, leftTrigger, rightTrigger, leftShoulderPressed, rightShoulderPressed);
                                 }
                             }
+                            // Check D-pad and button presses
+                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadUp))
+                            {
+                                //Application.Current.Dispatcher.Invoke(() =>
+                                //{
+                                //    CallDllFunction();
+                                //});
+                                keyStates[ControllerKey.DPadUp] = true;
+                            }
+                            else keyStates[ControllerKey.DPadUp] = false;
 
+                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadDown))
+                            {
+                                // D-pad Down button is pressed
+                                // Perform your action here
+                                keyStates[ControllerKey.DPadDown] = true;
+                            }
+                            else keyStates[ControllerKey.DPadDown] = false;
+
+                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadLeft))
+                            {
+                                // D-pad Left button is pressed
+                                // Perform your action here
+                                keyStates[ControllerKey.DPadLeft] = true;
+                            }
+                            else keyStates[ControllerKey.DPadLeft] = false;
+
+                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadRight))
+                            {
+                                // D-pad Right button is pressed
+                                // Perform your action here
+                                keyStates[ControllerKey.DPadRight] = true;
+                            }
+                            else keyStates[ControllerKey.DPadRight] = false;
+
+                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Start))
+                            {
+                                //Application.Current.Dispatcher.Invoke(() =>
+                                //{
+                                //    _ = StartCameraRoll();
+                                //});
+                                keyStates[ControllerKey.Start] = true;
+                            }
+                            else keyStates[ControllerKey.Start] = false;
+
+                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Back))
+                            {
+                                //Application.Current.Dispatcher.Invoke(() =>
+                                //{
+                                //    rollCamera = false;
+                                //});
+                                keyStates[ControllerKey.Back] = true;
+                            }
+                            else keyStates[ControllerKey.Back] = false;
+
+                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.A))
+                            {
+                                // A button is pressed
+                                // Perform your action here
+                                keyStates[ControllerKey.A] = true;
+                            }
+                            else keyStates[ControllerKey.A] = false;
+
+                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.X))
+                            {
+                                //Application.Current.Dispatcher.Invoke(() =>
+                                //{
+                                //    CaptureScene();
+                                //});
+                                keyStates[ControllerKey.X] = true;
+                            }
+                            else keyStates[ControllerKey.X] = false;
+
+                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.B))
+                            {
+                                keyStates[ControllerKey.B] = true;
+                            }
+                            else keyStates[ControllerKey.B] = false;
+
+                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Y))
+                            {
+                                //Application.Current.Dispatcher.Invoke(() =>
+                                //{
+                                //    replaySystem.StartRecording();
+                                //});
+                                keyStates[ControllerKey.Y] = true;
+                            }
+                            else keyStates[ControllerKey.Y] = false;
+
+                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder))
+                            {
+                                keyStates[ControllerKey.LB] = true;
+                            }
+                            else keyStates[ControllerKey.LB] = false;
+
+                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.RightShoulder))
+                            {
+                                // D-pad Down button is pressed
+                                // Perform your action here
+                                keyStates[ControllerKey.RB] = true;
+                            }
+                            else keyStates[ControllerKey.RB] = false;
+                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftThumb))
+                            {
+                                // D-pad Down button is pressed
+                                // Perform your action here
+                                keyStates[ControllerKey.LeftStick] = true;
+                            }
+                            else keyStates[ControllerKey.LeftStick] = false;
+
+                            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.RightThumb))
+                            {
+                                // D-pad Down button is pressed
+                                // Perform your action here
+                                keyStates[ControllerKey.RightStick] = true;
+                            }
+                            else keyStates[ControllerKey.RightStick] = false;
+                            ControllerKey[] activeKeys = keyStates.Where(kv => kv.Value).Select(kv => kv.Key).ToArray();
+
+                            if (activeKeys.Length > 0) // Check if any element in trueBoolsArray is true
+                            {
+                                Application.Current.Dispatcher.Invoke(() =>
+                                {
+                                    CheckForKeyBindActivation(activeKeys);
+                                });
+                            }
                         }
+
                     }
-                    Thread.Sleep(32); // Delay between controller state checks
+                    Thread.Sleep(33); // Delay between controller state checks
                 }
             });
+        }
+        private Dictionary<string, bool> toggleStateDictionary = new Dictionary<string, bool>();
+        public List<C_List_Info> c_List_Infos_L = new List<C_List_Info>();
+        private bool isTimerRunning = false;
+        private void CheckForKeyBindActivation(ControllerKey[] activeKeys)
+        {
+            foreach (var obj in c_List_Infos_L)
+            {
+                var c_keybinds = obj.c_KeyBind;
+                string command = obj.c_Name;
+                string actionState = obj.c_action;
+                bool togglestate = obj.c_toggle;
+                bool action = false;
+
+                // Check if any keybind contains a pair of active keys
+                bool keybindActive = c_keybinds.Any(keybind =>
+                {
+                    if (c_keybinds.Length == 1)
+                    {
+                        return activeKeys.Contains(ParseControllerKey(c_keybinds[0]));
+                    }
+                    else if (c_keybinds.Length == 2)
+                    {
+                        return activeKeys.Contains(ParseControllerKey(c_keybinds[0])) &&
+                            activeKeys.Contains(ParseControllerKey(c_keybinds[1]));
+                    }
+                    return false; // No active keys in this keybind
+                });
+
+                if (actionState == "Enable Mod") action = true;
+                if (actionState == "Disable Mod") action = false;
+                if (actionState == "Toggle Mod") action = !togglestate; // Toggle the state
+
+                if (keybindActive && !isTimerRunning)
+                {
+                    ApplyMods(action, command);
+                    obj.c_toggle = action;
+                    toggleTimer.Change(250, Timeout.Infinite); // Adjust the delay as needed (e.g., 1000 milliseconds)
+                    isTimerRunning = true;
+                }
+            }
+        }
+        private void ToggleCallback(object state)
+        {
+            // Reset all toggle states
+            toggleStateDictionary.Clear();
+            isTimerRunning = false;
+        }
+        // Define a method to parse a string into a ControllerKey enum
+        private ControllerKey ParseControllerKey(string key)
+        {
+            if (Enum.TryParse<ControllerKey>(key, out ControllerKey controllerKey))
+            {
+                return controllerKey;
+            }
+            return ControllerKey.RT; // Default to a specific key if parsing fails
         }
 
         private float ApplyDeadzone(float input, float deadbandThreshold)
@@ -2862,11 +3313,11 @@ namespace Bounce_Companion
                     float[] objectPosition = { p_X, p_Y, p_Z };
                     if (face_Selected_Player)
                     {
-                        UpdateCameraAngle(objectPosition, cameraPosition);
+                        UpdateCameraAngle(objectPosition, cameraPosition, 1f);
                     }
 
                     await OffsetObjectPosition(objectPosition, cameraPosition);
-                    await Task.Delay(1); // Delay between offset calculations (adjust as needed)
+                    await Task.Delay(33); // Delay between offset calculations (adjust as needed)
                 }
                 catch
                 { MessageBox.Show("Error in OffsetObjectPositionContinuous"); Offset_Selected_Player = false; CheckBox_OffsetPlayer.IsChecked = false; }
@@ -2922,18 +3373,15 @@ namespace Bounce_Companion
 
             return Task.CompletedTask;
         }
-        private void InitializeXboxController()
+        private async Task InitializeXboxController()
         {
-            Task.Run(() =>
-            {
-                xboxController = new Controller(UserIndex.One);
+            xboxController = new Controller(UserIndex.One);
 
-                while (true)
-                {
-                    HandleXboxControllerInputAsync().Wait();
-                    Thread.Sleep(1); // Delay between controller input handling
-                }
-            });
+            while (true)
+            {
+                await HandleXboxControllerInputAsync();
+                await Task.Delay(1); // Delay between controller input handling
+            }
         }
 
 
@@ -3370,6 +3818,51 @@ namespace Bounce_Companion
             TextBox_SelectedScene.Foreground = Brushes.White;
             TextBox_ProjectName.BorderBrush = Brushes.Aqua;
         }
+        public bool auto_warpFix = false;
+
+        private void AutoWarpfix()
+        {
+            if ((bool)checkbox_AutoWarpFix.IsChecked)
+            {
+                auto_warpFix = true;
+                _ = ApplyGameMod("//warpfix", true);
+            }
+            else
+            {
+                auto_warpFix = false;
+            }
+        }
+
+        private void OpenBindsButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (controllerKeyBindsWindow == null)
+            {
+                controllerKeyBindsWindow = new ControllerKeyBinds(this);
+                controllerKeyBindsWindow.Closed += Window_Closed;
+            }
+            else
+            {
+                controllerKeyBindsWindow.Activate(); // Bring the existing window to the front
+            }
+            if (!controllerKeyBindsWindow.IsActive) controllerKeyBindsWindow.Activate();
+            controllerKeyBindsWindow.Show();
+        }
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            controllerKeyBindsWindow = null; // Set the window to null when it's closed
+        }
+
+        private void CheckBox_AutoApplyWarpfix(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            AutoWarpfix();
+        }
+
+        private async void EditFolderPaths_Click(object sender, RoutedEventArgs e)
+        {
+            await CheckAndSetMapFiles();
+        }
+
+
     }
 
 

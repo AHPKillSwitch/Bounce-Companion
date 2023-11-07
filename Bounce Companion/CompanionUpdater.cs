@@ -14,7 +14,7 @@ namespace Bounce_Companion
     {
         public class UpdateChecker
         {
-            public static async Task<bool> IsNewVersionAvailable(string owner, string repo, string currentVersion)
+            public static async Task<bool> IsNewVersionAvailable(string owner, string repo, string currentVersion, MainWindow main)
             {
                 var githubClient = new GitHubClient(new Octokit.ProductHeaderValue("Bounce-Companion"));
                 var releases = await githubClient.Repository.Release.GetAll(owner, repo);
@@ -28,6 +28,8 @@ namespace Bounce_Companion
                     // Compare versions
                     if (new Version(latestVersion) > new Version(currentVersion))
                     {
+                        main.PrintToConsole("Version " + latestRelease.TagName + " Found!");
+                        main.newVersion = latestRelease.TagName;
                         return true; // A new version is available
                     }
                 }

@@ -1,0 +1,7 @@
+﻿KeyBindButton:
+LeftButtonText:Stop
+RightButtonText:Stop
+EnableModTextOutPut:Camera Stopped.
+DisableModTextOutPut:Camera Stopped.
+Enable://stopcamera
+Disable://stopcamera

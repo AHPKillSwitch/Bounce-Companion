@@ -11,419 +11,421 @@
         <StackPanel Orientation="Vertical">
 
             <StackPanel Orientation="Horizontal" Background="#FF414141">
-                <Button Height="20" Content="Settings" Click="OpenSettingsButton_Click" FontSize="11" Width="100" Background="#FF424141" Foreground="White" BorderBrush="Transparent"/>
+                <Button Height="20" Content="Controller Binds" Click="OpenBindsButton_Click" FontSize="11" Width="120" Background="#FF424141" Foreground="White" BorderBrush="Transparent"/>
+                <Button Content="Edit Maps Paths"  Background="#FF424141" Foreground="White" BorderBrush="Transparent"/>
+                <Button Height="20" Content="Settings" Click="OpenSettingsButton_Click" FontSize="11" Width="120" Background="#FF424141" Foreground="White" BorderBrush="Transparent"/>
+                <Label Content="." Width="446"/>
+                <Label x:Name="LabStatus" Content="Process: Not Attached" Foreground="White" FontSize="11" Height="25" Grid.Column="2" Width="120" HorizontalAlignment="Right"/>
             </StackPanel>
             <TabControl x:Name="TabControl_TB" Grid.Column="2" HorizontalAlignment="Center" Height="613" VerticalAlignment="Top" Width="890" Background="Black" Margin="0,-2,0,0">
-            <TabItem Header="Home" Foreground="White" Background="#FF202020" BorderBrush="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" Width="295">
-                <Grid Background="Black">
-                    <Grid.ColumnDefinitions>
-                    </Grid.ColumnDefinitions>
-                    <Grid Background="#FF202020" HorizontalAlignment="Center" Width="880">
+                <TabItem Header="Home" Foreground="White" Background="#FF202020" BorderBrush="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" Width="295">
+                    <Grid Background="Black">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="0*"/>
-                            <ColumnDefinition Width="82*"/>
-                            <ColumnDefinition Width="799*"/>
                         </Grid.ColumnDefinitions>
-                        <StackPanel HorizontalAlignment="Left" Height="340" VerticalAlignment="Top" Width="233" Margin="3,0,0,0" Grid.Column="1" Grid.ColumnSpan="2">
-                            <Label Content="Bounce Companion" Foreground="White" FontWeight="Bold" FontSize="20" FontFamily="Calibri" Height="31" Width="170">
-                                <Label.BorderBrush>
-                                    <ImageBrush/>
-                                </Label.BorderBrush>
-                            </Label>
-                            <Image Height="207" Width="193" Source="/Content/Medals/MultiBounce/BC.png"/>
-                            <Label x:Name="LabStatusLab" Content="- - -Tool Status - - -" Foreground="White" Height="25" FontWeight="Bold" HorizontalContentAlignment="Center"/>
-                            <Label x:Name="LabStatus" Content="Process: Not Attached" Foreground="White" FontSize="10" Height="25" Width="226"/>
-                            <Label x:Name="LabPoking" Content="Tag Poking: Disabled" Foreground="White" FontSize="10" Height="25" Width="227"/>
-                            <Label x:Name="LabToolOptions" Content="- - -Tool Options - - -" Foreground="White" Height="25" FontWeight="Bold" HorizontalContentAlignment="Center"/>
-                        </StackPanel>
-                        <CheckBox x:Name="checkbox_DisableAutoPoking" Content="Disable Auto-Poking" HorizontalAlignment="Left" Margin="10,340,0,0" VerticalAlignment="Top" Foreground="White" Width="213" FontSize="10" Grid.Column="1" Height="15" Click="Disable_Mods" Grid.ColumnSpan="2"/>
-                        <CheckBox x:Name="checkbox_DisableOverlay" Content="Disable Medals, Audio and Overlay" HorizontalAlignment="Left" Margin="10,355,0,0" VerticalAlignment="Top" Foreground="White" FontSize="10" Width="213" Grid.Column="1" Height="15" Click="Disable_Medals" Grid.ColumnSpan="2"/>
-                        <CheckBox x:Name="checkbox_EnableBounceStats" Content="Enable Debug Mode" HorizontalAlignment="Left" Margin="10,370,0,0" VerticalAlignment="Top" Foreground="White" Width="123" FontSize="10" Grid.Column="1" Height="15" Click="playerInfoTabClick" Grid.ColumnSpan="2"/>
-                        <CheckBox x:Name="checkbox_EnableBounceXYZStats" Content="- Debug: log XYZ" HorizontalAlignment="Left" Margin="27,385,0,0" VerticalAlignment="Top" Foreground="White" Width="123" FontSize="10" Grid.Column="1" Height="15" Click="playerInfoTabClick" Grid.ColumnSpan="2" Visibility="Hidden"/>
-                        <CheckBox x:Name="checkbox_EnableSliderStats" Content="- Debug: Sliders" HorizontalAlignment="Left" Margin="27,400,0,0" VerticalAlignment="Top" Foreground="White" Width="123" FontSize="10" Grid.Column="1" Height="15" Click="playerInfoTabClick" Grid.ColumnSpan="2" Visibility="Hidden"/>
-                        <CheckBox x:Name="checkbox_Credits" Content="Credits" HorizontalAlignment="Left" Margin="9,461,0,0" VerticalAlignment="Top" Foreground="White" Width="213" FontSize="10" Grid.Column="1" Height="15" Click="ShowCredits" Grid.ColumnSpan="2"/>
-                        <CheckBox x:Name="checkbox_NamePlate" Content="Name Plate" HorizontalAlignment="Left" Margin="9,443,0,0" VerticalAlignment="Top" Foreground="White" Width="76" FontSize="10" Grid.Column="1" Height="22" Click="ShowNamePlates" Grid.ColumnSpan="2"/>
+                        <Grid Background="#FF202020" HorizontalAlignment="Center" Width="880">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0*"/>
+                                <ColumnDefinition Width="82*"/>
+                                <ColumnDefinition Width="799*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel HorizontalAlignment="Left" Height="262" VerticalAlignment="Top" Width="233" Margin="3,0,0,0" Grid.Column="1" Grid.ColumnSpan="2">
+                                <Label Content="Bounce Companion" Foreground="White" FontWeight="Bold" FontSize="20" FontFamily="Calibri" Height="31" Width="170">
+                                    <Label.BorderBrush>
+                                        <ImageBrush/>
+                                    </Label.BorderBrush>
+                                </Label>
+                                <Image Height="207" Width="193" Source="/Content/Medals/MultiBounce/BC.png"/>
 
-                        <RichTextBox x:Name="ConsoleOut" HorizontalAlignment="Left" Height="448" Margin="152,30,0,0" VerticalAlignment="Top" Width="637" Background="#FF202020" Foreground="White" Grid.Column="2">
-                            <FlowDocument>
-                                <Paragraph>
-                                    <Run Text=""/>
-                                </Paragraph>
-                            </FlowDocument>
-                        </RichTextBox>
-                        <TextBox x:Name="txtbox_ConsoleIn" HorizontalAlignment="Left" Height="47" Margin="152,483,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="503" Background="#FF202020" Foreground="White" Grid.Column="2" PreviewKeyDown="UIElement_PreviewKeyDown" KeyDown="ConsoleIn_KeyDown"/>
-                        <Button Content="Enter" HorizontalAlignment="Left" Height="48" Margin="660,483,0,0" VerticalAlignment="Top" Width="129" Grid.Column="2" FontSize="9" Click="SendCommands"/>
-                        <Label Grid.Column="2" Content="Output Log -" HorizontalAlignment="Left" Height="28" Margin="152,6,0,0" VerticalAlignment="Top" Width="637" Foreground="White" FontWeight="Bold" HorizontalContentAlignment="Center"/>
-                        <ComboBox Margin="10,510,0,0" x:Name="ComboBox_Mods" HorizontalAlignment="Left" VerticalAlignment="Top" Width="219" Height="22" Grid.ColumnSpan="3" SelectedValuePath="0" SelectedIndex="0" DropDownClosed="UpdateModBttns"/>
-                        <ProgressBar x:Name="progressBar_TagsProgress" HorizontalAlignment="Left" Height="15" Margin="9,537,0,0" VerticalAlignment="Top" Width="861" Grid.Column="1" RenderTransformOrigin="0.5,-0.681" Grid.ColumnSpan="2"/>
-                        <Button x:Name="Bttn_on" Content="On" Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="22" Margin="9,483,0,0" VerticalAlignment="Top" Width="106" Click="ApplyDDLModOn" RenderTransformOrigin="-2.896,-0.704"/>
-                        <Button x:Name="Bttn_off" Content="Off" HorizontalAlignment="Left" Height="22" Margin="43,483,0,0" VerticalAlignment="Top" Width="104" Click="ApplyDDLModOff" Grid.Column="2"/>
-                        <Label Content="- - - Mods - - -" Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="25" Margin="0,453,0,0" VerticalAlignment="Top" Width="234" Foreground="White" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Vertical" Grid.ColumnSpan="3" Margin="9,245,646,128">
+                                <Label x:Name="LabToolOptions" Content="- - -Tool Options - - -" Foreground="White" Height="25" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+                                <CheckBox x:Name="checkbox_AutoWarpFix" Content="Auto Enable Warpfix" Foreground="White" FontSize="10" IsEnabledChanged="CheckBox_AutoApplyWarpfix"/>
+                                <CheckBox x:Name="checkbox_DisableAutoPoking" Content="Disable Auto-Poking" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" Width="213" FontSize="10" Grid.Column="1" Height="15" Click="Disable_Mods" Grid.ColumnSpan="2"/>
+                                <CheckBox x:Name="checkbox_DisableOverlay" Content="Disable Medals, Audio and Overlay" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" FontSize="10" Width="213" Grid.Column="1" Height="15" Click="Disable_Medals" Grid.ColumnSpan="2"/>
+                                <CheckBox x:Name="checkbox_EnableBounceStats" Content="Enable Debug Mode" HorizontalAlignment="Left"  VerticalAlignment="Top" Foreground="White" Width="123" FontSize="10" Grid.Column="1" Height="15" Click="playerInfoTabClick" Grid.ColumnSpan="2"/>
+                                <CheckBox x:Name="checkbox_EnableBounceXYZStats" Content="- Debug: log XYZ" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" Width="123" FontSize="10" Grid.Column="1" Height="15" Click="playerInfoTabClick" Grid.ColumnSpan="2" Visibility="Visible"/>
+                                <CheckBox x:Name="checkbox_EnableSliderStats" Content="- Debug: Sliders" HorizontalAlignment="Left"  VerticalAlignment="Top" Foreground="White" Width="123" FontSize="10" Grid.Column="1" Height="15" Click="playerInfoTabClick" Grid.ColumnSpan="2" Visibility="Visible"/>
+                                <CheckBox x:Name="checkbox_Credits" Content="Credits" HorizontalAlignment="Left"  VerticalAlignment="Top" Foreground="White"  FontSize="10" Grid.Column="1" Height="15" Click="ShowCredits" Grid.ColumnSpan="2"/>
+                                <CheckBox x:Name="checkbox_NamePlate" Content="Name Plate" HorizontalAlignment="Left"  VerticalAlignment="Top" Foreground="White" Width="76" FontSize="10" Grid.Column="1" Height="22" Click="ShowNamePlates" Grid.ColumnSpan="2"/>
+                            </StackPanel>
+                            <RichTextBox x:Name="ConsoleOut" HorizontalAlignment="Left" Height="448" Margin="152,30,0,0" VerticalAlignment="Top" Width="637" Background="#FF202020" Foreground="White" Grid.Column="2">
+                                <FlowDocument>
+                                    <Paragraph>
+                                        <Run Text=""/>
+                                    </Paragraph>
+                                </FlowDocument>
+                            </RichTextBox>
+                            <TextBox x:Name="txtbox_ConsoleIn" HorizontalAlignment="Left" Height="47" Margin="152,483,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="503" Background="#FF202020" Foreground="White" Grid.Column="2" PreviewKeyDown="UIElement_PreviewKeyDown" KeyDown="ConsoleIn_KeyDown"/>
+                            <Button Content="Enter" HorizontalAlignment="Left" Height="48" Margin="660,483,0,0" VerticalAlignment="Top" Width="129" Grid.Column="2" FontSize="9" Click="SendCommands"/>
+                            <Label Grid.Column="2" Content="Output Log -" HorizontalAlignment="Left" Height="28" Margin="152,2,0,0" VerticalAlignment="Top" Width="85" Foreground="White" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+                            <ComboBox Margin="10,510,0,0" x:Name="ComboBox_Mods" HorizontalAlignment="Left" VerticalAlignment="Top" Width="219" Height="22" Grid.ColumnSpan="3" SelectedValuePath="0" SelectedIndex="0" DropDownClosed="UpdateModBttns"/>
+                            <ProgressBar x:Name="progressBar_TagsProgress" HorizontalAlignment="Left" Height="15" Margin="9,537,0,0" VerticalAlignment="Top" Width="861" Grid.Column="1" RenderTransformOrigin="0.5,-0.681" Grid.ColumnSpan="2"/>
+                            <Button x:Name="Bttn_on" Content="On" Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="22" Margin="9,483,0,0" VerticalAlignment="Top" Width="106" Click="ApplyDDLModOn" RenderTransformOrigin="-2.896,-0.704"/>
+                            <Button x:Name="Bttn_off" Content="Off" HorizontalAlignment="Left" Height="22" Margin="43,483,0,0" VerticalAlignment="Top" Width="104" Click="ApplyDDLModOff" Grid.Column="2"/>
+                            <Label Content="- - - Mods - - -" Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="25" Margin="0,453,0,0" VerticalAlignment="Top" Width="234" Foreground="White" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+                        </Grid>
+
 
 
                     </Grid>
-
-
-
-                </Grid>
-            </TabItem>
+                </TabItem>
                 <TabItem x:Name="TabItem_CameraTool" Header="Camera Tool" BorderBrush="Transparent" Foreground="White" Background="#FF202020" HorizontalAlignment="Left" VerticalAlignment="Center" Width="295">
-                <Grid>
-                    <StackPanel Background="#FF202020" Margin="10,0,10,2" Grid.ColumnSpan="2">
+                    <Grid>
+                        <StackPanel Background="#FF202020" Margin="10,0,10,2" Grid.ColumnSpan="2">
 
-                        <!-- Large Image Panel -->
-                        <!-- Large Image Panel -->
-                        <StackPanel Orientation="Vertical"  Height="319" Width="864">
-                            <StackPanel Orientation="Horizontal" Height="319" Width="863">
+                            <!-- Large Image Panel -->
+                            <!-- Large Image Panel -->
+                            <StackPanel Orientation="Vertical"  Height="319" Width="864">
+                                <StackPanel Orientation="Horizontal" Height="319" Width="863">
 
-                                <StackPanel Width="180">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Project Name:" Height="16" FontWeight="Normal" Foreground="White" FontFamily="Calibri" FontSize="10" Margin="0,0,5,0"/>
-                                        <TextBox x:Name="TextBox_ProjectName" BorderBrush="PaleVioletRed" Text="Untitled" Height="16" FontWeight="Normal" Foreground="White" FontFamily="Calibri" FontSize="11" Background="Transparent" Width="116" TextChanged="UpdateSelectedSceneTextBox_Event"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Button Content="Load Project" Width="90" Click="LoadScenarioDataFromFile_click"/>
-                                        <Button Content="Save  Project" Width="90" Click="SaveSceneDataToFile_click"/>
-                                    </StackPanel>
-
-                                    <TextBlock Text="Camera Data"   Foreground="White"  Height="15" TextAlignment="Center" FontSize="11" />
-                                    <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
-                                        <TextBlock Text="X:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11"/>
-                                        <TextBox x:Name="SceneDataTextBox_C_X" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" FontSize="10" TextBlock.FontSize="11" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
-                                        <TextBlock Text="Y:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11"/>
-                                        <TextBox x:Name="SceneDataTextBox_C_Y" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" FontSize="10" TextBlock.FontSize="11" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
-                                        <TextBlock Text="Z:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11"/>
-                                        <TextBox x:Name="SceneDataTextBox_C_Z" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" FontSize="10" TextBlock.FontSize="11" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
-                                        <TextBlock Text="Yaw:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11" />
-                                        <TextBox x:Name="SceneDataTextBox_C_Yaw" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" FontSize="10" TextBlock.FontSize="11" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
-                                        <TextBlock Text="Pitch:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11"/>
-                                        <TextBox x:Name="SceneDataTextBox_C_Pitch" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" FontSize="10" TextBlock.FontSize="11" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
-                                        <TextBlock Text="Roll:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11" />
-                                        <TextBox x:Name="SceneDataTextBox_C_Roll" BorderBrush = "Transparent" Text="0" Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" FontSize="10" TextBlock.FontSize="11" />
-                                    </StackPanel>
-                                    <Separator Margin="0,2,0,0"/>
-                                    <TextBlock Text="Target Player" Height="16" FontWeight="Normal" HorizontalAlignment="Center" VerticalAlignment="Stretch" FontSize="11"/>
-                                    <ComboBox x:Name="ComboBox_Playernames" Height="19" Width="174" DropDownOpened="LoadNamesToComboBox" HorizontalAlignment="Center"/>
-                                    <StackPanel Orientation="Horizontal" Width="176" HorizontalAlignment="Center">
-                                        <TextBlock Text="Track Player " Height="16" FontWeight="Normal" VerticalAlignment="Stretch" Width="160" FontSize="11"/>
-                                        <CheckBox x:Name="CheckBox_TrackPlayer" Height="15" Click="CheckBoxChecked_TrackPlayer" Width="15" HorizontalAlignment="Center"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Width="176" HorizontalAlignment="Center">
-                                        <TextBlock Text="Spectate Player" Height="16" FontWeight="Normal" VerticalAlignment="Stretch" Width="160" FontSize="11"/>
-                                        <CheckBox x:Name="CheckBox_OffsetPlayer" Height="15" Width="16" HorizontalAlignment="Stretch" Click="CheckBoxChecked_OffsetPlayer"/>
-                                    </StackPanel>
-
-                                    <Separator Margin="0,2,0,0"/>
-                                    <TextBlock Text="Spectate Camera Offsets" Width="168"  Foreground="White"  Height="15" TextAlignment="Center" FontSize="11" />
-                                    <TextBlock Text="X         :        Y        :            Z" Width="168"  Foreground="White"  Height="15" TextAlignment="Center" FontSize="11" />
-                                    <StackPanel Orientation="Horizontal" Width="177" HorizontalAlignment="Center">
-                                        <TextBox x:Name="TextBox_Offset_X" BorderBrush = "Transparent"  Text="0.00" Width="49" Foreground="White" Background="#FF202020" TextChanged="UpdateScene_Click" FontWeight="Bold" TextAlignment="Center" TextBlock.FontSize="11" />
-                                        <StackPanel Orientation="Vertical" Width="10">
-                                            <Button x:Name="Button_X_Up" Height="10" Click="Button_Up_Click">
-                                                <Button.Background>
-                                                    <ImageBrush ImageSource="/uparrow.jpg"/>
-                                                </Button.Background>
-
-                                            </Button>
-                                            <Button x:Name="Button_X_Down" Height="10" Content="↑" HorizontalAlignment="Stretch" Click="Button_Down_Click">
-                                                <Button.Background>
-                                                    <ImageBrush ImageSource="/down arrow.jpg"/>
-                                                </Button.Background>
-                                            </Button>
-
+                                    <StackPanel Width="180">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Project Name:" Height="16" FontWeight="Normal" Foreground="White" FontFamily="Calibri" FontSize="10" Margin="0,0,5,0"/>
+                                            <TextBox x:Name="TextBox_ProjectName" BorderBrush="PaleVioletRed" Text="Untitled" Height="16" FontWeight="Normal" Foreground="White" FontFamily="Calibri" FontSize="11" Background="Transparent" Width="116" TextChanged="UpdateSelectedSceneTextBox_Event"/>
                                         </StackPanel>
-                                        <TextBox x:Name="TextBox_Offset_Y" Text="0.00" BorderBrush = "Transparent" Width="49" Foreground="White" Background="#FF202020" TextChanged="UpdateScene_Click" FontWeight="Bold" TextAlignment="Center" TextBlock.FontSize="10" />
-                                        <StackPanel Orientation="Vertical" Width="10">
-                                            <Button x:Name="Button_Y_Up" Height="10" Click="Button_Up_Click">
-                                                <Button.Background>
-                                                    <ImageBrush ImageSource="/uparrow.jpg"/>
-                                                </Button.Background>
-
-                                            </Button>
-                                            <Button x:Name="Button_Y_Down" Height="10" Content="↑" HorizontalAlignment="Stretch" Click="Button_Down_Click">
-                                                <Button.Background>
-                                                    <ImageBrush ImageSource="/down arrow.jpg"/>
-                                                </Button.Background>
-                                            </Button>
-
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="Load Project" Width="90" Click="LoadScenarioDataFromFile_click"/>
+                                            <Button Content="Save  Project" Width="90" Click="SaveSceneDataToFile_click"/>
                                         </StackPanel>
-                                        <TextBox x:Name="TextBox_Offset_Z" Text="1.50" Width="49" BorderBrush = "Transparent" Foreground="White" Background="#FF202020" TextChanged="UpdateScene_Click" FontWeight="Bold" TextAlignment="Center" TextBlock.FontSize="10" />
-                                        <StackPanel Orientation="Vertical" Width="10">
-                                            <Button x:Name="Button_Z_Up" Height="10" Click="Button_Up_Click">
-                                                <Button.Background>
-                                                    <ImageBrush ImageSource="/uparrow.jpg"/>
-                                                </Button.Background>
 
-                                            </Button>
-                                            <Button x:Name="Button_Z_Down" Height="10" Content="↑" HorizontalAlignment="Stretch" Click="Button_Down_Click">
-                                                <Button.Background>
-                                                    <ImageBrush ImageSource="/down arrow.jpg"/>
-                                                </Button.Background>
-                                            </Button>
+                                        <TextBlock Text="Camera Data"   Foreground="White"  Height="15" TextAlignment="Center" FontSize="11" />
+                                        <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
+                                            <TextBlock Text="X:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11"/>
+                                            <TextBox x:Name="SceneDataTextBox_C_X" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" FontSize="10" TextBlock.FontSize="11" />
                                         </StackPanel>
-                                    </StackPanel>
-                                    <Separator Margin="0,2,0,0"/>
+                                        <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
+                                            <TextBlock Text="Y:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11"/>
+                                            <TextBox x:Name="SceneDataTextBox_C_Y" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" FontSize="10" TextBlock.FontSize="11" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
+                                            <TextBlock Text="Z:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11"/>
+                                            <TextBox x:Name="SceneDataTextBox_C_Z" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" FontSize="10" TextBlock.FontSize="11" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
+                                            <TextBlock Text="Yaw:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11" />
+                                            <TextBox x:Name="SceneDataTextBox_C_Yaw" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" FontSize="10" TextBlock.FontSize="11" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
+                                            <TextBlock Text="Pitch:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11"/>
+                                            <TextBox x:Name="SceneDataTextBox_C_Pitch" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" FontSize="10" TextBlock.FontSize="11" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
+                                            <TextBlock Text="Roll:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11" />
+                                            <TextBox x:Name="SceneDataTextBox_C_Roll" BorderBrush = "Transparent" Text="0" Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" FontSize="10" TextBlock.FontSize="11" />
+                                        </StackPanel>
+                                        <Separator Margin="0,2,0,0"/>
+                                        <TextBlock Text="Target Player" Height="16" FontWeight="Normal" HorizontalAlignment="Center" VerticalAlignment="Stretch" FontSize="11"/>
+                                        <ComboBox x:Name="ComboBox_Playernames" Height="19" Width="174" DropDownOpened="LoadNamesToComboBox" HorizontalAlignment="Center"/>
+                                        <StackPanel Orientation="Horizontal" Width="176" HorizontalAlignment="Center">
+                                            <TextBlock Text="Track Player " Height="16" FontWeight="Normal" VerticalAlignment="Stretch" Width="160" FontSize="11"/>
+                                            <CheckBox x:Name="CheckBox_TrackPlayer" Height="15" Click="CheckBoxChecked_TrackPlayer" Width="15" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Width="176" HorizontalAlignment="Center">
+                                            <TextBlock Text="Spectate Player" Height="16" FontWeight="Normal" VerticalAlignment="Stretch" Width="160" FontSize="11"/>
+                                            <CheckBox x:Name="CheckBox_OffsetPlayer" Height="15" Width="16" HorizontalAlignment="Stretch" Click="CheckBoxChecked_OffsetPlayer"/>
+                                        </StackPanel>
+
+                                        <Separator Margin="0,2,0,0"/>
+                                        <TextBlock Text="Spectate Camera Offsets" Width="168"  Foreground="White"  Height="15" TextAlignment="Center" FontSize="11" />
+                                        <TextBlock Text="X         :        Y        :            Z" Width="168"  Foreground="White"  Height="15" TextAlignment="Center" FontSize="11" />
+                                        <StackPanel Orientation="Horizontal" Width="177" HorizontalAlignment="Center">
+                                            <TextBox x:Name="TextBox_Offset_X" BorderBrush = "Transparent"  Text="0.00" Width="49" Foreground="White" Background="#FF202020" TextChanged="UpdateScene_Click" FontWeight="Bold" TextAlignment="Center" TextBlock.FontSize="11" />
+                                            <StackPanel Orientation="Vertical" Width="10">
+                                                <Button x:Name="Button_X_Up" Height="10" Click="Button_Up_Click">
+                                                    <Button.Background>
+                                                        <ImageBrush ImageSource="/uparrow.jpg"/>
+                                                    </Button.Background>
+
+                                                </Button>
+                                                <Button x:Name="Button_X_Down" Height="10" Content="↑" HorizontalAlignment="Stretch" Click="Button_Down_Click">
+                                                    <Button.Background>
+                                                        <ImageBrush ImageSource="/down arrow.jpg"/>
+                                                    </Button.Background>
+                                                </Button>
+
+                                            </StackPanel>
+                                            <TextBox x:Name="TextBox_Offset_Y" Text="0.00" BorderBrush = "Transparent" Width="49" Foreground="White" Background="#FF202020" TextChanged="UpdateScene_Click" FontWeight="Bold" TextAlignment="Center" TextBlock.FontSize="10" />
+                                            <StackPanel Orientation="Vertical" Width="10">
+                                                <Button x:Name="Button_Y_Up" Height="10" Click="Button_Up_Click">
+                                                    <Button.Background>
+                                                        <ImageBrush ImageSource="/uparrow.jpg"/>
+                                                    </Button.Background>
+
+                                                </Button>
+                                                <Button x:Name="Button_Y_Down" Height="10" Content="↑" HorizontalAlignment="Stretch" Click="Button_Down_Click">
+                                                    <Button.Background>
+                                                        <ImageBrush ImageSource="/down arrow.jpg"/>
+                                                    </Button.Background>
+                                                </Button>
+
+                                            </StackPanel>
+                                            <TextBox x:Name="TextBox_Offset_Z" Text="1.50" Width="49" BorderBrush = "Transparent" Foreground="White" Background="#FF202020" TextChanged="UpdateScene_Click" FontWeight="Bold" TextAlignment="Center" TextBlock.FontSize="10" />
+                                            <StackPanel Orientation="Vertical" Width="10">
+                                                <Button x:Name="Button_Z_Up" Height="10" Click="Button_Up_Click">
+                                                    <Button.Background>
+                                                        <ImageBrush ImageSource="/uparrow.jpg"/>
+                                                    </Button.Background>
+
+                                                </Button>
+                                                <Button x:Name="Button_Z_Down" Height="10" Content="↑" HorizontalAlignment="Stretch" Click="Button_Down_Click">
+                                                    <Button.Background>
+                                                        <ImageBrush ImageSource="/down arrow.jpg"/>
+                                                    </Button.Background>
+                                                </Button>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <Separator Margin="0,2,0,0"/>
 
 
-                                    <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center" Margin="0,4,0,5">
-                                        <TextBlock Text="Starting Transition Speed" Width="142"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="10" />
-                                        <TextBox x:Name="GlobalTransitionTimeTextBox" Text="1.00" BorderBrush = "Transparent" Width="34" Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" Margin="0,0,0,2" FontSize="11" />
+                                        <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center" Margin="0,4,0,5">
+                                            <TextBlock Text="Starting Transition Speed" Width="142"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="10" />
+                                            <TextBox x:Name="GlobalTransitionTimeTextBox" Text="1.00" BorderBrush = "Transparent" Width="34" Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" Margin="0,0,0,2" FontSize="11" />
+                                        </StackPanel>
+                                        <Separator Margin="0,2,0,1"/>
+
+
+
                                     </StackPanel>
-                                    <Separator Margin="0,2,0,1"/>
-                                    
+                                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" RenderTransformOrigin="0.5,0.5" Width="7" >
+                                        <Separator.RenderTransform>
+                                            <TransformGroup>
+                                                <ScaleTransform ScaleX="-1"/>
+                                                <SkewTransform/>
+                                                <RotateTransform/>
+                                                <TranslateTransform/>
+                                            </TransformGroup>
+                                        </Separator.RenderTransform>
+                                    </Separator>
+                                    <StackPanel Orientation="Vertical" Width="477">
+                                        <TextBlock x:Name="TextBox_SelectedScene" Text="⇦ ⇦ ⇦ Don`t forget to give your project a name!!" TextAlignment="Center" FontWeight="Bold" Foreground="Red"/>
+                                        <Image x:Name="LargeImage" Height="304" Width="475" Visibility="Visible" Stretch="Uniform" OpacityMask="Black" />
+                                    </StackPanel>
+                                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Width="7" RenderTransformOrigin="0.5,0.5" >
+                                        <Separator.RenderTransform>
+                                            <TransformGroup>
+                                                <ScaleTransform ScaleX="-1"/>
+                                                <SkewTransform/>
+                                                <RotateTransform/>
+                                                <TranslateTransform/>
+                                            </TransformGroup>
+                                        </Separator.RenderTransform>
+                                    </Separator>
+
+                                    <StackPanel Width="189">
+                                        <TextBlock x:Name="TextBox_SelectedSceneData" Text=" - Selected Scene Data -  " Height="16" FontWeight="Bold" TextAlignment="Center" Foreground="White"/>
+                                        <Separator/>
+                                        <TextBlock Text="Scene Coordinate"   Foreground="White"  Height="15" TextAlignment="Center" FontSize="11" />
+                                        <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
+                                            <TextBlock Text="X:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11" />
+                                            <TextBox x:Name="SceneDataTextBox_X" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" Margin="0,0,0,2" FontSize="11" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
+                                            <TextBlock Text="Y:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11" />
+                                            <TextBox x:Name="SceneDataTextBox_Y" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" Margin="0,0,0,2" FontSize="11" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
+                                            <TextBlock Text="Z:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11" />
+                                            <TextBox x:Name="SceneDataTextBox_Z" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" Margin="0,0,0,2" FontSize="11" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
+                                            <TextBlock Text="Yaw:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11" />
+                                            <TextBox x:Name="SceneDataTextBox_Yaw" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" Margin="0,0,0,2" FontSize="11" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
+                                            <TextBlock Text="Pitch:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11" />
+                                            <TextBox x:Name="SceneDataTextBox_Pitch" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" Margin="0,0,0,2" FontSize="11" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
+                                            <TextBlock Text="Roll:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11" />
+                                            <TextBox x:Name="SceneDataTextBox_Roll" BorderBrush = "Transparent" Text="0" Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" Margin="0,0,0,2" FontSize="11" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Width="177" HorizontalAlignment="Center">
+                                            <TextBlock Text="Scene Transition Time: " Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11" />
+                                            <TextBox x:Name="TransitionTimeTextBox" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" Margin="0,0,0,2" FontSize="11" />
+                                        </StackPanel>
+                                        <Separator Margin="0,6,0,2"/>
+                                        <TextBlock Text="- Post Scene Settings - "   Foreground="White"  Height="15" TextAlignment="Center" FontWeight="Bold" />
+                                        <StackPanel Orientation="Vertical" Width="177" HorizontalAlignment="Center">
+                                            <TextBlock Text="Select Player  " Height="16" FontWeight="Normal" HorizontalAlignment="Center" VerticalAlignment="Stretch" FontSize="11"/>
+                                            <ComboBox x:Name="ComboBox_SceneData_Playernames" Height="20" Width="175" DropDownOpened="LoadNamesToComboBox" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Width="177" HorizontalAlignment="Center">
+                                            <TextBlock Text="Track Player After Scene: " Width="161"  Foreground="White"  Height="15" TextAlignment="Left" HorizontalAlignment="Center" FontSize="11" />
+                                            <CheckBox x:Name="CheckBox_TrackAfterScene" Width="16" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Width="177" HorizontalAlignment="Center">
+                                            <TextBlock Text="Spectate Player After Scene: " Width="161"  Foreground="White"  Height="15" TextAlignment="Left" HorizontalAlignment="Center" FontSize="11" />
+                                            <CheckBox x:Name="CheckBox_OffsetAfterScene" Width="16" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                        <Separator Margin="0,2,0,2"/>
+                                        <TextBlock Text="Spectate Offsets" Width="180"  Foreground="White"  Height="15" TextAlignment="Center" HorizontalAlignment="Center" Margin="0,-4,0,1" />
+                                        <TextBlock Text="X        :        Y        :        Z" Width="168"  Foreground="White"  Height="15" TextAlignment="Center" />
+                                        <StackPanel Orientation="Horizontal" Width="177" HorizontalAlignment="Center">
+                                            <TextBox x:Name="TextBox_SceneData_Offset_X" Text="1.00" BorderBrush = "Transparent" Width="60" Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" />
+                                            <TextBox x:Name="TextBox_SceneData_Offset_Y" Text="1.00" Width="60" BorderBrush = "Transparent" Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" />
+                                            <TextBox x:Name="TextBox_SceneData_Offset_Z" Text="1.00" Width="54" BorderBrush = "Transparent" Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" />
+                                        </StackPanel>
+                                        <Separator Margin="0,0,0,1"/>
+
+                                        <Button Content="Save Changes" Height="20" Width="188" Click="UpdateScene_Click" FontWeight="Bold" HorizontalAlignment="Stretch"/>
+                                    </StackPanel>
 
 
                                 </StackPanel>
-                                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" RenderTransformOrigin="0.5,0.5" Width="7" >
-                                    <Separator.RenderTransform>
-                                        <TransformGroup>
-                                            <ScaleTransform ScaleX="-1"/>
-                                            <SkewTransform/>
-                                            <RotateTransform/>
-                                            <TranslateTransform/>
-                                        </TransformGroup>
-                                    </Separator.RenderTransform>
-                                </Separator>
-                                <StackPanel Orientation="Vertical" Width="477">
-                                    <TextBlock x:Name="TextBox_SelectedScene" Text="⇦ ⇦ ⇦ Don`t forget to give your project a name!!" TextAlignment="Center" FontWeight="Bold" Foreground="Red"/>
-                                    <Image x:Name="LargeImage" Height="304" Width="475" Visibility="Visible" Stretch="Uniform" OpacityMask="Black" />
-                                </StackPanel>
-                                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Width="7" RenderTransformOrigin="0.5,0.5" >
-                                    <Separator.RenderTransform>
-                                        <TransformGroup>
-                                            <ScaleTransform ScaleX="-1"/>
-                                            <SkewTransform/>
-                                            <RotateTransform/>
-                                            <TranslateTransform/>
-                                        </TransformGroup>
-                                    </Separator.RenderTransform>
-                                </Separator>
+                            </StackPanel>
+                            <Separator Height="3" Width="auto" Margin="0,0,0,-8">
+                                <Separator.Style>
+                                    <Style TargetType="{x:Type Separator}">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type Separator}">
+                                                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Height="{TemplateBinding Height}" />
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </Separator.Style>
+                            </Separator>
+                            <!-- Image Timeline -->
+                            <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Visible" Height="183">
+                                <StackPanel x:Name="ImageStackPanel" Orientation="Horizontal" Margin="10" Height="152" RenderTransformOrigin="0.5,0.5" Width="auto">
 
-                                <StackPanel Width="189">
-                                    <TextBlock x:Name="TextBox_SelectedSceneData" Text=" - Selected Scene Data -  " Height="16" FontWeight="Bold" TextAlignment="Center" Foreground="White"/>
-                                    <Separator/>
-                                    <TextBlock Text="Scene Coordinate"   Foreground="White"  Height="15" TextAlignment="Center" FontSize="11" />
-                                    <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
-                                        <TextBlock Text="X:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11" />
-                                        <TextBox x:Name="SceneDataTextBox_X" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" Margin="0,0,0,2" FontSize="11" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
-                                        <TextBlock Text="Y:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11" />
-                                        <TextBox x:Name="SceneDataTextBox_Y" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" Margin="0,0,0,2" FontSize="11" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
-                                        <TextBlock Text="Z:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11" />
-                                        <TextBox x:Name="SceneDataTextBox_Z" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" Margin="0,0,0,2" FontSize="11" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
-                                        <TextBlock Text="Yaw:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11" />
-                                        <TextBox x:Name="SceneDataTextBox_Yaw" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" Margin="0,0,0,2" FontSize="11" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
-                                        <TextBlock Text="Pitch:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11" />
-                                        <TextBox x:Name="SceneDataTextBox_Pitch" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" Margin="0,0,0,2" FontSize="11" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Width="178" HorizontalAlignment="Center">
-                                        <TextBlock Text="Roll:" Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11" />
-                                        <TextBox x:Name="SceneDataTextBox_Roll" BorderBrush = "Transparent" Text="0" Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" Margin="0,0,0,2" FontSize="11" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Width="177" HorizontalAlignment="Center">
-                                        <TextBlock Text="Scene Transition Time: " Width="130"  Foreground="White"  Height="15" TextAlignment="Left" FontSize="11" />
-                                        <TextBox x:Name="TransitionTimeTextBox" BorderBrush = "Transparent" Text="0"  Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" Height="15" Margin="0,0,0,2" FontSize="11" />
-                                    </StackPanel>
-                                    <Separator Margin="0,6,0,2"/>
-                                    <TextBlock Text="- Post Scene Settings - "   Foreground="White"  Height="15" TextAlignment="Center" FontWeight="Bold" />
-                                    <StackPanel Orientation="Vertical" Width="177" HorizontalAlignment="Center">
-                                        <TextBlock Text="Select Player  " Height="16" FontWeight="Normal" HorizontalAlignment="Center" VerticalAlignment="Stretch" FontSize="11"/>
-                                        <ComboBox x:Name="ComboBox_SceneData_Playernames" Height="20" Width="175" DropDownOpened="LoadNamesToComboBox" HorizontalAlignment="Center"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Width="177" HorizontalAlignment="Center">
-                                        <TextBlock Text="Track Player After Scene: " Width="161"  Foreground="White"  Height="15" TextAlignment="Left" HorizontalAlignment="Center" FontSize="11" />
-                                        <CheckBox x:Name="CheckBox_TrackAfterScene" Width="16" HorizontalAlignment="Center"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Width="177" HorizontalAlignment="Center">
-                                        <TextBlock Text="Spectate Player After Scene: " Width="161"  Foreground="White"  Height="15" TextAlignment="Left" HorizontalAlignment="Center" FontSize="11" />
-                                        <CheckBox x:Name="CheckBox_OffsetAfterScene" Width="16" HorizontalAlignment="Center"/>
-                                    </StackPanel>
-                                    <Separator Margin="0,2,0,2"/>
-                                    <TextBlock Text="Spectate Offsets" Width="180"  Foreground="White"  Height="15" TextAlignment="Center" HorizontalAlignment="Center" Margin="0,-4,0,1" />
-                                    <TextBlock Text="X        :        Y        :        Z" Width="168"  Foreground="White"  Height="15" TextAlignment="Center" />
-                                    <StackPanel Orientation="Horizontal" Width="177" HorizontalAlignment="Center">
-                                        <TextBox x:Name="TextBox_SceneData_Offset_X" Text="1.00" BorderBrush = "Transparent" Width="60" Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" />
-                                        <TextBox x:Name="TextBox_SceneData_Offset_Y" Text="1.00" Width="60" BorderBrush = "Transparent" Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" />
-                                        <TextBox x:Name="TextBox_SceneData_Offset_Z" Text="1.00" Width="54" BorderBrush = "Transparent" Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" />
-                                    </StackPanel>
-                                    <Separator Margin="0,0,0,1"/>
-
-                                    <Button Content="Save Changes" Height="20" Width="188" Click="UpdateScene_Click" FontWeight="Bold" HorizontalAlignment="Stretch"/>
+                                    <!-- Images will be added here -->
                                 </StackPanel>
 
+                            </ScrollViewer>
+                            <StackPanel Height="68">
+                                <StackPanel Orientation="Horizontal" Height="30">
+                                    <Button Content="" Click="StartCamera" ToolTip="Play Scenes" Width="75">
+                                        <Button.Background>
+                                            <ImageBrush ImageSource="/Play Button.jpg" Stretch="Fill"/>
+                                        </Button.Background>
+                                    </Button>
+                                    <Button Click="LoopCamera" ToolTip="Loop camera path." Width="78">
+                                        <Button.Background>
+                                            <ImageBrush ImageSource="/Loop Button.jpg"/>
+                                        </Button.Background>
+                                    </Button>
+                                    <Button Content=""  RenderTransformOrigin="1.176,0.547" ToolTip="Stop camera" Click="StopCamera" Width="75">
+                                        <Button.Background>
+                                            <ImageBrush ImageSource="/Stop Button.jpg" Stretch="Uniform"/>
+                                        </Button.Background>
+                                    </Button>
+                                    <Button FontSize="20" FontWeight="Bold" Click="InsertSceneBeforeSelected_Click" ToolTip="Insert scene before selected scene." Width="20">
+                                        <Button.Background>
+                                            <ImageBrush ImageSource="/camera Insert Left1.png"/>
+                                        </Button.Background>
+                                    </Button>
+                                    <Button Content=""  Foreground="White" Click="AddButton_Click" FontWeight="Bold" ToolTip="Capture scene." Width="75" >
+                                        <Button.Background>
+                                            <ImageBrush ImageSource="/camera.png"/>
+                                        </Button.Background>
+                                    </Button>
+                                    <Button FontSize="20" FontWeight="Bold" FontStyle="Normal" Click="InsertSceneAfterSelected_Click" ToolTip="Insert scene after selected scene." Width="20" >
+                                        <Button.Background>
+                                            <ImageBrush ImageSource="/camera Insert Right.png"/>
+                                        </Button.Background>
+                                    </Button>
+                                    <Button Content="Re-Capture Scene" ToolTip="Re-capture the selected scene"  Foreground="White" Background="#FF202020" Click="ResetScene_Click" FontWeight="Bold" Width="96" FontSize="10"/>
+                                    <Button Content="Jump To Scene" ToolTip="TP camera to selected scene." Background="#FF202020" BorderBrush="#FF707070" Foreground="White" Click="JumpToSceneButton_Click" FontWeight="Bold" Width="232" FontSize="10"/>
+                                    <Button Content="Delete Scene" ToolTip="Delete selected scene." Foreground="White" Click="DeleteScene" FontWeight="Bold" Width="84" FontSize="10">
+                                        <Button.Background>
+                                            <RadialGradientBrush>
+                                                <GradientStop Color="Black" Offset="1"/>
+                                                <GradientStop Color="#FFFF0B0B" Offset="0"/>
+                                            </RadialGradientBrush>
+                                        </Button.Background>
+                                    </Button>
+                                    <Button Content="Delete All" ToolTip="Delete all scenes." Foreground="White" Click="ClearTimelineButton_Click" FontWeight="Bold" Width="84" FontSize="10">
+                                        <Button.Background>
+                                            <RadialGradientBrush>
+                                                <GradientStop Color="Black" Offset="1"/>
+                                                <GradientStop Color="#FFFF0B0B" Offset="0"/>
+                                            </RadialGradientBrush>
+                                        </Button.Background>
+                                    </Button>
+                                </StackPanel>
+                                <Button x:Name="button_DebugCamera" Content="Toggle Debug Camera" Height="29"  Click="ToggleDebugCamera" Foreground="White" Background="#FF382323" FontWeight="Bold" FontSize="10"/>
 
                             </StackPanel>
                         </StackPanel>
-                        <Separator Height="3" Width="auto" Margin="0,0,0,-8">
-                            <Separator.Style>
-                                <Style TargetType="{x:Type Separator}">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="{x:Type Separator}">
-                                                <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Height="{TemplateBinding Height}" />
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </Separator.Style>
-                        </Separator>
-                        <!-- Image Timeline -->
-                        <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Visible" Height="183">
-                            <StackPanel x:Name="ImageStackPanel" Orientation="Horizontal" Margin="10" Height="152" RenderTransformOrigin="0.5,0.5" Width="auto">
-
-                                <!-- Images will be added here -->
-                            </StackPanel>
-
-                        </ScrollViewer>
-                        <StackPanel Height="68">
-                            <StackPanel Orientation="Horizontal" Height="30">
-                                <Button Content="" Click="StartCamera" ToolTip="Play Scenes" Width="75">
-                                    <Button.Background>
-                                        <ImageBrush ImageSource="/Play Button.jpg" Stretch="Fill"/>
-                                    </Button.Background>
-                                </Button>
-                                <Button Click="LoopCamera" ToolTip="Loop camera path." Width="78">
-                                    <Button.Background>
-                                        <ImageBrush ImageSource="/Loop Button.jpg"/>
-                                    </Button.Background>
-                                </Button>
-                                <Button Content=""  RenderTransformOrigin="1.176,0.547" ToolTip="Stop camera" Click="StopCamera" Width="75">
-                                    <Button.Background>
-                                        <ImageBrush ImageSource="/Stop Button.jpg" Stretch="Uniform"/>
-                                    </Button.Background>
-                                </Button>
-                                <Button FontSize="20" FontWeight="Bold" Click="InsertSceneBeforeSelected_Click" ToolTip="Insert scene before selected scene." Width="20">
-                                    <Button.Background>
-                                        <ImageBrush ImageSource="/camera Insert Left1.png"/>
-                                    </Button.Background>
-                                </Button>
-                                <Button Content=""  Foreground="White" Click="AddButton_Click" FontWeight="Bold" ToolTip="Capture scene." Width="75" >
-                                    <Button.Background>
-                                        <ImageBrush ImageSource="/camera.png"/>
-                                    </Button.Background>
-                                </Button>
-                                <Button FontSize="20" FontWeight="Bold" FontStyle="Normal" Click="InsertSceneAfterSelected_Click" ToolTip="Insert scene after selected scene." Width="20" >
-                                    <Button.Background>
-                                        <ImageBrush ImageSource="/camera Insert Right.png"/>
-                                    </Button.Background>
-                                </Button>
-                                <Button Content="Re-Capture Scene" ToolTip="Re-capture the selected scene"  Foreground="White" Background="#FF202020" Click="ResetScene_Click" FontWeight="Bold" Width="96" FontSize="10"/>
-                                <Button Content="Jump To Scene" ToolTip="TP camera to selected scene." Background="#FF202020" BorderBrush="#FF707070" Foreground="White" Click="JumpToSceneButton_Click" FontWeight="Bold" Width="232" FontSize="10"/>
-                                <Button Content="Delete Scene" ToolTip="Delete selected scene." Foreground="White" Click="DeleteScene" FontWeight="Bold" Width="84" FontSize="10">
-                                    <Button.Background>
-                                        <RadialGradientBrush>
-                                            <GradientStop Color="Black" Offset="1"/>
-                                            <GradientStop Color="#FFFF0B0B" Offset="0"/>
-                                        </RadialGradientBrush>
-                                    </Button.Background>
-                                </Button>
-                                <Button Content="Delete All" ToolTip="Delete all scenes." Foreground="White" Click="ClearTimelineButton_Click" FontWeight="Bold" Width="84" FontSize="10">
-                                    <Button.Background>
-                                        <RadialGradientBrush>
-                                            <GradientStop Color="Black" Offset="1"/>
-                                            <GradientStop Color="#FFFF0B0B" Offset="0"/>
-                                        </RadialGradientBrush>
-                                    </Button.Background>
-                                </Button>
-                            </StackPanel>
-                            <Button Content="Toggle Debug Camera" Height="29"  Click="ToggleDebugCamera" Foreground="White" Background="#FF382323" FontWeight="Bold" FontSize="10"/>
-
-                        </StackPanel>
-                    </StackPanel>
-                </Grid>
-            </TabItem>
+                    </Grid>
+                </TabItem>
                 <TabItem Header="Challenges and Rewards" Foreground="White" Background="#FF202020" BorderBrush="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" Width="295">
-                <TabControl Grid.Column="2" HorizontalAlignment="Center" Height="613" VerticalAlignment="Top" Width="890" Background="Black">
-                    <TabItem Header="Global" Foreground="White" Background="#FF202020" BorderBrush="#FF2D2D2D" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100">
-                        <Grid Background="#FF202020" HorizontalAlignment="Center" Width="880" >
-                            <StackPanel Orientation="Horizontal">
-                                <StackPanel>
-                                    <Label Content="- Consecutive Bounces -" Foreground="White"/>
-                                    <CheckBox Content="x 5 - Reward: Congrats " Foreground="White"/>
-                                    <CheckBox Content="x 10 - Reward: Congrats" Foreground="White"/>
-                                    <CheckBox Content="x 15 - Reward: Contrail - Purple" Foreground="White"/>
-                                    <CheckBox Content="x 20 - Reward: Contrail - Red" Foreground="White"/>
-                                    <CheckBox Content="x 25 - Reward: Blast Armour Effect " Foreground="White"/>
-                                    <CheckBox Content="x 50 - Reward: Halo Armour Effect" Foreground="White"/>
+                    <TabControl Grid.Column="2" HorizontalAlignment="Center" Height="613" VerticalAlignment="Top" Width="890" Background="Black">
+                        <TabItem Header="Global" Foreground="White" Background="#FF202020" BorderBrush="#FF2D2D2D" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100">
+                            <Grid Background="#FF202020" HorizontalAlignment="Center" Width="880" >
+                                <StackPanel Orientation="Horizontal">
+                                    <StackPanel>
+                                        <Label Content="- Consecutive Bounces -" Foreground="White"/>
+                                        <CheckBox Content="x 5 - Reward: Congrats " Foreground="White"/>
+                                        <CheckBox Content="x 10 - Reward: Congrats" Foreground="White"/>
+                                        <CheckBox Content="x 15 - Reward: Contrail - Purple" Foreground="White"/>
+                                        <CheckBox Content="x 20 - Reward: Contrail - Red" Foreground="White"/>
+                                        <CheckBox Content="x 25 - Reward: Blast Armour Effect " Foreground="White"/>
+                                        <CheckBox Content="x 50 - Reward: Halo Armour Effect" Foreground="White"/>
+                                    </StackPanel>
                                 </StackPanel>
-                            </StackPanel>
-                        </Grid>
-                    </TabItem>
-                    <TabItem Header="Locational" Foreground="White" Background="#FF202020" BorderBrush="#FF2D2D2D" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100">
-                        <Grid Background="#FF202020" HorizontalAlignment="Center" Width="880" >
-                            <StackPanel Orientation="Horizontal">
-                                <StackPanel>
-                                    <Label Content="- Headlong Bounces -" Foreground="White"/>
-                                    <CheckBox Content="Palm Tree Monster" Foreground="White"/>
-                                    <CheckBox Content="Palm Tree Single" Foreground="White"/>
-                                    <CheckBox Content="X to Palm" Foreground="White"/>
-                                    <CheckBox Content="Palm to X" Foreground="White"/>
-                                    <CheckBox Content="Radio Tower" Foreground="White"/>
-                                    <CheckBox Content="Light pole" Foreground="White"/>
-                                    <CheckBox Content="Canyon" Foreground="White"/>
-                                    <CheckBox Content="Tallest" Foreground="White"/>
-                                    <CheckBox Content="Around the world" Foreground="White"/>
-                                    <CheckBox Content="Back Penguin" Foreground="White"/>
-                                    <CheckBox Content="Relic" Foreground="White"/>
-                                    <CheckBox Content="Horseshoe" Foreground="White"/>
-                                    <CheckBox Content="Hotel" Foreground="White"/>
-                                    <CheckBox Content="Invis" Foreground="White"/>
-                                    <CheckBox Content="Twin" Foreground="White"/>
-                                    <CheckBox Content="X building" Foreground="White"/>
-                                    <CheckBox Content="X Monster Slant" Foreground="White"/>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Locational" Foreground="White" Background="#FF202020" BorderBrush="#FF2D2D2D" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100">
+                            <Grid Background="#FF202020" HorizontalAlignment="Center" Width="880" >
+                                <StackPanel Orientation="Horizontal">
+                                    <StackPanel>
+                                        <Label Content="- Headlong Bounces -" Foreground="White"/>
+                                        <CheckBox Content="Palm Tree Monster" Foreground="White"/>
+                                        <CheckBox Content="Palm Tree Single" Foreground="White"/>
+                                        <CheckBox Content="X to Palm" Foreground="White"/>
+                                        <CheckBox Content="Palm to X" Foreground="White"/>
+                                        <CheckBox Content="Radio Tower" Foreground="White"/>
+                                        <CheckBox Content="Light pole" Foreground="White"/>
+                                        <CheckBox Content="Canyon" Foreground="White"/>
+                                        <CheckBox Content="Tallest" Foreground="White"/>
+                                        <CheckBox Content="Around the world" Foreground="White"/>
+                                        <CheckBox Content="Back Penguin" Foreground="White"/>
+                                        <CheckBox Content="Relic" Foreground="White"/>
+                                        <CheckBox Content="Horseshoe" Foreground="White"/>
+                                        <CheckBox Content="Hotel" Foreground="White"/>
+                                        <CheckBox Content="Invis" Foreground="White"/>
+                                        <CheckBox Content="Twin" Foreground="White"/>
+                                        <CheckBox Content="X building" Foreground="White"/>
+                                        <CheckBox Content="X Monster Slant" Foreground="White"/>
 
+                                    </StackPanel>
                                 </StackPanel>
-                            </StackPanel>
-                        </Grid>
-                    </TabItem>
+                            </Grid>
+                        </TabItem>
 
-                </TabControl>
-            </TabItem>
-            <TabControl.Resources>
-                <Style TargetType="{x:Type TabItem}">
-                    <Style.Resources>
-                        <!-- Default brush for unselected tab items -->
-                        <SolidColorBrush x:Key="TabItem.Default.BorderBrush" Color="#FF707070"/>
-                    </Style.Resources>
-                    <Setter Property="Foreground" Value="White"/>
-                    <Setter Property="Background" Value="#FF202020"/>
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="{x:Type TabItem}">
-                                <Border Name="Border" BorderThickness="1,1,1,0" BorderBrush="{DynamicResource TabItem.Default.BorderBrush}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                                    <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header" Margin="10,2"/>
-                                </Border>
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="Border" Property="Background" Value="#404040"/>
-                                        <Setter Property="Foreground" Value="White"/>
-                                        <Setter Property="BorderThickness" Value="1,1,1,0"/>
-                                        <Setter Property="BorderBrush" Value="Black"/>
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </TabControl.Resources>
-        </TabControl>
+                    </TabControl>
+                </TabItem>
+                <TabControl.Resources>
+                    <Style TargetType="{x:Type TabItem}">
+                        <Style.Resources>
+                            <!-- Default brush for unselected tab items -->
+                            <SolidColorBrush x:Key="TabItem.Default.BorderBrush" Color="#FF707070"/>
+                        </Style.Resources>
+                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="Background" Value="#FF202020"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type TabItem}">
+                                    <Border Name="Border" BorderThickness="1,1,1,0" BorderBrush="{DynamicResource TabItem.Default.BorderBrush}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                        <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header" Margin="10,2"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="Border" Property="Background" Value="#404040"/>
+                                            <Setter Property="Foreground" Value="White"/>
+                                            <Setter Property="BorderThickness" Value="1,1,1,0"/>
+                                            <Setter Property="BorderBrush" Value="Black"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </TabControl.Resources>
+            </TabControl>
         </StackPanel>
     </Grid>
 </Window>

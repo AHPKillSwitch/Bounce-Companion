@@ -1,0 +1,7 @@
+﻿KeyBindButton:
+LeftButtonText:Capture
+RightButtonText:Capture
+EnableModTextOutPut:Camera Location Captured.
+DisableModTextOutPut:Camera Location Captured.
+Enable://capturescene
+Disable://capturescene
