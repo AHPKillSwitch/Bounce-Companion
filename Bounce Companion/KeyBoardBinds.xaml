@@ -1,0 +1,54 @@
+﻿<Window x:Class="Bounce_Companion.KeyBoardBinds"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Bounce_Companion"
+        mc:Ignorable="d"
+        Title="KeyBoardBinds" Height="450" Width="800">
+
+    <Grid Background="#FF212020">
+        <StackPanel Margin="10">
+            <Label Content="Mod List" Foreground="White" />
+            <ComboBox x:Name="modListComboBox" />
+
+            <Label Content="Mod Action" Foreground="White" />
+            <ComboBox x:Name="modActionComboBox" SelectedItem="{Binding SelectedAction, Mode=TwoWay}">
+                <ComboBoxItem IsEnabled="False">Action</ComboBoxItem>
+                <ComboBoxItem IsEnabled="true">Enable Mod</ComboBoxItem>
+                <ComboBoxItem IsEnabled="true">Disable Mod</ComboBoxItem>
+                <ComboBoxItem IsEnabled="true">Toggle Mod</ComboBoxItem>
+            </ComboBox>
+            <Label x:Name="recordedKeysLabel" Content="Recorded Keys: " HorizontalAlignment="Left" Foreground="White" />
+            <Button x:Name="RecordButton" Content="Record" Click="RecordButton_Click"/>
+
+            <Button Content="Add" Click="AddButton_Click" Margin="0,10,0,0"/>
+            <ScrollViewer>
+                <ListBox x:Name="keybindsListBox" ItemsSource="{Binding Keybinds}" Margin="0,10,0,0" Height="207" Background="#FF2B2B2B">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Background="#FF2B2B2B" Foreground="White">
+                                <Run Text=" | Enabled: "/>
+                                <Run Text="{Binding EnabledIndicator}" Foreground="{Binding EnabledIndicatorColor}"/>
+                                <Run Text=" | Mod: "/>
+                                <Run Text="{Binding Mod}"/>
+                                <Run Text=" | Action: "/>
+                                <Run Text="{Binding Action}"/>
+                                <Run Text=" | Keys: "/>
+                                <Run Text="{Binding DisplayKeys, Mode=OneWay}"/>
+                                </TextBlock>
+                                <StackPanel Orientation="Horizontal">
+                                    <ToggleButton Content="Enable/Disable" IsChecked="{Binding IsEnabled}" Click="ToggleButton_Click"/>
+                                    <Button Content="Remove" Click="RemoveButton_Click"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
+
+
+        </StackPanel>
+    </Grid>
+</Window>

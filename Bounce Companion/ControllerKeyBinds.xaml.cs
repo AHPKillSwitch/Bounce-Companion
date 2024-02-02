@@ -11,7 +11,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using Reloaded.Memory;
 using Newtonsoft.Json;
 using System.Threading.Channels;
 using static Bounce_Companion.ControllerKeyBinds;

@@ -1,0 +1,18 @@
+﻿<Window x:Class="Bounce_Companion.GameChatWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Bounce_Companion"
+        mc:Ignorable="d"
+        Title="Game Chat" Height="{Binding ElementName=mainWindow, Path=ActualHeight}" Width="400">
+    <Grid Background="#FF202020">
+        <StackPanel Margin="10,0,10,10" Background="#FF202020" HorizontalAlignment="Left">
+            <Label Content="Game Chat Window:" Width="376" Foreground="White" HorizontalAlignment="Left"/>
+            <!-- Your layout for game chat goes here -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Height="200">
+                <TextBox x:Name="txtChat" IsReadOnly="True" Background="#FF2B2B2B" Foreground="White" />
+            </ScrollViewer>
+        </StackPanel>
+    </Grid>
+</Window>

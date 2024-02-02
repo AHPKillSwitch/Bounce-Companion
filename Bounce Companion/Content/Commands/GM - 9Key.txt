@@ -1,13 +1,13 @@
 KeyBindButton:
 LeftButtonText:Apply
 RightButtonText:Disable
-EnableModTextOutPut:Contrails Applied - Note. Kill yourself to see contrails.
-DisableModTextOutPut:Contrails Disabled - Note. Kill yourself to see contrails.
+EnableModTextOutPut:Applied.
+DisableModTextOutPut:Applied.
 Enable:/objects\characters\masterchief\masterchief_mp.bipd.Jump Velocity=12
 Enable://9key
-Enable://Delay 2000
+Enable://Delay 200
 Enable:/objects\characters\masterchief\masterchief_mp.bipd.Jump Velocity=3.08
 Disable:/objects\characters\masterchief\masterchief_mp.bipd.Jump Velocity=12
 Disable://9key
-Disable://Delay 2000
+Disable://Delay 200
 Disable:/objects\characters\masterchief\masterchief_mp.bipd.Jump Velocity=3.08

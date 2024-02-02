@@ -35,26 +35,10 @@ namespace Bounce_Companion
             _ = main.UpdateConfigWithNewOptions();
         }
 
-        private void ResetOrientation_click(object sender, RoutedEventArgs e)
-        {
-            main.ResetOrientation(false);
-        }
-
-        private void ResetPosition_click(object sender, RoutedEventArgs e)
-        {
-            main.ResetOrientation(true);
-        }
-
         private void SetTickrate_click(object sender, RoutedEventArgs e)
         {
             int tickRateInt = int.Parse(Textbox_Tickrate.Text);
             main.SetTickrate(tickRateInt);
-        }
-
-        private void CallFunction_click(object sender, RoutedEventArgs e)
-        {
-            if (!main.Injected) main.InjectDLL();
-            main.CallFunction();
         }
 
         private void TestWTS_click(object sender, RoutedEventArgs e)
@@ -74,7 +58,7 @@ namespace Bounce_Companion
 
         private void ReplaySystemReplay_Click(object sender, RoutedEventArgs e)
         {
-            main.replaySystem.ReplayPlayerMovements();
+            _ = main.replaySystem.ReplayPlayerMovements();
         }
 
         private void SliderSFXChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -107,10 +91,7 @@ namespace Bounce_Companion
             int selectedIndex = ComboBox_DPadDown_EnableState.SelectedIndex;
             if (selectedIndex >= 0)
             {
-                if (selectedIndex == 0)
-                {
-                    main.AttachToProcess(selectedIndex);
-                }
+                main.AttachToProcess(selectedIndex);
             }
         }
     }

@@ -1,0 +1,7 @@
+﻿LeftButtonText:Set
+RightButtonText:Set
+KeyBindButton:
+EnableModTextOutPut:Velocity Set!
+DisableModTextOutPut:Velocity Set!
+Enable://setvelocity 22
+Disable://setvelocity -22

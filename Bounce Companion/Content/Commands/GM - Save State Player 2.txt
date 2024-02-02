@@ -1,0 +1,7 @@
+﻿LeftButtonText:Save
+RightButtonText:Load
+EnableModTextOutPut:Check Point Saved!
+DisableModTextOutPut:Check Point Loaded!
+Enable://SaveStatep2
+Disable://SaveStatep2
+Enable:/?0.sbsp.[Background Sound Palette:0].Background Sound=sound\ui\main_menu_music\main_menu_music.lsnd

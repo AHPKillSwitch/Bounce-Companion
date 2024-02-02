@@ -1,0 +1,15 @@
+﻿<Window x:Class="Bounce_Companion.NewProjectWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Bounce_Companion"
+        mc:Ignorable="d"
+        Title="Name Your Project" Height="106" Width="209">
+    <Grid Background="#FF303030">
+        <Label Content="Enter Project Name:" HorizontalAlignment="Center" VerticalAlignment="Top" Background="#FF313131" Foreground="White"/>
+        <TextBox x:Name="ProjectNameTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="2,20,0,0" Width="200" Background="White"/>
+        <Button Content="Create Project" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="2,43,0,0" Width="100" Click="CreateProjectButton_Click"/>
+        <Button Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="108,43,0,0" Width="94" Click="Cancel_Click"/>
+    </Grid>
+</Window>

@@ -35,14 +35,14 @@ namespace Bounce_Companion
         {
             doc = new XmlDocument();
             doc.Load(rm.puginpath + c.TagType + ".xml");
-            if (c.value.Contains("?"))
+            if (c.value.Contains("?*"))
             {
                 int i = int.Parse(c.value.Split('.')[1]);
                 TD = TH.GetPlayerColourTag(c.TagType, i);
             }
-            else if (c.TagName.Contains("?"))
+            else if (c.TagName.Contains("?*"))
             {
-                int i = int.Parse(c.TagName.Split('?')[1]);
+                int i = int.Parse(c.TagName.Split('*')[1]);
                 TD = TH.GetPlayerColourTag(c.TagType, i);
             }
             else
@@ -223,12 +223,12 @@ namespace Bounce_Companion
                                     if (value != "null")
                                     {
 
-                                        if (c.value.Contains("?"))
+                                        if (c.value.Contains("?*"))
                                         {
                                             int i = int.Parse(c.value.Split('.')[1]);
                                             TD = TH.GetPlayerColourTag(c.TagType, i);
                                         }
-                                        else if (c.TagName.Contains("?"))
+                                        else if (c.TagName.Contains("?*"))
                                         {
                                             int i = int.Parse(c.TagName.Split('?')[1]);
                                             TD = TH.GetPlayerColourTag(c.TagType, i);

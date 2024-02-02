@@ -1,0 +1,16 @@
+﻿<Window x:Class="Bounce_Companion.MarkBounceLocation"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Bounce_Companion"
+        mc:Ignorable="d"
+        Title="Mark Bounce Location" Height="58" Width="358">
+    <Grid Background="Black" Margin="0,0,0,-6">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top">
+            <ComboBox x:Name="combowBox_bounceLocationandType" Width="120" />
+            <ComboBox x:Name="combowBox_Velocity" Width="120" />
+            <Button Content="Mark Position" Height="22" Width="82"/>
+        </StackPanel>
+    </Grid>
+</Window>

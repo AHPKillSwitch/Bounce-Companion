@@ -1,0 +1,7 @@
+﻿LeftButtonText:Freeze
+RightButtonText:Unfreeze
+KeyBindButton:
+EnableModTextOutPut:Velocity Locked!
+DisableModTextOutPut:Velocity Unlocked!
+Enable://lockvelocity true
+Disable://lockvelocity false

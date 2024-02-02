@@ -17,8 +17,8 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Label x:Name="label_Vert_Vel2" Height="32" Width="70" FontSize="10" Background="{x:Null}" Foreground="White" HorizontalAlignment="Center" Visibility="Visible" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
-                <Label x:Name="label_P_NamePlate" Height="32" Width="70" FontSize="10" Background="{x:Null}" Foreground="White" HorizontalAlignment="Center" Visibility="Visible" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
+                <Label x:Name="label_Vert_Vel2" Height="32" Width="70" FontSize="18" Background="{x:Null}" Foreground="White" HorizontalAlignment="Center" Visibility="Visible" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
+                <Label x:Name="label_P_NamePlate" Height="32" Width="70" FontSize="14" Background="{x:Null}" Foreground="White" HorizontalAlignment="Center" Visibility="Visible" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
                 <Image x:Name="AimTextChat" Height="60" Width="22" PreviewMouseLeftButtonDown="PreviewDown" PreviewMouseLeftButtonUp="PreviewUp" MouseMove="MoveMouse" HorizontalAlignment="Center" VerticalAlignment="Top" Visibility="Hidden" Margin="0,254,0,0" OpacityMask="#FF585656" Source="/CrossHair.png"/>
                 <Slider x:Name="slider_HorX_Vel" Minimum="-15" Maximum="15" Width="150" Margin="160,0,0,74" VerticalAlignment="Bottom" Visibility="Hidden" HorizontalAlignment="Left" />
 

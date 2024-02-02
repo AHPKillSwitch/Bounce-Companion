@@ -8,6 +8,7 @@ using Memory;
 using System.Linq;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using static Bounce_Companion.RuntimeMemory;
 
 namespace Bounce_Companion
 {
@@ -82,7 +83,7 @@ namespace Bounce_Companion
         }
 
 
-        public void SetAddresses()
+        public async void SetAddresses()
         {
             string tagsHeader = "47CD68";
 
@@ -103,6 +104,7 @@ namespace Bounce_Companion
             SharedTagbase = game + "0x14B68A8";
             puginpath = "Content/Plugins/Halo2/";
             Main.PrintToConsole_ContinueNextText("Tag Reading In Progress . . .  ");
+            await Task.Delay(500);
             ParseTagInstanceList();
 
         }
@@ -238,6 +240,29 @@ namespace Bounce_Companion
             public TagData GetTag(string tagTypeName, string tagName)
             {
                 List<string> keys = new List<string>();
+                
+                if (tagName.Contains("?"))
+                {
+                    TagType sectetedtagType = tagTypeDict[tagTypeName];
+                    foreach (KeyValuePair<string, TagData> typePair in sectetedtagType.childTags)
+                    {
+                        keys.Add(typePair.Key.ToString());
+                    }
+                    try
+                    {
+                        int i = 0;
+                        if (tagName == "?+") i = keys.Count - 1;
+                        else i = int.Parse(tagName.Split('?')[1]);
+                        TagData tag = sectetedtagType.childTags[keys[i]];
+                        return tag;
+                    }
+                    catch
+                    {
+                        TagData nullTagData = new TagData("null", 0, 0, "null", "null");
+                        Main.PrintToConsole("Cound not find Key " + tagTypeName + "in Dictinary - GetPlayerColourTag");
+                        return nullTagData;
+                    }
+                }
                 foreach (KeyValuePair<string, TagType> typePair in tagTypeDict)
                 {
                     TagType tagType = typePair.Value;
@@ -246,6 +271,7 @@ namespace Bounce_Companion
                 }
                 try
                 {
+                    
                     TagType tagType = tagTypeDict[tagTypeName];
                     try
                     {

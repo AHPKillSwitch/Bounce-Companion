@@ -30,8 +30,6 @@
                 <TextBlock Text="Height:" Width="45"  Foreground="White"  Height="17" TextAlignment="Left" />
                 <TextBox x:Name="TextBox_Heightspeed" BorderBrush = "Transparent" Text="0" Width="35" Foreground="White" Background="#FF202020" FontWeight="Bold" TextAlignment="Center" HorizontalAlignment="Center" FontSize="11" />
             </StackPanel>
-            <RadioButton Content="Reset Position" Click="ResetPosition_click" Margin="1,5,1,1"  Height="20" HorizontalAlignment="Left"  Foreground="White" />
-            <RadioButton Content="Reset Orientation" Click="ResetOrientation_click" Margin="2,0,2,1" HorizontalAlignment="Left"  Foreground="White" />
 
             <Separator Height="6" Margin="0,0,0,0"/>
             <TextBlock Text="Engine settings -"   Foreground="White"  Height="15" TextAlignment="Left" HorizontalAlignment="Left" FontSize="10" Margin="0,0,0,3" VerticalAlignment="Bottom" />
@@ -65,7 +63,6 @@
             <TextBlock Text="- Debug Options -" Width="180"  Foreground="White"  Height="15" TextAlignment="Left" HorizontalAlignment="Stretch" FontSize="10" Margin="0,5,0,0" />
             <StackPanel Orientation="Vertical" Width="177" HorizontalAlignment="Center">
                 <RadioButton Content="World to screen test" Click="TestWTS_click" Foreground="White" />
-                <RadioButton Content="TP target to selected scene" Click="CallFunction_click" HorizontalAlignment="Stretch" Foreground="White"/>
             </StackPanel>
 
             <TextBlock Text="P_Address" Width="168"  Foreground="White"  Height="15" TextAlignment="Center" FontSize="11" />

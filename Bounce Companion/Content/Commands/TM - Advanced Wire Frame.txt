@@ -1,0 +1,14 @@
+﻿LeftButtonText:Enable
+RightButtonText:Disable
+EnableModTextOutPut:Wireframe Enabled.
+DisableModTextOutPut:Wireframe Disabled.
+Enable:/?0.sbsp.[Water Definitions:0].clear=null
+Enable:/?0.scnr.[Skies:0].clear=null
+Enable://WireFrame
+Disable:/?0.sbsp.[Water Definitions:0].add=null
+Disable:/?0.scnr.[Skies:0].add=null
+Disable://WireFrame
+
+/?0.sbsp.[Water Definitions:0].clear=null
+/?0.scnr.[Skies:0].clear=null
+/?0.scnr.[Scenario Kill Triggers:0].clear=null
