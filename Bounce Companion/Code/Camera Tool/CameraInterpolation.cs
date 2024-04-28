@@ -115,11 +115,11 @@ namespace Bounce_Companion.Code.Camera_Tool
                     {
                         if (selectedImageData.FacePlayer)
                         {
-                            salt = GetPlayerNameSalt(main.ComboBox_SceneData_Playernames.Text);
+                            salt = obj_Handler.GetPlayerNameSalt(main.ComboBox_SceneData_Playernames.Text);
                         }
                         else
                         {
-                            salt = GetPlayerNameSalt(main.ComboBox_Playernames.Text);
+                            salt = obj_Handler.GetPlayerNameSalt(main.ComboBox_Playernames.Text);
                         }
                     });
                     int obj_List_Memory_Address;

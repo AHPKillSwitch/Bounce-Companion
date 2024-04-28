@@ -1,4 +1,5 @@
 ﻿using Bounce_Companion.Code.Addresses___Offsets;
+using Bounce_Companion.Code.Bounce_Handler;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static Bounce_Companion.MainWindow;
 
 namespace Bounce_Companion.Code.Bounce_Companion_Utility
 {
@@ -14,6 +16,7 @@ namespace Bounce_Companion.Code.Bounce_Companion_Utility
         Mem m;
         MainWindow main;
         GameOverlayWindow GOW;
+        BounceHandler bounceHandler;
         public Utility(Mem m, MainWindow main)
         {
             this.m = m;
@@ -82,7 +85,7 @@ namespace Bounce_Companion.Code.Bounce_Companion_Utility
             {
                 PrintToConsole($"Player XYZ Velocity: {p_X_Vel}, {p_Y_Vel}, {p_Z_Vel}    Player XYZ Position: {p_X}, {p_Y}, {p_Z}");
             }
-            GOW.UpdateStatusBar(Globals.bounceCount, p_Z_Vel, p_X, p_Y, p_Z, tr);
+            GOW.UpdateStatusBar(bounceHandler.bounceCount, p_Z_Vel, p_X, p_Y, p_Z, tr);
             GOW.UpdateSliders(p_X_Vel, p_Y_Vel, p_Z_Vel);
         }
         public string CleanString(string str)
@@ -106,7 +109,7 @@ namespace Bounce_Companion.Code.Bounce_Companion_Utility
             string details = $" - - - - - - - - Bounce Detected - - - - - - - -\n" +
                 $"Triggered at location X: {p_X} Y: {p_Y} Z: {p_Z} \n" +
                 $"Trigged Velocity - X: {p_X_Vel} Y: {p_Y_Vel} Z: {p_Z_Vel}\n" +
-                $"Pre Bounce Velocity - X: {prev_P_X_Vel} Y: {prev_P_Y_Vel} Z: {prev_P_Z_Vel} \n" +
+                $"Pre Bounce Velocity - X: {Globals.prev_P_X_Vel} Y: {Globals.prev_P_Y_Vel} Z: {Globals.prev_P_Z_Vel} \n" +
                 $"Bounce Type: {bouncetype} \n";
 
             PrintToConsole(details);

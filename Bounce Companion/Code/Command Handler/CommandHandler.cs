@@ -1,12 +1,15 @@
 ﻿using Bounce_Companion.Code.Addresses___Offsets;
 using Bounce_Companion.Code.Bounce_Companion_Utility;
 using Bounce_Companion.Code.Bounce_Handler;
+using Bounce_Companion.Code.Camera_Tool;
+using Bounce_Companion.Code.Object___Havok_Helpers;
 using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.Remoting;
 using System.Text;
 using System.Threading.Tasks;
 using static Bounce_Companion.MainWindow;
@@ -16,17 +19,21 @@ namespace Bounce_Companion.Code.Command_Handler
     internal class CommandHandler
     {
         MainWindow main;
+        Annoucements annoucements;
         Utility utility;
         Mem m;
         BounceHandler bounceHandler;
+        CameraTool cameraTool;
+        CameraControls cameraControls;
         RuntimeMemory RM;
         CommandExecution CE;
+        ObjectHandler ObjectHandler;
 
         public List<Command> Commands = new List<Command>();
 
         private bool FreezeVelocity = true;
         private float freezeValue = 0;
-        public CommandHandler(MainWindow main, Utility utility, Mem m, BounceHandler bounceHandler, RuntimeMemory RM, CommandExecution CE) 
+        public CommandHandler(MainWindow main, Utility utility, Mem m, BounceHandler bounceHandler, RuntimeMemory RM, CommandExecution CE, Annoucements annoucements, CameraControls cameraControls, ObjectHandler ObjectHandler) 
         {
 
             this.m = m; 
@@ -35,6 +42,9 @@ namespace Bounce_Companion.Code.Command_Handler
             this.bounceHandler = bounceHandler;
             this.RM = RM;
             this.CE = CE;
+            this.annoucements = annoucements;
+            this.cameraControls = cameraControls;
+            this.ObjectHandler = ObjectHandler;
         }
         public struct Command
         {
@@ -316,15 +326,15 @@ namespace Bounce_Companion.Code.Command_Handler
             {
                 case "//addbounce":
                     {
-                        debug = true;
+                        bounceHandler.debug = true;
                         bounceHandler.bounceCount++;
                         utility.PrintToConsole("+1 Added to bounce count.");
-                        _ = Announcements(bounceCount, "null", "standard");
+                        _ = annoucements.Announce(bounceHandler.bounceCount, "null", "standard");
                         break;
                     }
                 case "//clearbounce":
                     {
-                        debug = false;
+                        bounceHandler.debug = false;
                         bounceHandler.bounceCount = 0;
                         utility.PrintToConsole("Bounce count reset.");
                         break;
@@ -357,11 +367,11 @@ namespace Bounce_Companion.Code.Command_Handler
                     {
                         if (on)
                         {
-                            if (player2Attched) Globals.mp2.WriteToMemory("halo2.exe+482250", "Byte", "0x01");
+                            if (main.player2Attched) main.mp2.WriteToMemory("halo2.exe+482250", "Byte", "0x01");
                         }
                         else
                         {
-                            if (player2Attched) Globals.mp2.WriteToMemory("halo2.exe+48224F", "Byte", "0x01");
+                            if (main.player2Attched) main.mp2.WriteToMemory("halo2.exe+48224F", "Byte", "0x01");
                         }
                         break;
                     }
@@ -381,11 +391,11 @@ namespace Bounce_Companion.Code.Command_Handler
                     {
                         if (on)
                         {
-                            customContrails = true;
+                            main.customContrails = true;
                         }
                         else
                         {
-                            customContrails = false;
+                            main.customContrails = false;
                         }
                         break;
                     }
@@ -403,17 +413,17 @@ namespace Bounce_Companion.Code.Command_Handler
                     }
                 case "//capturescene":
                     {
-                        CaptureScene();
+                        cameraTool.CaptureScene();
                         break;
                     }
                 case "//startcamera":
                     {
-                        await StartCameraRoll();
+                        await cameraTool.StartCameraRoll();
                         break;
                     }
                 case "//stopcamera":
                     {
-                        rollCamera = false;
+                        cameraTool.rollCamera = false;
                         break;
                     }
                 case "//jumptoscene":
@@ -421,12 +431,12 @@ namespace Bounce_Companion.Code.Command_Handler
                         int index = 0;
                         if (string.IsNullOrEmpty(prefix)) index = 0;
                         else index = int.Parse(prefix);
-                        JumpCameraToScene(index);
+                        cameraTool.JumpCameraToScene(index);
                         break;
                     }
                 case "//debugcamera":
                     {
-                        ToggleDebugMode();
+                        cameraTool.ToggleDebugMode();
                         //isCameraToolOpen = true;
                         break;
                     }
@@ -434,11 +444,11 @@ namespace Bounce_Companion.Code.Command_Handler
                     {
                         if (on)
                         {
-                            flyCamControl = true;
+                            cameraControls.flyCamControl = true;
                         }
                         else
                         {
-                            flyCamControl = false;
+                            cameraControls.flyCamControl = false;
                         }
                         break;
                     }
@@ -459,7 +469,7 @@ namespace Bounce_Companion.Code.Command_Handler
                         if (prefix == "true")
                         {
                             FreezeVelocity = true;
-                            freezeValue = m.ReadFloat((havokaddress - 0x28));
+                            freezeValue = m.ReadFloat((ObjectHandler.objectHavokAddress - 0x28));
                             Task.Run(() => StartAsyncFreezeVelocity());
 
                         }
@@ -472,38 +482,38 @@ namespace Bounce_Companion.Code.Command_Handler
                 case "//setvelocity":
                     {
                         float velocity = float.Parse(prefix);
-                        m.WriteToMemory((havokaddress - 0x28), "float", (0.6 * velocity).ToString());
+                        m.WriteToMemory((ObjectHandler.objectHavokAddress - 0x28), "float", (0.6 * velocity).ToString());
                         await Task.Delay(222);
-                        m.WriteToMemory((havokaddress - 0x28), "float", velocity.ToString());
+                        m.WriteToMemory((ObjectHandler.objectHavokAddress - 0x28), "float", velocity.ToString());
                         break;
                     }
                 case "//addvelocity":
                     {
-                        freezeValue = m.ReadFloat((havokaddress - 0x28));
+                        freezeValue = m.ReadFloat((ObjectHandler.objectHavokAddress - 0x28));
                         freezeValue += float.Parse(prefix);
-                        m.WriteToMemory((havokaddress - 0x28), "float", (0.6 * freezeValue).ToString());
+                        m.WriteToMemory((ObjectHandler.objectHavokAddress - 0x28), "float", (0.6 * freezeValue).ToString());
                         await Task.Delay(222);
-                        m.WriteToMemory((havokaddress - 0x28), "float", freezeValue.ToString());
+                        m.WriteToMemory((ObjectHandler.objectHavokAddress - 0x28), "float", freezeValue.ToString());
                         break;
                     }
                 case "//autocrouch":
                     {
-                        float p_z = m.ReadFloat((havokaddress + 0x8));
-                        m.WriteToMemory((havokaddress + 0x8), "float", (p_z - 0.2).ToString());
+                        float p_z = m.ReadFloat((ObjectHandler.objectHavokAddress + 0x8));
+                        m.WriteToMemory((ObjectHandler.objectHavokAddress + 0x8), "float", (p_z - 0.2).ToString());
                         break;
                     }
                 case "//moveplayer_z":
                     {
                         float player_Z = float.Parse(fullCommand);
-                        float p_z = m.ReadFloat((havokaddress + 0x8));
-                        if (prefix == "minus") m.WriteToMemory((havokaddress + 0x8), "float", (p_z - player_Z).ToString());
-                        if (prefix == "add") m.WriteToMemory((havokaddress + 0x8), "float", (p_z + player_Z).ToString());
+                        float p_z = m.ReadFloat((ObjectHandler.objectHavokAddress + 0x8));
+                        if (prefix == "minus") m.WriteToMemory((ObjectHandler.objectHavokAddress + 0x8), "float", (p_z - player_Z).ToString());
+                        if (prefix == "add") m.WriteToMemory((ObjectHandler.objectHavokAddress + 0x8), "float", (p_z + player_Z).ToString());
                         break;
                     }
                 case "//freestylemode":
                     {
-                        if (on) freeStyleMode = true;
-                        else freeStyleMode = false;
+                        if (on) bounceHandler.freeStyleMode = true;
+                        else bounceHandler.freeStyleMode = false;
                         break;
                     }
                 case "//markposition"://MarkPosition Test Standard
@@ -576,7 +586,7 @@ namespace Bounce_Companion.Code.Command_Handler
         {
             while (FreezeVelocity)
             {
-                m.WriteToMemory((havokaddress - 0x28), "float", freezeValue.ToString());
+                m.WriteToMemory((ObjectHandler.objectHavokAddress - 0x28), "float", freezeValue.ToString());
 
                 await Task.Delay(29);
             }

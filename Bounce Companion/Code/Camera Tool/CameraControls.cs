@@ -20,6 +20,7 @@ namespace Bounce_Companion.Code.Camera_Tool
         private Controller xboxController;
         private CameraInterpolation interpolation;
         private CommandHandler c_Handler;
+        private CameraTool cameraTool;
         private System.Threading.Timer toggleTimer;
 
         
@@ -115,7 +116,7 @@ namespace Bounce_Companion.Code.Camera_Tool
                             bool rightShoulderPressed = controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.RightShoulder);
                             if (xAxisInput != 0 || yAxisInput != 0 || yawAxisInput != 0 || pitchAxisInput != 0 || leftTrigger != 0 || rightTrigger != 0 || leftShoulderPressed || rightShoulderPressed)
                             {
-                                if (!rollCamera && flyCamControl)
+                                if (!cameraTool.rollCamera && flyCamControl)
                                 {
                                     await interpolation.MoveCameraPositionAsync(xAxisInput, yAxisInput, yawAxisInput, pitchAxisInput, leftTrigger, rightTrigger, leftShoulderPressed, rightShoulderPressed);
                                 }

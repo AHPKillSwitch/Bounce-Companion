@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bounce_Companion.Code.Command_Handler;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,8 +19,9 @@ namespace Bounce_Companion
         RuntimeMemory.StringID stringID = new RuntimeMemory.StringID();
         MainWindow Main;
         Mem m;
-        public MainWindow.Command c;
+        public CommandHandler.Command c;
         public int i = 0;
+
 
         public CommandExecution(RuntimeMemory RM, Mem memory, MainWindow main)
         {
@@ -29,7 +31,6 @@ namespace Bounce_Companion
             Main = main;
             stringID = RM.SI;
         }
-
         public void TagBlockProcessing(Mem memory)
         {
             doc = new XmlDocument();

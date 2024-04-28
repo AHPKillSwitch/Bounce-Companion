@@ -19,6 +19,8 @@ namespace Bounce_Companion.Code.Bounce_Handler
         HavokHandler hav;
         CommandHandler commandHandler;
         Annoucements announcements;
+        ReplaySystem replaySystem;
+        ObjectHandler objectHandler;
 
         public int bounceCount = 0;
         public int countReset = 0;
@@ -33,17 +35,18 @@ namespace Bounce_Companion.Code.Bounce_Handler
         float prev_P_Y_Vel;
         float prev_P_Z_Vel;
         public bool freeStyleMode = false;
-        public int havokaddress = 0;
+        
         public bool debug = false;
 
-        public BounceHandler(Mem m, Utility utility, HavokHandler hav, CommandHandler commandHandler, MainWindow main)
+        public BounceHandler(Mem m, Utility utility, HavokHandler hav, CommandHandler commandHandler, MainWindow main, ReplaySystem replaySystem, ObjectHandler objectHandler)
         {
             this.m = m;
             this.utility = utility;
             this.commandHandler = commandHandler;
             this.main = main;
-
+            this.replaySystem = replaySystem;
             GetLocationData();
+            this.objectHandler = objectHandler;
         }
 
         public Task BounceChecker()
@@ -68,10 +71,10 @@ namespace Bounce_Companion.Code.Bounce_Handler
                 if (vehi_salt != "FFFFFFFF")
                 {
                     int hav_Salt = hav.GetHavokSaltFromObjectDatum(Obj_Vehi_Index_Datum.ToString("X"));
-                    havokaddress = hav.GetHavokAddressFromHavokSalt(hav_Salt.ToString("X"));
+                    objectHandler.objectHavokAddress = hav.GetHavokAddressFromHavokSalt(hav_Salt.ToString("X"));
                 }
 
-                else havokaddress = hav.GetHavokAddressFromHavokSalt(hav_Index_Datum.ToString("X"));
+                else objectHandler.objectHavokAddress = hav.GetHavokAddressFromHavokSalt(hav_Index_Datum.ToString("X"));
                 replaySystem.RecordPlayerPosition(p_X, p_Y, p_Z, p_X_Vel, p_Y_Vel, p_Z_Vel);
                 utility.UpdateUI(p_X_Vel, p_Y_Vel, p_Z_Vel, p_X, p_Y, p_Z, tickrate);
                 _ = HandleBounces(p_X, p_Y, p_Z, p_X_Vel, p_Y_Vel, p_Z_Vel, p_Airbourne);

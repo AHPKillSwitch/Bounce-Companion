@@ -32,6 +32,7 @@ using static Bounce_Companion.Code.Camera_Tool.CameraTool;
 using Octokit;
 using Bounce_Companion.Code.Command_Handler;
 using Bounce_Companion.Code.Bounce_Handler;
+using System.Runtime.Remoting;
 
 namespace Bounce_Companion
 {
@@ -71,6 +72,7 @@ namespace Bounce_Companion
         public Settings settingsWindow;
         public ControllerKeyBinds controllerKeyBindsWindow;
         public KeyBoardBinds keyboardKeyBindsWindow;
+        public Dictionary<string, p_List_Info> p_List = new Dictionary<string, p_List_Info>();
         public string currentGameMainWindow = string.Empty;
         public bool attached = false;
         bool modsEnabled;
@@ -140,6 +142,9 @@ namespace Bounce_Companion
 
 
             //Bounce Tracker Stats
+            public static float prev_P_X_Vel = 0.0f;
+            public static float prev_P_Y_Vel = 0.0f;
+            public static float prev_P_Z_Vel = 0.0f;
 
 
 
@@ -567,7 +572,7 @@ namespace Bounce_Companion
                     {
                         System.Windows.Application.Current.Dispatcher.Invoke(() =>
                         {
-                            _ = UpdatePlayerList();
+                            _ = objectHandler.UpdatePlayerList();
                         });
                     }
 
@@ -705,104 +710,8 @@ namespace Bounce_Companion
 
             }
         }
-        public string GetPlayerNameSalt(string playerName)
-        {
-            UpdatePlayerList();
-            foreach (KeyValuePair<string, p_List_Info> key in p_List)
-            {
-                p_List_Info info = key.Value;
-                if (playerName == info.p_Name)
-                {
-                    return info.p_Salt;
-                }
-            }
-            return "null";
-        }
-
-
-        private struct p_List_Info
-        {
-            public string p_Name;
-            public string p_Salt;
-            public int p_number;
-
-            public p_List_Info(string p_Name, string p_Salt, int p_number)
-            {
-                this.p_Name = p_Name;
-                this.p_Salt = p_Salt;
-                this.p_number = p_number;
-            }
-        }
-        //List<p_List_Info> p_List = new List<p_List_Info>();
-        Dictionary<string, p_List_Info> p_List = new Dictionary<string, p_List_Info>();
-        int check = 0;
-        public Task UpdatePlayerList()
-        {
-            for (int i = 0; i < 15; i++)
-            {
-                string player_Info = PopulatePlayersList(i); // return Name:Salt
-                if (player_Info.Split(':')[1] != "0" && player_Info.Split(':')[0] != "" && player_Info.Split(':')[1] != "FFFFFFFF") // if player name isnt null and player salt isnt null
-                {
-                    if (!p_List.ContainsKey(player_Info.Split(':')[0])) // check if dict doesnt contain key before adding
-                    {
-                        p_List.Add(player_Info.Split(':')[0], new p_List_Info(player_Info.Split(':')[0], player_Info.Split(':')[1], i));
-                    }
-                }
-            }
-            for (int p = 0; p < 15; p++)
-            {
-                string player_Info = PopulatePlayersList(p);
-                if (p_List.ContainsKey(player_Info.Split(':')[0])) // check if dict has player stored
-                {
-                    p_List_Info p_info = p_List[player_Info.Split(':')[0]];
-                    if (player_Info.Split(':')[1] != p_info.p_Salt) // check if salt has changeg
-                    {
-                        if (player_Info.Split(':')[1] == "FFFFFFFF") // has player died or left the game
-                        {
-                            //SetContrails(player_Info.Split(':')[0], p_info.p_number);
-                            utility.PrintToConsole("Player Died");
-                            check = 0;
-                            p_info.p_Salt = player_Info.Split(':')[1];
-                        }
-                        else
-                        {
-                            p_info.p_Salt = player_Info.Split(':')[1];
-                        }
-
-                    }
-                }
-            }
-            check = 0;
-            return null;
-        }
-
-        private string PopulatePlayersList(int i)
-        {
-            int playersAddress = m.ReadInt32("halo2.exe+47CD48");
-            playersAddress += 0x17D8 + 0x74;
-
-            int salt = m.ReadInt32((playersAddress + (0x204 * i)));
-            byte[] nameBytes = m.ReadBytes((playersAddress + (0x204 * i) + 0x18), 32);
-            int count = 0;
-            for (int x = 0; x < nameBytes.Length; x++)
-            {
-                if (nameBytes[x] == 00) count++;
-                else count = 0;
-                if (count >= 2)
-                {
-                    nameBytes[x] = 0x20;
-                }
-            }
-            string name = System.Text.Encoding.Unicode.GetString(nameBytes);
-            name = StripUnicodeCharactersFromString(name);
-            string saltToString = salt.ToString("X");
-            return name + ":" + saltToString;
-        }
-
-        public static String StripUnicodeCharactersFromString(string inputValue)
-        {
-            return Regex.Replace(inputValue, @"[^\u0000-\u007F]", String.Empty);
-        }
+        
+        
 
         private void SetContrails(string name, int index)
         {
@@ -1347,25 +1256,33 @@ namespace Bounce_Companion
             // The "Camera Tool" tab has been unselected
             cameraControls.flyCamControl = false;
         }
-        
-        
-        
+        public struct p_List_Info
+        {
+            public string p_Name;
+            public string p_Salt;
+            public int p_number;
 
-
+            public p_List_Info(string p_Name, string p_Salt, int p_number)
+            {
+                this.p_Name = p_Name;
+                this.p_Salt = p_Salt;
+                this.p_number = p_number;
+            }
+        }
         private void LoadNamesToComboBox(object sender, EventArgs e)
         {
             ComboBox_Playernames.Items.Clear();
             ComboBox_SceneData_Playernames.Items.Clear();
-            p_List.Clear();
-            UpdatePlayerList();
-            foreach (KeyValuePair<string, p_List_Info> key in p_List)
+            objectHandler.p_List.Clear();
+            objectHandler.UpdatePlayerList();
+            foreach (var key in objectHandler.p_List)
             {
-                p_List_Info info = key.Value;
+                ObjectHandler.p_List_Info info = key.Value;
                 ComboBox_Playernames.Items.Add(info.p_Name.ToString());
                 ComboBox_SceneData_Playernames.Items.Add(info.p_Name.ToString());
             }
         }
-        
+
         private void CheckBoxChecked_TrackPlayer(object sender, RoutedEventArgs e)
         {
             if (CheckBox_TrackPlayer.IsChecked == true)
@@ -1393,7 +1310,7 @@ namespace Bounce_Companion
                 //CheckBox_TrackPlayer.IsChecked = false;
                 interpolation.CTO_OffsetPlayer = true;
                 interpolation.Offset_Selected_Player = true;
-                string salt = GetPlayerNameSalt(ComboBox_Playernames.Text);
+                string salt = objectHandler.GetPlayerNameSalt(ComboBox_Playernames.Text);
                 await interpolation.OffsetObjectPositionContinuous(salt);
             }
             else
@@ -1611,7 +1528,7 @@ namespace Bounce_Companion
 
         private void ShowNamePlates(object sender, RoutedEventArgs e)
         {
-            noClip = true;
+            //noClip = true;
             //GOW.SetnamePlateName(ComboBox_Playernames.Text.Split(':')[0]);
         }
 
@@ -1678,12 +1595,12 @@ namespace Bounce_Companion
 
         private void ResetPositionButton(object sender, RoutedEventArgs e)
         {
-            cameraTool.ResetOrientation(true);
+            cameraControls.ResetOrientation(true);
         }
 
         private void ResetorientationButto(object sender, RoutedEventArgs e)
         {
-            cameraTool.ResetOrientation(false);
+            cameraControls.ResetOrientation(false);
         }
 
         private void UpdateCommands(object sender, EventArgs e)
