@@ -3,5 +3,5 @@ RightButtonText:Set
 KeyBindButton:
 EnableModTextOutPut:Velocity Set!
 DisableModTextOutPut:Velocity Set!
-Enable://addvelocity 24
+Enable://addvelocity 3.8
 Disable://addvelocity 3.8

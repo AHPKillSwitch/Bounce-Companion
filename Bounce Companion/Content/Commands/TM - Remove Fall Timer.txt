@@ -1,0 +1,6 @@
+LeftButtonText:Apply
+RightButtonText:Disable
+EnableModTextOutPut:Fall Timer Removed.
+DisableModTextOutPut:Fall Timer Restored
+Enable:/objects\characters\masterchief\masterchief.bipd.BIPED Flags=Immune To Falling Damage:true
+Disable:/objects\characters\masterchief\masterchief.bipd.BIPED Flags=Immune To Falling Damage:false

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Timers;
 using System.Windows;
-using Memory;
 
 namespace Bounce_Companion
 {
@@ -31,7 +30,7 @@ namespace Bounce_Companion
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             // Read chat bytes from memory
-            byte[] chatBytes = m.ReadBytes("halo2.exe+009758C8,0x0", 1005, "");
+            byte[] chatBytes = m.ReadBytes("halo2.exe+009758C8,0x0", 1005);
 
             // Convert bytes to string
             string newMessages = Encoding.Unicode.GetString(chatBytes).Split('\0').FirstOrDefault(part => !string.IsNullOrEmpty(part));

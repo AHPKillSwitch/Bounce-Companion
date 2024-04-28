@@ -136,9 +136,9 @@ namespace Bounce_Companion
                 // Add the recorded key to the ModAction ComboBox
                 Dispatcher.Invoke(() =>
                 {
-                // Update the recorded keys label
-                recordedKeysLabel.Content += $"{e.Key} ";
-                keys.Add(e.Key.ToString());
+                    // Update the recorded keys label
+                    recordedKeysLabel.Content += $"{e.Key} ";
+                    keys.Add(e.Key.ToString());
                 });
             }
             else

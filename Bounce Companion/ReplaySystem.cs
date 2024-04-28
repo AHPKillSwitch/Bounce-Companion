@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
-using Memory;
 
 
 namespace Bounce_Companion
@@ -63,7 +62,7 @@ namespace Bounce_Companion
         }
         private float ReadPlayerFloat(int baseAddress, int offset)
         {
-            return m.ReadFloat((baseAddress + offset).ToString("X"), "");
+            return m.ReadFloat((baseAddress + offset).ToString("X"));
         }
         public async Task ReplayPlayerMovements()
         {
@@ -73,9 +72,9 @@ namespace Bounce_Companion
             }
             else
             {
-                int p_Index = m.Read2Byte("halo2.exe+4E7C88");
-                int obj_List_Address = m.ReadInt("halo2.exe+4E461C,0x44");
-                int obj_List_Memory_Address = m.ReadInt((obj_List_Address + p_Index * 0xC + 0x8).ToString("X"));
+                int p_Index = m.ReadInt16("halo2.exe+4E7C88");
+                int obj_List_Address = m.ReadInt32("halo2.exe+4E461C,0x44");
+                int obj_List_Memory_Address = m.ReadInt32((obj_List_Address + p_Index * 0xC + 0x8).ToString("X"));
 
                 float currentX = ReadPlayerFloat(obj_List_Memory_Address, 0xC * 0x4);
                 float currentY = ReadPlayerFloat(obj_List_Memory_Address, 0xD * 0x4);
@@ -145,9 +144,9 @@ namespace Bounce_Companion
 
                     string hexString = main.settingsWindow.Textbox_P_Address_replay.Text;
                     int xAddress = Convert.ToInt32(hexString, 16);
-                    m.WriteMemory(xAddress.ToString("X"), "float", adjustedXVel.ToString());
-                    m.WriteMemory((xAddress += 0x04).ToString("X"), "float", adjustedYVel.ToString());
-                    m.WriteMemory((xAddress += 0x04).ToString("X"), "float", adjustedZVel.ToString());
+                    m.WriteToMemory(xAddress.ToString("X"), "float", adjustedXVel.ToString());
+                    m.WriteToMemory((xAddress += 0x04).ToString("X"), "float", adjustedYVel.ToString());
+                    m.WriteToMemory((xAddress += 0x04).ToString("X"), "float", adjustedZVel.ToString());
                     await Task.Delay(29);
                 }
             }

@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using Memory;
 using System.Linq;
 using System.ComponentModel;
 using System.Threading.Tasks;
@@ -33,7 +32,7 @@ namespace Bounce_Companion
             P = p;
             Main = main;
             SetAddresses();
-            tagCount = m.ReadInt(tag_instance_count);
+            tagCount = m.ReadInt32(tag_instance_count);
             Main.progressBar_TagsProgress.Maximum = 100;
             bGW.WorkerReportsProgress = true;
             bGW.ProgressChanged += BGW_ProgressChanged;
@@ -105,7 +104,7 @@ namespace Bounce_Companion
             puginpath = "Content/Plugins/Halo2/";
             Main.PrintToConsole_ContinueNextText("Tag Reading In Progress . . .  ");
             await Task.Delay(500);
-            ParseTagInstanceList();
+            //ParseTagInstanceList();
 
         }
 
@@ -115,9 +114,9 @@ namespace Bounce_Companion
 
         private bool ParseTagInstanceList()
         {
-            try
-            {
-                int mapBaseTagAddress = m.ReadInt(mapTagBase, "");
+            //try
+            //{
+                int mapBaseTagAddress = m.ReadInt32(mapTagBase);
                 string tagDatumIndexstring;
 
                 TagHolder newHolder = new TagHolder(Main);
@@ -132,18 +131,18 @@ namespace Bounce_Companion
                         bGW.ReportProgress((int)Math.Round((i / (decimal)tagCount) * 100));
                     }
 
-                    int tagInstancesMemory = m.ReadInt(tag_instances_address, "");
+                    int tagInstancesMemory = m.ReadInt32(tag_instances_address);
                     //Address Setting
-                    string tagtype = m.ReadString((tagInstancesMemory + (i * 0x10)).ToString("X"), "", 4);
-                    uint test = m.ReadUInt((tagInstancesMemory + (i * 0x10 + 0x4)).ToString("X"), "");
-                    int datum_Index_value = m.ReadInt((tagInstancesMemory + (i * 0x10 + 0x4)).ToString("X"), "");
-                    int tag_instance_value = m.ReadInt((tagInstancesMemory + (i * 0x10 + 0x8)).ToString("X"), "");
-                    int tag_size_value = m.ReadInt((tagInstancesMemory + (i * 0x10 + 0x12)).ToString("X"), "");
+                    string tagtype = m.ReadString(tagInstancesMemory + i * 0x10, 4);
+                    int test = m.ReadInt32((tagInstancesMemory + (i * 0x10) + 0x4));
+                    int datum_Index_value = m.ReadInt32(tagInstancesMemory + (i * 0x10) + 0x4);
+                    int tag_instance_value = m.ReadInt32(tagInstancesMemory + (i * 0x10) + 0x8);
+                    int tag_size_value = m.ReadInt32(tagInstancesMemory + (i * 0x10) + 0x12);
 
-                    if (test != 0xFFFFFFFF)
+                    if (test != 0xFFFFFFFF && test != 0)
                     {
-                        shared_Magic = m.ReadInt(shared_Magic_address);
-                        map_Magic = m.ReadInt(map_Magic_Address);
+                        shared_Magic = m.ReadInt32(shared_Magic_address);
+                        map_Magic = m.ReadInt32(map_Magic_Address);
                         //Get Group Name
                         byte[] bytes = Encoding.ASCII.GetBytes(tagtype);
                         Array.Reverse(bytes);
@@ -163,11 +162,11 @@ namespace Bounce_Companion
                 }
                 TH.PrintTagTypes();
                 return true;
-            }
-            catch
-            {
-                return false;
-            }
+            //}
+            //catch
+            //{
+            //    return false;
+            //}
         }
 
         public int sharedTagAddressBase;

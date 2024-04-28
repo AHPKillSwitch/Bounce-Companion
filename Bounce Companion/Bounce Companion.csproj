@@ -237,6 +237,9 @@
     <None Update="Content\Commands\Custom Contrails.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Content\Commands\GM - AutoCrouch - Copy.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Content\Commands\GM - Null Char Spawn Filter.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -307,6 +310,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Content\Commands\TM - Advanced Wire Frame.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\Commands\TM - Remove Fall Timer.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Content\Commands\TM - Custom Contrails.txt">
@@ -675,12 +681,6 @@
 
   <ItemGroup>
     <NativeLibs Remove="uparrow.jpg" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Memory">
-      <HintPath>..\..\..\..\OneDrive\Desktop\The_Superintendent_-_Halo_MCC_Mod_Tool_0.7\The Superintendent - Halo MCC Mod Tool 0.7\Memory.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <ItemGroup>

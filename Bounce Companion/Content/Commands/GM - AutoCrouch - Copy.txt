@@ -1,0 +1,7 @@
+﻿LeftButtonText:Set
+RightButtonText:Set
+KeyBindButton:
+EnableModTextOutPut:Player Moved!
+DisableModTextOutPut:Player Moved!
+Enable://moveplayer_z minus 1.4
+Disable://moveplayer_z minus 1.4

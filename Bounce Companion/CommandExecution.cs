@@ -1,5 +1,4 @@
-﻿using Memory;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -112,22 +111,20 @@ namespace Bounce_Companion
                     int Bindex = Convert.ToInt32(BlockIndex, 16);
                     if (method1 == "copy")
                     {
-                        int addrToRead1 = (RunTimeAddress + offs + 4); //
-                        string mm1 = addrToRead1.ToString("X");
-                        CopyPasteBlockData = (memory.ReadInt(mm1));
+                        int addrToRead1 = (RunTimeAddress + offs + 4);
+                        CopyPasteBlockData = (memory.ReadInt32(addrToRead1));
                         rm.outPutStrings.Add("copied Data: " + CopyPasteBlockData.ToString() + "\n");
 
                     }
                     else if (method1 == "paste")
                     {
-                        int addrToRead1 = (RunTimeAddress + offs + 4); //
-                        string mm1 = addrToRead1.ToString("X");
-                        WriteMemory(mm1, "int", CopyPasteBlockData.ToString());
+                        int addrToRead1 = (RunTimeAddress + offs + 4);
+                        WriteMemory(addrToRead1, "int", CopyPasteBlockData.ToString());
                         rm.outPutStrings.Add("Pasted Data: " + CopyPasteBlockData.ToString() + "\n");
                     }
                     else if (method1 == "delete" || method1 == "add" || method1 == "clear" || method1 == "set")
                     {
-                        int blockindexcount = memory.ReadInt((RunTimeAddress + offs).ToString("X"));
+                        int blockindexcount = memory.ReadInt32(RunTimeAddress + offs);
                         if (method1 == "add")
                         {
                             int addrToRead1 = (RunTimeAddress + offs); //
@@ -162,9 +159,8 @@ namespace Bounce_Companion
                     else
                     {
                         int addrToRead = (RunTimeAddress + offs + 4); // runtime tag address + offset to Selected [block] + 4 to get to block address
-                        string mm = addrToRead.ToString("X");
                         int tagbase = rm.ReturnMapBase(TD.map);
-                        RunTimeAddress = (memory.ReadInt(mm)) + tagbase;
+                        RunTimeAddress = (memory.ReadInt32(addrToRead)) + tagbase;
                         Bindex = CmdBlockIndex * Bindex;
                         RunTimeAddress += Bindex;
                         string mk = RunTimeAddress.ToString("X");
@@ -197,23 +193,23 @@ namespace Bounce_Companion
                         {
                             case "/rangef":
                                 { // Code flow ----->
-                                    float value1 = float.Parse(value.Split(':')[0]); WriteMemory(Tagruntimeaddress.ToString("X"), "float", value1.ToString());
-                                    float value2 = float.Parse(value.Split(':')[1]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress.ToString("X"), "float", value2.ToString());
+                                    float value1 = float.Parse(value.Split(':')[0]); WriteMemory(Tagruntimeaddress, "float", value1.ToString());
+                                    float value2 = float.Parse(value.Split(':')[1]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", value2.ToString());
                                     break;
                                 }
                             case "/ranged":
                                 { // Code flow ----->
-                                    float value1 = float.Parse(value.Split(':')[0]); WriteMemory(Tagruntimeaddress.ToString("X"), "float", value1.ToString());
-                                    float value2 = float.Parse(value.Split(':')[1]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress.ToString("X"), "float", value2.ToString());
+                                    float value1 = float.Parse(value.Split(':')[0]); WriteMemory(Tagruntimeaddress, "float", value1.ToString());
+                                    float value2 = float.Parse(value.Split(':')[1]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", value2.ToString());
                                     break;
                                 }
                             case "/colorf":
                                 { // Code flow ----->
                                     int runtimeaddress = Tagruntimeaddress;
-                                    WriteMemory(runtimeaddress.ToString("X"), "float", GetColorF(value.Substring(0, 2))); //alpha
-                                    WriteMemory((runtimeaddress += 0x4).ToString("X"), "float", GetColorF(value.Substring(2, 2))); //R
-                                    WriteMemory((runtimeaddress += 0x4).ToString("X"), "float", GetColorF(value.Substring(4, 2))); //G
-                                    WriteMemory((runtimeaddress += 0x4).ToString("X"), "float", GetColorF(value.Substring(6, 2))); //B
+                                    WriteMemory(runtimeaddress, "float", GetColorF(value.Substring(0, 2))); //alpha
+                                    WriteMemory(runtimeaddress += 0x4, "float", GetColorF(value.Substring(2, 2))); //R
+                                    WriteMemory(runtimeaddress += 0x4, "float", GetColorF(value.Substring(4, 2))); //G
+                                    WriteMemory(runtimeaddress += 0x4, "float", GetColorF(value.Substring(6, 2))); //B
                                     break;
                                 }
                             case "/tagRef":
@@ -254,16 +250,16 @@ namespace Bounce_Companion
                                     else
                                     {
                                         int runtimeaddress = Tagruntimeaddress;
-                                        WriteMemory(runtimeaddress.ToString("X"), "int", Convert.ToInt32("0xFFFFFFFF", 16).ToString());
+                                        WriteMemory(runtimeaddress, "int", Convert.ToInt32("0xFFFFFFFF", 16).ToString());
                                         runtimeaddress += 4;
-                                        WriteMemory((runtimeaddress).ToString("X"), "int", Convert.ToInt32("0xFFFFFFFF", 16).ToString());
+                                        WriteMemory(runtimeaddress, "int", Convert.ToInt32("0xFFFFFFFF", 16).ToString());
                                     }
                                     break;
                                 }
                             case "/int8":
                                 {
 
-                                    WriteMemory(Tagruntimeaddress.ToString("X"), "byte", sbyte.Parse(value).ToString());
+                                    WriteMemory(Tagruntimeaddress, "byte", sbyte.Parse(value).ToString());
 
                                     //WriteMemory(Tagruntimeaddress.ToString("X"), "int", value);
                                     break;
@@ -277,14 +273,14 @@ namespace Bounce_Companion
                                         output += "0x" + bytes[i].ToString("X");
                                         if (i != bytes.Length - 1) output += ",";
                                     }
-                                    WriteMemory(Tagruntimeaddress.ToString("X"), "bytes", output);
+                                    WriteMemory(Tagruntimeaddress, "bytes", output);
 
                                     //WriteMemory(Tagruntimeaddress.ToString("X"), "int", value);
                                     break;
                                 }
                             case "/int32":
                                 {
-                                    WriteMemory(Tagruntimeaddress.ToString("X"), "int", value);
+                                    WriteMemory(Tagruntimeaddress, "int", value);
                                     break;
                                 }
                             case "/enum8":
@@ -297,7 +293,7 @@ namespace Bounce_Companion
                                                          let off1 = Convert.ToInt32(tmpflagindex, 16)
                                                          select off1)
                                     {
-                                        WriteMemory(Tagruntimeaddress.ToString("X"), "int", off1.ToString());
+                                        WriteMemory(Tagruntimeaddress, "int", off1.ToString());
                                         return 0;
                                     }
 
@@ -313,7 +309,7 @@ namespace Bounce_Companion
                                                          let off1 = Convert.ToInt32(tmpflagindex, 16)
                                                          select off1)
                                     {
-                                        WriteMemory(Tagruntimeaddress.ToString("x"), "int", off1.ToString());
+                                        WriteMemory(Tagruntimeaddress, "int", off1.ToString());
                                         return 0;
                                     }
 
@@ -329,7 +325,7 @@ namespace Bounce_Companion
                                                          let off1 = Convert.ToInt32(tmpflagindex, 16)
                                                          select off1)
                                     {
-                                        WriteMemory(Tagruntimeaddress.ToString("X"), "int", off1.ToString());
+                                        WriteMemory(Tagruntimeaddress, "int", off1.ToString());
                                         return 0;
                                     }
 
@@ -338,46 +334,46 @@ namespace Bounce_Companion
                             case "/float32":
                                 {
                                     float v1 = float.Parse(value);
-                                    WriteMemory(Tagruntimeaddress.ToString("X"), "float", v1.ToString());
+                                    WriteMemory(Tagruntimeaddress, "float", v1.ToString());
                                     break;
                                 }
                             case "/point2":
                                 { // Code flow ----->
-                                    float v1 = float.Parse(value.Split(':')[0]); WriteMemory(Tagruntimeaddress.ToString("X"), "float", v1.ToString());
-                                    float v2 = float.Parse(value.Split(':')[1]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress.ToString("X"), "float", v2.ToString());
+                                    float v1 = float.Parse(value.Split(':')[0]); WriteMemory(Tagruntimeaddress, "float", v1.ToString());
+                                    float v2 = float.Parse(value.Split(':')[1]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", v2.ToString());
                                     break;
                                 }
                             case "/point3":
                                 { // Code flow ----->
-                                    float v1 = float.Parse(value.Split(':')[0]); WriteMemory(Tagruntimeaddress.ToString("X"), "float", v1.ToString());
-                                    float v2 = float.Parse(value.Split(':')[1]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress.ToString("X"), "float", v2.ToString());
-                                    float v3 = float.Parse(value.Split(':')[1]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress.ToString("X"), "float", v3.ToString());
+                                    float v1 = float.Parse(value.Split(':')[0]); WriteMemory(Tagruntimeaddress, "float", v1.ToString());
+                                    float v2 = float.Parse(value.Split(':')[1]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", v2.ToString());
+                                    float v3 = float.Parse(value.Split(':')[1]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", v3.ToString());
                                     break;
                                 }
                             case "/degree":
                                 { // Code flow ----->
-                                    int v1 = int.Parse(value.Split(':')[0]); float v1_2 = ConvertDegreesToRadians(v1); WriteMemory(Tagruntimeaddress.ToString("X"), "float", v1_2.ToString());
+                                    int v1 = int.Parse(value.Split(':')[0]); float v1_2 = ConvertDegreesToRadians(v1); WriteMemory(Tagruntimeaddress, "float", v1_2.ToString());
                                     break;
                                 }
                             case "/degree2":
                                 { // Code flow ----->
-                                    int v1 = int.Parse(value.Split(':')[0]); float v1_2 = ConvertDegreesToRadians(v1); WriteMemory(Tagruntimeaddress.ToString("X"), "float", v1_2.ToString());
-                                    int v2 = int.Parse(value.Split(':')[1]); float v2_2 = ConvertDegreesToRadians(v2); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress.ToString("X"), "float", v2_2.ToString());
+                                    int v1 = int.Parse(value.Split(':')[0]); float v1_2 = ConvertDegreesToRadians(v1); WriteMemory(Tagruntimeaddress, "float", v1_2.ToString());
+                                    int v2 = int.Parse(value.Split(':')[1]); float v2_2 = ConvertDegreesToRadians(v2); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", v2_2.ToString());
                                     break;
                                 }
                             case "/vector3":
                                 { // Code flow ----->
-                                    float v1 = float.Parse(value.Split(':')[0]); WriteMemory(Tagruntimeaddress.ToString("X"), "float", v1.ToString());
-                                    float v2 = float.Parse(value.Split(':')[1]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress.ToString("X"), "float", v2.ToString());
-                                    float v3 = float.Parse(value.Split(':')[2]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress.ToString("X"), "float", v3.ToString());
+                                    float v1 = float.Parse(value.Split(':')[0]); WriteMemory(Tagruntimeaddress, "float", v1.ToString());
+                                    float v2 = float.Parse(value.Split(':')[1]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", v2.ToString());
+                                    float v3 = float.Parse(value.Split(':')[2]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", v3.ToString());
                                     break;
                                 }
                             case "/vector4":
                                 { // Code flow ----->
-                                    float v1 = float.Parse(value.Split(':')[0]); WriteMemory(Tagruntimeaddress.ToString("X"), "float", v1.ToString());
-                                    float v2 = float.Parse(value.Split(':')[1]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress.ToString("X"), "float", v2.ToString());
-                                    float v3 = float.Parse(value.Split(':')[2]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress.ToString("X"), "float", v3.ToString());
-                                    float v4 = float.Parse(value.Split(':')[3]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress.ToString("X"), "float", v4.ToString());
+                                    float v1 = float.Parse(value.Split(':')[0]); WriteMemory(Tagruntimeaddress, "float", v1.ToString());
+                                    float v2 = float.Parse(value.Split(':')[1]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", v2.ToString());
+                                    float v3 = float.Parse(value.Split(':')[2]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", v3.ToString());
+                                    float v4 = float.Parse(value.Split(':')[3]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", v4.ToString());
                                     break;
                                 }
                             case "/stringId":
@@ -386,11 +382,11 @@ namespace Bounce_Companion
                                     stringID = rm.GetStringID(value);
                                     if (stringID.index == "")
                                     {
-                                        WriteMemory(Tagruntimeaddress.ToString("X"), "int", "0");
+                                        WriteMemory(Tagruntimeaddress, "int", "0");
                                     }
                                     else
                                     {
-                                        WriteMemory(Tagruntimeaddress.ToString("X"), "int", stringID.index.Length.ToString("X") + stringID.index);
+                                        WriteMemory(Tagruntimeaddress, "int", stringID.index.Length.ToString("X") + stringID.index);
                                     }
                                     break;
                                 }
@@ -411,7 +407,7 @@ namespace Bounce_Companion
                                                                                        select (Tagruntimeaddress1, tmpflagindex))
                                     {
                                         flagindex = int.Parse(tmpflagindex);
-                                        int readFlags = memory.ReadByte(Tagruntimeaddress1.ToString("X"), "");
+                                        int readFlags = memory.ReadByte(Tagruntimeaddress1);
                                         RTEFlags(memory, Tagruntimeaddress1, readFlags, flagindex, settrue);
                                         return 0;
                                     }
@@ -435,7 +431,7 @@ namespace Bounce_Companion
                                                                                        select (Tagruntimeaddress1, tmpflagindex))
                                     {
                                         flagindex = int.Parse(tmpflagindex);
-                                        int readFlags = memory.Read2Byte(Tagruntimeaddress1.ToString("X"), "");
+                                        int readFlags = memory.ReadInt16(Tagruntimeaddress1);
                                         RTEFlags(memory, Tagruntimeaddress1, readFlags, flagindex, settrue);
                                         return 0;
                                     }
@@ -459,7 +455,7 @@ namespace Bounce_Companion
                                                                                        select (Tagruntimeaddress1, tmpflagindex))
                                     {
                                         flagindex = int.Parse(tmpflagindex);
-                                        int readFlags = memory.ReadInt(Tagruntimeaddress1.ToString("X"), "");
+                                        int readFlags = memory.ReadInt32(Tagruntimeaddress1);
                                         RTEFlags(memory, Tagruntimeaddress1, readFlags, flagindex, settrue);
                                         return 0;
                                     }
@@ -473,10 +469,10 @@ namespace Bounce_Companion
             return 0;
         }
 
-        public void WriteMemory(string Tagruntimeaddress,string type, string value)
+        public void WriteMemory(object Tagruntimeaddress,string type, string value)
         {
             rm.outPutStrings.Add("Memory: " + Tagruntimeaddress + " Type: " + type + " Value: " + value);
-            m.WriteMemory(Tagruntimeaddress, type, value);
+            m.WriteToMemory(Tagruntimeaddress, type, value);
         }
 
         private void ErrorOutput_TagNotFound(string tagname, string tagtype)
@@ -509,9 +505,9 @@ namespace Bounce_Companion
             Array.Reverse(bytes);
             string Rtagtype = Encoding.ASCII.GetString(bytes);
             string intstr = (int.Parse(datumindex, System.Globalization.NumberStyles.HexNumber)).ToString();
-            WriteMemory(runtimeaddress.ToString("X"), "string", Rtagtype);
+            WriteMemory(runtimeaddress, "string", Rtagtype);
             runtimeaddress += 4;
-            WriteMemory((runtimeaddress).ToString("X"), "int", intstr);
+            WriteMemory(runtimeaddress, "int", intstr);
         }
         public void RTEFlags(Mem memory, int runtimeaddress, int currentFlags, int option, bool setTrue)
         {
@@ -521,13 +517,13 @@ namespace Bounce_Companion
             {
                 int intValue = output | (1 << option);
 
-                WriteMemory(runtimeaddress.ToString("X"), "int", intValue.ToString());
+                WriteMemory(runtimeaddress, "int", intValue.ToString());
             }
             else
             {
                 int intValue = output &= ~(1 << option);
 
-                WriteMemory(runtimeaddress.ToString("X"), "int", intValue.ToString());
+                WriteMemory(runtimeaddress, "int", intValue.ToString());
             }
         }
         private string GetColorF(string hex)
