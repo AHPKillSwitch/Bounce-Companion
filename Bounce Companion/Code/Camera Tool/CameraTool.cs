@@ -17,6 +17,7 @@ using Bounce_Companion.Code.Bounce_Companion_Utility;
 using System.IO;
 using Newtonsoft.Json;
 using Microsoft.Win32;
+using MathNet.Numerics.Interpolation;
 
 namespace Bounce_Companion.Code.Camera_Tool
 {
@@ -26,18 +27,29 @@ namespace Bounce_Companion.Code.Camera_Tool
         MainWindow main;
         Settings settingsWindow;
         Utility utility;
+        Mem m;
+        CameraInterpolation interpolation;
+        public List<ImageData> imageDataList; // Store the image data
+        public List<float[]> CameraPositionArrayList = new List<float[]>();
 
-        List<float[]> CameraPositionArrayList = new List<float[]>();
+        public bool debugCameraToggle = false;
+        int debugCameraTogglebytes = 0;
 
+        //Camera Tool Parameters
+        public string currentProjectName = string.Empty;
+        public bool rollCamera = false;
+        public bool loopCamera = false;
         public int jumpToIndex = 0;
 
-        public CameraTool(CameraControls cameraControls, MainWindow main, Settings settingsWindow, Utility utility) 
+        public CameraTool(CameraControls cameraControls, MainWindow main, Settings settingsWindow, Utility utility, CameraInterpolation interpolation, Mem m) 
         {
+            this.interpolation = interpolation;
             this.main = main;
             this.cameraControls = cameraControls;
-            Globals.imageDataList = new List<ImageData>();
+            imageDataList = new List<ImageData>();
             this.settingsWindow = settingsWindow;
             this.utility = utility;
+            this.m = m;
 
         }
         public class ImageData
@@ -62,19 +74,20 @@ namespace Bounce_Companion.Code.Camera_Tool
         {
             if (index == -1)
             {
-                index = Globals.jumpToIndex;
+                index = jumpToIndex;
             }
-            if (Globals.imageDataList.Count == 0) return;
+            if (imageDataList.Count == 0) return;
             // Retrieve and display the selected image data
             if (index > -1)
             {
-                Globals.selectedImageData = Globals.imageDataList[index];
+                ImageData selectedImageData = imageDataList[index];
+                cameraControls.MoveCameraPosition(selectedImageData.CameraPosition[0], selectedImageData.CameraPosition[1], selectedImageData.CameraPosition[2], selectedImageData.CameraPosition[3], selectedImageData.CameraPosition[4], selectedImageData.CameraPosition[5]);
             }
-            cameraControls.MoveCameraPosition(Globals.selectedImageData.CameraPosition[0], selectedImageData.CameraPosition[1], selectedImageData.CameraPosition[2], selectedImageData.CameraPosition[3], selectedImageData.CameraPosition[4], selectedImageData.CameraPosition[5]);
+            
         }
-        private void InsertSceneAtSelected(int selectedIndex, bool insertBefore)
+        public void InsertSceneAtSelected(int selectedIndex, bool insertBefore)
         {
-            if (selectedIndex >= 0 && selectedIndex <= Globals.imageDataList.Count)
+            if (selectedIndex >= 0 && selectedIndex <= imageDataList.Count)
             {
                 // Retrieve data from text boxes
                 float[] cameraPosition = cameraControls.GetCameraData(out byte[] cameraPositionArray);
@@ -101,7 +114,7 @@ namespace Bounce_Companion.Code.Camera_Tool
                 int insertIndex = insertBefore ? selectedIndex : selectedIndex + 1;
 
                 // Insert the new image data at the calculated index
-                Globals.imageDataList.Insert(insertIndex, newImageData);
+                imageDataList.Insert(insertIndex, newImageData);
 
                 // Update the UI - Add a new stack panel at the calculated index
                 InsertStackPanel(insertIndex, imageFileName);
@@ -114,7 +127,7 @@ namespace Bounce_Companion.Code.Camera_Tool
                 if (bitmapSource != null)
                 {
                     // Use the Documents folder and specific path
-                    string imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Halo 2", "Bounce Companion", "Camera Paths", Globals.currentProjectName, imageFileName);
+                    string imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Halo 2", "Bounce Companion", "Camera Paths", currentProjectName, imageFileName);
 
                     // Save the bitmap source to the specified path
                     SaveBitmapSourceToFile((BitmapSource)bitmapSource, imagePath);
@@ -126,7 +139,7 @@ namespace Bounce_Companion.Code.Camera_Tool
         public void SaveSceneDataToFile(List<ImageData> imageDataList)
         {
             var dialog = new SaveFileDialog();
-            dialog.InitialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Halo 2", "Bounce Companion", "Camera Paths", Globals.currentProjectName);
+            dialog.InitialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Halo 2", "Bounce Companion", "Camera Paths", currentProjectName);
             dialog.Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*";
 
             if (dialog.ShowDialog() == true)
@@ -163,7 +176,7 @@ namespace Bounce_Companion.Code.Camera_Tool
         {
             // Clear the stack panel and data list
             main.ImageStackPanel.Children.Clear();
-            Globals.imageDataList.Clear();
+            imageDataList.Clear();
 
             // Hide the large image and data panel
             main.LargeImage.Source = null;
@@ -204,7 +217,7 @@ namespace Bounce_Companion.Code.Camera_Tool
                 var bitmapSource = ScreenshotHelper.GetBitmapThumbnailAsync(320, 240);
                 if (bitmapSource != null)
                 {
-                    string imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Halo 2", "Bounce Companion", "Camera Paths", Globals.currentProjectName, imageFileName);
+                    string imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Halo 2", "Bounce Companion", "Camera Paths", currentProjectName, imageFileName);
 
                     // Save the bitmap source to the specified path
                     SaveBitmapSourceToFile((BitmapSource)bitmapSource, imagePath);
@@ -226,7 +239,7 @@ namespace Bounce_Companion.Code.Camera_Tool
                 floats[2] = "0.00";
 
                 // Store image data
-                Globals.imageDataList.Add(new ImageData
+                imageDataList.Add(new ImageData
                 {
                     CameraPosition = cameraPosition,
                     TransitionTime = transitionTime,
@@ -310,7 +323,7 @@ namespace Bounce_Companion.Code.Camera_Tool
                     if (stackPanel.Children.Contains(clickedImage))
                     {
                         selectedIndex = i;
-                        Globals.jumpToIndex = i;
+                        jumpToIndex = i;
                         break;
                     }
                 }
@@ -319,13 +332,13 @@ namespace Bounce_Companion.Code.Camera_Tool
             if (selectedIndex != -1)
             {
                 // Retrieve and display the selected image data
-                ImageData selectedImageData = Globals.imageDataList[selectedIndex];
+                ImageData selectedImageData = imageDataList[selectedIndex];
                 // Use the selectedImageData as needed
 
                 // Display the larger image and data panel
                 main.LargeImage.Source = clickedImage.Source;
                 main.LargeImage.Visibility = Visibility.Visible;
-                userTextChanged = false;
+                Globals.userTextChanged = false;
                 main.TransitionTimeTextBox.Text = selectedImageData.TransitionTime.ToString();
                 main.CheckBox_OffsetAfterScene.IsChecked = selectedImageData.SpectatePlayer;
                 main.CheckBox_TrackAfterScene.IsChecked = selectedImageData.FacePlayer;
@@ -347,7 +360,7 @@ namespace Bounce_Companion.Code.Camera_Tool
             }
         }
         // Modify LoadSceneData to open an open file dialog in the specified folder
-        List<ImageData> LoadSceneData()
+        public List<ImageData> LoadSceneData()
         {
             var dialog = new OpenFileDialog();
             dialog.InitialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Halo 2", "Bounce Companion", "Camera Paths");
@@ -361,13 +374,13 @@ namespace Bounce_Companion.Code.Camera_Tool
                 string directoryPath = Path.GetDirectoryName(filePath);
 
                 // Get the name of the last folder in the directory path
-                Globals.currentProjectName = Path.GetFileName(directoryPath);
+                currentProjectName = Path.GetFileName(directoryPath);
 
                 if (File.Exists(filePath))
                 {
                     string jsonData = File.ReadAllText(filePath);
                     main.staackPanel_CameraTool.Visibility = Visibility.Visible;
-                    main.textBox_ProjectName.Text = Globals.currentProjectName;  // Set the text to the new currentProjectName
+                    main.textBox_ProjectName.Text = currentProjectName;  // Set the text to the new currentProjectName
                     return JsonConvert.DeserializeObject<List<ImageData>>(jsonData);
                 }
             }
@@ -375,10 +388,10 @@ namespace Bounce_Companion.Code.Camera_Tool
             return new List<ImageData>();
         }
 
-        private void LoadSceneFromFile()
+        public void LoadSceneFromFile()
         {
             int i = 2;
-            foreach (var imageData in Globals.imageDataList)
+            foreach (var imageData in imageDataList)
             {
                 if (i >= 10) i = 2;
                 // Create a new stack panel
@@ -405,7 +418,7 @@ namespace Bounce_Companion.Code.Camera_Tool
 
                 try
                 {
-                    string imagePath = Path.Combine(documentsFolder, "My Games", "Halo 2", "Bounce Companion", "Camera Paths", Globals.currentProjectName, imageData.ImageFileName);
+                    string imagePath = Path.Combine(documentsFolder, "My Games", "Halo 2", "Bounce Companion", "Camera Paths", currentProjectName, imageData.ImageFileName);
                     //string imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Halo 2", "Bounce Companion", "Camera Paths", currentProjectName, imageData.ImageFileName);
                     BitmapImage bitmap = new BitmapImage();
                     bitmap.BeginInit();
@@ -436,34 +449,34 @@ namespace Bounce_Companion.Code.Camera_Tool
                 main.ImageStackPanel.Children.Add(stackPanel);
             }
         }
-        private void UpdateImageDataIndex(bool fullreset)
+        public void UpdateImageDataIndex(bool fullreset)
         {
-            if (Globals.imageDataList == null || Globals.imageDataList.Count == 0) return;
+            if (imageDataList == null || imageDataList.Count == 0) return;
             float transitionTime = float.Parse(main.TransitionTimeTextBox.Text);
             float[] cameraPosition = cameraControls.GetCameraData(out byte[] cameraPositionArray);
             bool Face = false;
             bool Spectate = false;
-            if (Globals.jumpToIndex > -1)
+            if (jumpToIndex > -1)
             {
                 if (main.CheckBox_TrackAfterScene.IsChecked == true) Face = true;
                 if (main.CheckBox_OffsetAfterScene.IsChecked == true) Spectate = true;
-                selectedImageData = Globals.imageDataList[Globals.jumpToIndex];
+                ImageData selectedImageData = imageDataList[jumpToIndex];
 
-                Globals.imageDataList[Globals.jumpToIndex].TransitionTime = transitionTime;
-                if (fullreset) Globals.imageDataList[Globals.jumpToIndex].CameraPosition = cameraPosition;
-                if (fullreset) Globals.imageDataList[Globals.jumpToIndex].CameraPositionArray = cameraPositionArray;
-                Globals.imageDataList[Globals.jumpToIndex].FacePlayer = Face;
-                Globals.imageDataList[Globals.jumpToIndex].SpectatePlayer = Spectate;
-                Globals.imageDataList[Globals.jumpToIndex].CameraPosition[0] = float.Parse(main.SceneDataTextBox_X.Text);
-                Globals.imageDataList[Globals.jumpToIndex].CameraPosition[1] = float.Parse(main.SceneDataTextBox_Y.Text);
-                Globals.imageDataList[Globals.jumpToIndex].CameraPosition[2] = float.Parse(main.SceneDataTextBox_Z.Text);
-                Globals.imageDataList[Globals.jumpToIndex].CameraPosition[3] = float.Parse(main.SceneDataTextBox_Yaw.Text);
-                Globals.imageDataList[Globals.jumpToIndex].CameraPosition[4] = float.Parse(main.SceneDataTextBox_Pitch.Text);
-                Globals.imageDataList[Globals.jumpToIndex].CameraPosition[5] = float.Parse(main.SceneDataTextBox_Roll.Text);
-                Globals.imageDataList[Globals.jumpToIndex].CameraOffsetsArray[0] = main.TextBox_SceneData_Offset_X.Text;
-                Globals.imageDataList[Globals.jumpToIndex].CameraOffsetsArray[1] = main.TextBox_SceneData_Offset_Y.Text;
-                Globals.imageDataList[Globals.jumpToIndex].CameraOffsetsArray[2] = main.TextBox_SceneData_Offset_Z.Text;
-                Globals.imageDataList[Globals.jumpToIndex].SelctedPlayerString = main.ComboBox_SceneData_Playernames.Text;
+                imageDataList[jumpToIndex].TransitionTime = transitionTime;
+                if (fullreset) imageDataList[jumpToIndex].CameraPosition = cameraPosition;
+                if (fullreset) imageDataList[jumpToIndex].CameraPositionArray = cameraPositionArray;
+                imageDataList[jumpToIndex].FacePlayer = Face;
+                imageDataList[jumpToIndex].SpectatePlayer = Spectate;
+                imageDataList[jumpToIndex].CameraPosition[0] = float.Parse(main.SceneDataTextBox_X.Text);
+                imageDataList[jumpToIndex].CameraPosition[1] = float.Parse(main.SceneDataTextBox_Y.Text);
+                imageDataList[jumpToIndex].CameraPosition[2] = float.Parse(main.SceneDataTextBox_Z.Text);
+                imageDataList[jumpToIndex].CameraPosition[3] = float.Parse(main.SceneDataTextBox_Yaw.Text);
+                imageDataList[jumpToIndex].CameraPosition[4] = float.Parse(main.SceneDataTextBox_Pitch.Text);
+                imageDataList[jumpToIndex].CameraPosition[5] = float.Parse(main.SceneDataTextBox_Roll.Text);
+                imageDataList[jumpToIndex].CameraOffsetsArray[0] = main.TextBox_SceneData_Offset_X.Text;
+                imageDataList[jumpToIndex].CameraOffsetsArray[1] = main.TextBox_SceneData_Offset_Y.Text;
+                imageDataList[jumpToIndex].CameraOffsetsArray[2] = main.TextBox_SceneData_Offset_Z.Text;
+                imageDataList[jumpToIndex].SelctedPlayerString = main.ComboBox_SceneData_Playernames.Text;
                 if (fullreset)
                 {
                     var bitmapSource = ScreenshotHelper.GetBitmapThumbnailAsync(320, 240);
@@ -474,38 +487,38 @@ namespace Bounce_Companion.Code.Camera_Tool
                         main.LargeImage.Source = bitmapSource;
                         clickedImage.Source = bitmapSource;
                         // Use the Documents folder and specific path
-                        string imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Halo 2", "Bounce Companion", "Camera Paths", Globals.currentProjectName, Globals.imageDataList[Globals.jumpToIndex].ImageFileName);
+                        string imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Halo 2", "Bounce Companion", "Camera Paths", currentProjectName, imageDataList[jumpToIndex].ImageFileName);
 
                         // Save the bitmap source to the specified path
                         SaveBitmapSourceToFile((BitmapSource)bitmapSource, imagePath);
                         // Update the image source in the UI
-                        UpdateImageSource(Globals.jumpToIndex, bitmapSource);
+                        UpdateImageSource(jumpToIndex, bitmapSource);
                     }
                 }
 
             }
         }
         
-        private async Task StartCameraRoll()
+        public async Task StartCameraRoll()
         {
             if (!rollCamera)
             {
                 try
                 {
                     main.CheckBox_OffsetPlayer.IsChecked = false;
-                    Offset_Selected_Player = false;
+                    interpolation.Offset_Selected_Player = false;
                     List<float[]> cameraPathList = new List<float[]>();
                     List<float> cameraTransitionTImeList = new List<float>();
-                    for (int i = 0; i < Globals.imageDataList.Count; i++)
+                    for (int i = 0; i < imageDataList.Count; i++)
                     {
-                        var currentImageData = Globals.imageDataList[i];
+                        var currentImageData = imageDataList[i];
                         cameraPathList.Add(currentImageData.CameraPosition);
                         cameraTransitionTImeList.Add(currentImageData.TransitionTime);
                     }
                     await Task.Run(async () =>
                     {
                         // This code will run on a separate thread.
-                        await cameraInterpolation.MoveCameraSmoothly(cameraPathList, cameraTransitionTImeList);
+                        await interpolation.MoveCameraSmoothly(cameraPathList, cameraTransitionTImeList);
                     });
                 }
                 catch (Exception ex) { MessageBox.Show("Error:" + ex.Message); rollCamera = false; }
@@ -532,7 +545,7 @@ namespace Bounce_Companion.Code.Camera_Tool
                 if (!string.IsNullOrEmpty(projectName))
                 {
                     // Set the current project name
-                    Globals.currentProjectName = projectName;
+                    currentProjectName = projectName;
 
                     // Calculate the position below the button
                     double buttonBottom = main.NewProjectButton.PointToScreen(new Point(0, main.NewProjectButton.ActualHeight)).Y;
@@ -545,7 +558,7 @@ namespace Bounce_Companion.Code.Camera_Tool
                     newProjectWindow.Top = buttonBottom;
 
                     // Create a folder for the project in the specified path
-                    string projectFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Halo 2", "Bounce Companion", "Camera Paths", Globals.currentProjectName);
+                    string projectFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Halo 2", "Bounce Companion", "Camera Paths", currentProjectName);
                     Directory.CreateDirectory(projectFolderPath);
 
                     // Now you can use projectFolderPath to save screenshots for this project
@@ -557,11 +570,27 @@ namespace Bounce_Companion.Code.Camera_Tool
             if (main.isAppLoading)
                 return;
 
-            if (!string.IsNullOrEmpty(settingsWindow.TextBox_FlySpeed.Text) && utility.ContainsOnlyNumbersOrDecimals(settingsWindow.TextBox_FlySpeed.Text)) Globals.c_moveSpeed = float.Parse(settingsWindow.TextBox_FlySpeed.Text);
-            if (!string.IsNullOrEmpty(settingsWindow.TextBox_Turnspeed.Text) && utility.ContainsOnlyNumbersOrDecimals(settingsWindow.TextBox_Turnspeed.Text)) Globals.c_turnSpeed = float.Parse(settingsWindow.TextBox_Turnspeed.Text);
-            if (!string.IsNullOrEmpty(settingsWindow.TextBox_Pitchspeed.Text) && utility.ContainsOnlyNumbersOrDecimals(settingsWindow.TextBox_Pitchspeed.Text)) Globals.c_pitchSpeed = float.Parse(settingsWindow.TextBox_Pitchspeed.Text);
-            if (!string.IsNullOrEmpty(settingsWindow.TextBox_Heightspeed.Text) && utility.ContainsOnlyNumbersOrDecimals(settingsWindow.TextBox_Heightspeed.Text)) Globals.c_heightSpeed = float.Parse(settingsWindow.TextBox_Heightspeed.Text);
-            if (!string.IsNullOrEmpty(settingsWindow.TextBox_Rollspeed.Text) && utility.ContainsOnlyNumbersOrDecimals(settingsWindow.TextBox_Rollspeed.Text)) Globals.c_rollSpeed = float.Parse(settingsWindow.TextBox_Rollspeed.Text);
+            if (!string.IsNullOrEmpty(settingsWindow.TextBox_FlySpeed.Text) && utility.ContainsOnlyNumbersOrDecimals(settingsWindow.TextBox_FlySpeed.Text)) cameraControls.c_moveSpeed = float.Parse(settingsWindow.TextBox_FlySpeed.Text);
+            if (!string.IsNullOrEmpty(settingsWindow.TextBox_Turnspeed.Text) && utility.ContainsOnlyNumbersOrDecimals(settingsWindow.TextBox_Turnspeed.Text)) cameraControls.c_turnSpeed = float.Parse(settingsWindow.TextBox_Turnspeed.Text);
+            if (!string.IsNullOrEmpty(settingsWindow.TextBox_Pitchspeed.Text) && utility.ContainsOnlyNumbersOrDecimals(settingsWindow.TextBox_Pitchspeed.Text)) cameraControls.c_pitchSpeed = float.Parse(settingsWindow.TextBox_Pitchspeed.Text);
+            if (!string.IsNullOrEmpty(settingsWindow.TextBox_Heightspeed.Text) && utility.ContainsOnlyNumbersOrDecimals(settingsWindow.TextBox_Heightspeed.Text)) cameraControls.c_heightSpeed = float.Parse(settingsWindow.TextBox_Heightspeed.Text);
+            if (!string.IsNullOrEmpty(settingsWindow.TextBox_Rollspeed.Text) && utility.ContainsOnlyNumbersOrDecimals(settingsWindow.TextBox_Rollspeed.Text)) cameraControls.c_rollSpeed = float.Parse(settingsWindow.TextBox_Rollspeed.Text);
+        }
+        
+        public void ToggleDebugMode()
+        {
+            debugCameraTogglebytes = m.ReadInt32("halo2.exe+0x4A8870");
+            if (m.ReadInt32("halo2.exe+0x4A84B0") == debugCameraTogglebytes)
+            {
+                m.WriteToMemory("halo2.exe+0x4A849C", "int", "2");
+                debugCameraToggle = true;
+            }
+            else
+            {
+                m.WriteToMemory("halo2.exe+0x4A849C", "int", "0");
+                m.WriteToMemory("halo2.exe+0x4A84B0", "int", debugCameraTogglebytes.ToString());
+                debugCameraToggle = false;
+            }
         }
         public void ClearTimeline()
         {
@@ -577,11 +606,11 @@ namespace Bounce_Companion.Code.Camera_Tool
             {
                 ClearTimelineData();
             }
-            Globals.rollCamera = false;
+            rollCamera = false;
         }
         private void ClearAllImages()
         {
-            string imagePathToDelete = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Halo 2", "Bounce Companion", "Camera Paths", Globals.currentProjectName);
+            string imagePathToDelete = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Halo 2", "Bounce Companion", "Camera Paths", currentProjectName);
             DeleteAllFilesInFolder(imagePathToDelete);
         }
         public void DeleteAllFilesInFolder(string folderPath)

@@ -18,16 +18,37 @@ namespace Bounce_Companion.Code.Camera_Tool
     {
         private Mem m;
         private Controller xboxController;
-        private CameraInterpolation c_Interpolation;
+        private CameraInterpolation interpolation;
         private CommandHandler c_Handler;
         private System.Threading.Timer toggleTimer;
 
-        public bool rollCamera = false;
+        
         private float[] c_angle;
+
+        // Camera Transition speed
+        public float c_GlobalTransitionTime = 0f;
+        public int loopDelayTime = 100;
+
+        //camera Addresses
+        public int xAddress = 0;
+        public int yAddress = 0;
+        public int zAddress = 0;
+        public int yawAddress = 0;
+        public int pitchAddress = 0;
+        public int rollAddress = 0;
+
+        //camera flyspeeds
+        public float c_moveSpeed = 0f;
+        public float c_turnSpeed = 0f;
+        public float c_pitchSpeed = 0f;
+        public float c_heightSpeed = 0f;
+        public float c_rollSpeed = 0f;
+
+
         public CameraControls(Mem M, CameraInterpolation Interpolation)
         {
             m = M;
-            c_Interpolation = Interpolation;
+            interpolation = Interpolation;
             toggleTimer = new System.Threading.Timer(ToggleCallback, null, Timeout.Infinite, Timeout.Infinite);
 
             _ = InitializeXboxController();
@@ -96,7 +117,7 @@ namespace Bounce_Companion.Code.Camera_Tool
                             {
                                 if (!rollCamera && flyCamControl)
                                 {
-                                    await c_Interpolation.MoveCameraPositionAsync(xAxisInput, yAxisInput, yawAxisInput, pitchAxisInput, leftTrigger, rightTrigger, leftShoulderPressed, rightShoulderPressed);
+                                    await interpolation.MoveCameraPositionAsync(xAxisInput, yAxisInput, yawAxisInput, pitchAxisInput, leftTrigger, rightTrigger, leftShoulderPressed, rightShoulderPressed);
                                 }
                             }
                             // Check D-pad and button presses
@@ -276,12 +297,12 @@ namespace Bounce_Companion.Code.Camera_Tool
         public void MoveCameraPosition(float x, float y, float z, float yaw, float pitch, float roll)
         {
             // Write the camera position and rotation values to memory
-            m.WriteToMemory(Globals.xAddress, "float", x.ToString());
-            m.WriteToMemory(Globals.yAddress, "float", y.ToString());
-            m.WriteToMemory(Globals.zAddress, "float", z.ToString());
-            m.WriteToMemory(Globals.yawAddress, "float", yaw.ToString());
-            m.WriteToMemory(Globals.pitchAddress, "float", pitch.ToString());
-            m.WriteToMemory(Globals.rollAddress, "float", roll.ToString());
+            m.WriteToMemory(xAddress, "float", x.ToString());
+            m.WriteToMemory(yAddress, "float", y.ToString());
+            m.WriteToMemory(zAddress, "float", z.ToString());
+            m.WriteToMemory(yawAddress, "float", yaw.ToString());
+            m.WriteToMemory(pitchAddress, "float", pitch.ToString());
+            m.WriteToMemory(rollAddress, "float", roll.ToString());
         }
         public float[] GetCameraData(out byte[] cameraPosition)
         {
@@ -334,27 +355,27 @@ namespace Bounce_Companion.Code.Camera_Tool
         {
             if (postion)
             {
-                m.WriteToMemory(Globals.xAddress, "float", 0.ToString());
-                m.WriteToMemory(Globals.yAddress, "float", 0.ToString());
-                m.WriteToMemory(Globals.zAddress, "float", 10.ToString());
+                m.WriteToMemory(xAddress, "float", 0.ToString());
+                m.WriteToMemory(yAddress, "float", 0.ToString());
+                m.WriteToMemory(zAddress, "float", 10.ToString());
 
             }
             else
             {
-                m.WriteToMemory(Globals.yawAddress, "float", 0.ToString());
-                m.WriteToMemory(Globals.pitchAddress, "float", 0.ToString());
-                m.WriteToMemory(Globals.rollAddress, "float", 0.ToString());
+                m.WriteToMemory(yawAddress, "float", 0.ToString());
+                m.WriteToMemory(pitchAddress, "float", 0.ToString());
+                m.WriteToMemory(rollAddress, "float", 0.ToString());
             }
         }
         public void SetCameraAddresses()
         {
             int cameraPositionAddress = m.ReadInt32("halo2.exe+0x004D84EC");
-            Globals.xAddress = cameraPositionAddress;
-            Globals.yAddress = cameraPositionAddress + 0x4;
-            Globals.zAddress = cameraPositionAddress + 0x8;
-            Globals.yawAddress = cameraPositionAddress + 0xC;
-            Globals.pitchAddress = cameraPositionAddress + 0x10;
-            Globals.rollAddress = cameraPositionAddress + 0x14;
+            xAddress = cameraPositionAddress;
+            yAddress = cameraPositionAddress + 0x4;
+            zAddress = cameraPositionAddress + 0x8;
+            yawAddress = cameraPositionAddress + 0xC;
+            pitchAddress = cameraPositionAddress + 0x10;
+            rollAddress = cameraPositionAddress + 0x14;
         }
     }
 }

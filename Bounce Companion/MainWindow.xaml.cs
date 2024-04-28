@@ -61,6 +61,7 @@ namespace Bounce_Companion
         ObjectHandler objectHandler;
         Utility utility;
         BounceHandler BH;
+        CameraInterpolation interpolation;
 
 
         HandleChallenges CH;
@@ -81,14 +82,11 @@ namespace Bounce_Companion
         public string customMapsPath = string.Empty;
         public string serverPlaylistPath = string.Empty;
         
-        // Camera Transition speed
-        public float c_GlobalTransitionTime = 0f;
-        public int loopDelayTime = 100;
+        
 
         public bool tags_Loaded_Status;
         public bool enableDebug = false;
         public bool customContrails = false;
-        private bool userTextChanged = true;
         public bool isAppLoading = true;
         
         //public WebSocket ws;
@@ -137,31 +135,15 @@ namespace Bounce_Companion
             public static bool modsEnabled = true;
             public static bool modsEnabledMaster = true;
 
-            //camera Addresses
-            public static int xAddress = 0;
-            public static int yAddress = 0;
-            public static int zAddress = 0;
-            public static int yawAddress = 0;
-            public static int pitchAddress = 0;
-            public static int rollAddress = 0;
+            public static bool userTextChanged = true;
 
-            //camera flyspeeds
-            public static float c_moveSpeed = 0f;
-            public static float c_turnSpeed = 0f;
-            public static float c_pitchSpeed = 0f;
-            public static float c_heightSpeed = 0f;
-            public static float c_rollSpeed = 0f;
 
-            //Camera Tool Parameters
-            public static string currentProjectName = string.Empty;
-            public static bool rollCamera = false;
-            public static int jumpToIndex = 0;
 
             //Bounce Tracker Stats
-            
 
-            public static List<ImageData> imageDataList; // Store the image data
-            
+
+
+
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
@@ -177,7 +159,7 @@ namespace Bounce_Companion
                 //attempt to attach
                 AttachToProcess(0);
                 GetCommansFromFile();
-                PrintToConsole_ContinueNextText("Checking Config . . . ");
+                utility.PrintToConsole_ContinueNextText("Checking Config . . . ");
                 await CheckAndSetMapFiles();
                 SetupConfig();
 
@@ -223,7 +205,7 @@ namespace Bounce_Companion
 
         private async Task<bool> CheckForNewVersion()
         {
-            PrintToConsole_ContinueNextText("Checking for newer Versions . . .  ");
+            utility.PrintToConsole_ContinueNextText("Checking for newer Versions . . .  ");
             string owner = "AHPKillSwitch";
             string repo = "Bounce-Companion";
 
@@ -266,12 +248,12 @@ namespace Bounce_Companion
         }
         private void SetCameraFlySpeeds()
         {
-            settingsWindow.TextBox_FlySpeed.Text = Globals.c_moveSpeed.ToString();
-            settingsWindow.TextBox_Turnspeed.Text = Globals.c_turnSpeed.ToString();
-            settingsWindow.TextBox_Pitchspeed.Text = Globals.c_pitchSpeed.ToString();
-            settingsWindow.TextBox_Heightspeed.Text = Globals.c_heightSpeed.ToString();
-            settingsWindow.TextBox_Rollspeed.Text = Globals.c_rollSpeed.ToString();
-            GlobalTransitionTimeTextBox.Text = c_GlobalTransitionTime.ToString();
+            settingsWindow.TextBox_FlySpeed.Text = cameraControls.c_moveSpeed.ToString();
+            settingsWindow.TextBox_Turnspeed.Text = cameraControls.c_turnSpeed.ToString();
+            settingsWindow.TextBox_Pitchspeed.Text = cameraControls.c_pitchSpeed.ToString();
+            settingsWindow.TextBox_Heightspeed.Text = cameraControls.c_heightSpeed.ToString();
+            settingsWindow.TextBox_Rollspeed.Text = cameraControls.c_rollSpeed.ToString();
+            GlobalTransitionTimeTextBox.Text = cameraControls.c_GlobalTransitionTime.ToString();
             int tickrate = m.ReadByte("halo2.exe+0x004C06E4,0x02");
             settingsWindow.Textbox_Tickrate.Text = tickrate.ToString();
         }
@@ -297,12 +279,12 @@ namespace Bounce_Companion
             customMapsPath = configJson.CustomMapsPath;
             serverPlaylistPath = configJson.ServerPlaylistPath;
 
-            Globals.c_moveSpeed = float.Parse(configJson.MoveSpeed);
-            Globals.c_turnSpeed = float.Parse(configJson.TurnSpeed);
-            Globals.c_pitchSpeed = float.Parse(configJson.PitchSpeed);
-            Globals.c_heightSpeed = float.Parse(configJson.HeightSpeed);
-            Globals.c_rollSpeed = float.Parse(configJson.RollSpeed);
-            c_GlobalTransitionTime = float.Parse(configJson.globalTransitionTime);
+            cameraControls.c_moveSpeed = float.Parse(configJson.MoveSpeed);
+            cameraControls.c_turnSpeed = float.Parse(configJson.TurnSpeed);
+            cameraControls.c_pitchSpeed = float.Parse(configJson.PitchSpeed);
+            cameraControls.c_heightSpeed = float.Parse(configJson.HeightSpeed);
+            cameraControls.c_rollSpeed = float.Parse(configJson.RollSpeed);
+            cameraControls.c_GlobalTransitionTime = float.Parse(configJson.globalTransitionTime);
             return configJson;
         }
         private async Task UpdateConfig(ConfigJson config)
@@ -436,7 +418,7 @@ namespace Bounce_Companion
 
             try
             {
-                PrintToConsole_ContinueNextText("Attempting to attach to the Halo 2 game process . . .  ");
+                utility.PrintToConsole_ContinueNextText("Attempting to attach to the Halo 2 game process . . .  ");
                 Process[] processes = Process.GetProcessesByName("halo2");
                 if (selectedIndex < processes.Length)
                 {
@@ -501,7 +483,7 @@ namespace Bounce_Companion
             if (!tagscurrentlyloaded && tags_Loaded_Status) //Check if tags are loaded if not load them
             {
                 tagscurrentlyloaded = true;
-                PrintToConsole_ContinueNextText("Checking Game Session . . . ");
+                utility.PrintToConsole_ContinueNextText("Checking Game Session . . . ");
                 if (GameTypeValidCheck())
                 {
                     utility.PrintToConsole("Valid Session Found!");
@@ -570,7 +552,7 @@ namespace Bounce_Companion
         {
             while (true)
             {
-                if (!Globals.rollCamera || !debugCameraToggle && attached)
+                if (!cameraTool.rollCamera || !cameraTool.debugCameraToggle && attached)
                 {
                     if (System.Windows.Application.Current == null)
                     {
@@ -712,8 +694,8 @@ namespace Bounce_Companion
             {
                 utility.PrintToConsole("" +
                     "Credits: \n" +
-                    "Luke: Farther of the Project, Creative Vision, Emblem Design and Concept, Audio Design \n" +
                     "KillSwitch: UI Design, Emblem Concept, Bounce Detection Code, Tag Editing Code, Camera Tool, General Programming\n" +
+                    "Luke: Announcements Design, Creative Vision, Emblem Design and Concept, Audio Design \n" +
                     "Bestiole: Audio Engineering\n" +
                     "nhoj: Graphics/Emblem Designer\n" +
                     "Special Thanks:\n" +
@@ -723,9 +705,21 @@ namespace Bounce_Companion
 
             }
         }
-        
+        public string GetPlayerNameSalt(string playerName)
+        {
+            UpdatePlayerList();
+            foreach (KeyValuePair<string, p_List_Info> key in p_List)
+            {
+                p_List_Info info = key.Value;
+                if (playerName == info.p_Name)
+                {
+                    return info.p_Salt;
+                }
+            }
+            return "null";
+        }
 
-        
+
         private struct p_List_Info
         {
             public string p_Name;
@@ -742,7 +736,7 @@ namespace Bounce_Companion
         //List<p_List_Info> p_List = new List<p_List_Info>();
         Dictionary<string, p_List_Info> p_List = new Dictionary<string, p_List_Info>();
         int check = 0;
-        private Task UpdatePlayerList()
+        public Task UpdatePlayerList()
         {
             for (int i = 0; i < 15; i++)
             {
@@ -1141,31 +1135,11 @@ namespace Bounce_Companion
             base.OnClosed(e);
         }
        
-        public bool debugCameraToggle = false;
-        int debugCameraTogglebytes = 0;
+        
         private void ToggleDebugCamera(object sender, RoutedEventArgs e)
         {
-            ToggleDebugMode();
+            cameraTool.ToggleDebugMode();
         }
-
-        private void ToggleDebugMode()
-        {
-            debugCameraTogglebytes = m.ReadInt32("halo2.exe+0x4A8870");
-            if (m.ReadInt32("halo2.exe+0x4A84B0") == debugCameraTogglebytes)
-            {
-                m.WriteToMemory("halo2.exe+0x4A849C", "int", "2");
-                debugCameraToggle = true;
-            }
-            else
-            {
-                m.WriteToMemory("halo2.exe+0x4A849C", "int", "0");
-                m.WriteToMemory("halo2.exe+0x4A84B0", "int", debugCameraTogglebytes.ToString());
-                debugCameraToggle = false;
-            }
-        }
-
-        
-        
         private void JumpToSceneButton_Click(object sender, RoutedEventArgs e)
         {
             cameraTool.JumpCameraToScene(-1);
@@ -1207,24 +1181,24 @@ namespace Bounce_Companion
 
         private void SaveSceneDataToFile_click(object sender, RoutedEventArgs e)
         {
-            SaveSceneDataToFile(imageDataList);
+            cameraTool.SaveSceneDataToFile(cameraTool.imageDataList);
         }
 
         private void LoadScenarioDataFromFile_click(object sender, RoutedEventArgs e)
         {
             cameraTool.ClearTimeline();
-            Globals.imageDataList = cameraTool.LoadSceneData();
+            cameraTool.imageDataList = cameraTool.LoadSceneData();
             cameraTool.LoadSceneFromFile();
         }
 
         private void InsertSceneBeforeSelected_Click(object sender, RoutedEventArgs e)
         {
-            cameraTool.InsertSceneAtSelected(jumpToIndex, true);
+            cameraTool.InsertSceneAtSelected(cameraTool.jumpToIndex, true);
         }
 
         private void InsertSceneAfterSelected_Click(object sender, RoutedEventArgs e)
         {
-            cameraTool.InsertSceneAtSelected(jumpToIndex, false);
+            cameraTool.InsertSceneAtSelected(cameraTool.jumpToIndex, false);
         }
         private async void StartCamera(object sender, RoutedEventArgs e)
         {
@@ -1365,13 +1339,13 @@ namespace Bounce_Companion
         private void TabItem_CameraTool_GotFocus(object sender, RoutedEventArgs e)
         {
             // The "Camera Tool" tab has been selected
-            flyCamControl = true;
+            cameraControls.flyCamControl = true;
         }
 
         private void TabItem_CameraTool_LostFocus(object sender, RoutedEventArgs e)
         {
             // The "Camera Tool" tab has been unselected
-            flyCamControl = false;
+            cameraControls.flyCamControl = false;
         }
         
         
@@ -1398,11 +1372,11 @@ namespace Bounce_Companion
             {
                 //CheckBox_OffsetPlayer.IsChecked = false;
                 //Offset_Selected_Player = false;
-                face_Selected_Player = true;
+                interpolation.face_Selected_Player = true;
             }
             else
             {
-                face_Selected_Player = false;
+                interpolation.face_Selected_Player = false;
             }
         }
         
@@ -1417,14 +1391,14 @@ namespace Bounce_Companion
                     return;
                 }
                 //CheckBox_TrackPlayer.IsChecked = false;
-                CTO_OffsetPlayer = true;
-                Offset_Selected_Player = true;
+                interpolation.CTO_OffsetPlayer = true;
+                interpolation.Offset_Selected_Player = true;
                 string salt = GetPlayerNameSalt(ComboBox_Playernames.Text);
-                await OffsetObjectPositionContinuous(salt);
+                await interpolation.OffsetObjectPositionContinuous(salt);
             }
             else
             {
-                Offset_Selected_Player = false;
+                interpolation.Offset_Selected_Player = false;
             }
         }
         //public async Task OffsetObjectPositionContinuous(string salt)
@@ -1537,7 +1511,7 @@ namespace Bounce_Companion
                 float x = float.Parse(n);
                 float y = (float)Math.Round((x + 0.2), 1);
                 textBox.Text = (y).ToString();
-                UpdateImageDataIndex(false);
+                cameraTool.UpdateImageDataIndex(false);
             }
         }
 
@@ -1553,7 +1527,7 @@ namespace Bounce_Companion
                 float x = float.Parse(n);
                 float y = (float)Math.Round((x - 0.2), 1);
                 textBox.Text = (y).ToString();
-                UpdateImageDataIndex(false);
+                cameraTool.UpdateImageDataIndex(false);
             }
         }
 
@@ -1699,7 +1673,7 @@ namespace Bounce_Companion
 
         private void UpdateTransitionTimes(object sender, RoutedEventArgs e)
         {
-            Globals.imageDataList.ForEach(imageData => imageData.TransitionTime = float.Parse(GlobalTransitionTimeTextBox.Text));
+            cameraTool.imageDataList.ForEach(imageData => imageData.TransitionTime = float.Parse(GlobalTransitionTimeTextBox.Text));
         }
 
         private void ResetPositionButton(object sender, RoutedEventArgs e)
