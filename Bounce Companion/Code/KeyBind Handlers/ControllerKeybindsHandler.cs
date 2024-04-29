@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Bounce_Companion.Code.KeyBind_Handlers
 {
-    internal class ControllerKeybindsHandler
+    public class ControllerKeybindsHandler
     {
 
     }

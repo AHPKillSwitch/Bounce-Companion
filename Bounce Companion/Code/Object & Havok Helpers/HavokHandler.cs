@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Bounce_Companion.Code.Object___Havok_Helpers
 {
-    internal class HavokHandler
+    public class HavokHandler
     {
         Mem m;
         public HavokHandler(Mem M) 

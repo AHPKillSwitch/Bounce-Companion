@@ -18,17 +18,15 @@ using System.IO;
 using Newtonsoft.Json;
 using Microsoft.Win32;
 using MathNet.Numerics.Interpolation;
+using Bounce_Companion.Code.Object___Havok_Helpers;
 
 namespace Bounce_Companion.Code.Camera_Tool
 {
-    internal class CameraTool
+    public class CameraTool
     {
-        CameraControls cameraControls;
         MainWindow main;
-        Settings settingsWindow;
-        Utility utility;
         Mem m;
-        CameraInterpolation interpolation;
+        public CameraInterpolation Interpolation;
         public List<ImageData> imageDataList; // Store the image data
         public List<float[]> CameraPositionArrayList = new List<float[]>();
 
@@ -41,15 +39,14 @@ namespace Bounce_Companion.Code.Camera_Tool
         public bool loopCamera = false;
         public int jumpToIndex = 0;
 
-        public CameraTool(CameraControls cameraControls, MainWindow main, Settings settingsWindow, Utility utility, CameraInterpolation interpolation, Mem m) 
+        public CameraTool(MainWindow main) 
         {
-            this.interpolation = interpolation;
+            main.Interpolation = new CameraInterpolation(main, this);
             this.main = main;
-            this.cameraControls = cameraControls;
+            this.Interpolation = main.Interpolation;
+            main.CameraTool = this;
             imageDataList = new List<ImageData>();
-            this.settingsWindow = settingsWindow;
-            this.utility = utility;
-            this.m = m;
+            this.m = main.m;
 
         }
         public class ImageData
@@ -81,7 +78,7 @@ namespace Bounce_Companion.Code.Camera_Tool
             if (index > -1)
             {
                 ImageData selectedImageData = imageDataList[index];
-                cameraControls.MoveCameraPosition(selectedImageData.CameraPosition[0], selectedImageData.CameraPosition[1], selectedImageData.CameraPosition[2], selectedImageData.CameraPosition[3], selectedImageData.CameraPosition[4], selectedImageData.CameraPosition[5]);
+                main.CameraControls.MoveCameraPosition(selectedImageData.CameraPosition[0], selectedImageData.CameraPosition[1], selectedImageData.CameraPosition[2], selectedImageData.CameraPosition[3], selectedImageData.CameraPosition[4], selectedImageData.CameraPosition[5]);
             }
             
         }
@@ -90,7 +87,7 @@ namespace Bounce_Companion.Code.Camera_Tool
             if (selectedIndex >= 0 && selectedIndex <= imageDataList.Count)
             {
                 // Retrieve data from text boxes
-                float[] cameraPosition = cameraControls.GetCameraData(out byte[] cameraPositionArray);
+                float[] cameraPosition = main.CameraControls.GetCameraData(out byte[] cameraPositionArray);
                 float transitionTime = float.Parse(main.GlobalTransitionTimeTextBox.Text);
                 CameraPositionArrayList.Add(cameraPosition);
 
@@ -189,7 +186,7 @@ namespace Bounce_Companion.Code.Camera_Tool
             try
             {
                 // Retrieve data from text boxes
-                float[] cameraPosition = cameraControls.GetCameraData(out byte[] cameraPositionArray);
+                float[] cameraPosition = main.CameraControls.GetCameraData(out byte[] cameraPositionArray);
                 float transitionTime = float.Parse(main.GlobalTransitionTimeTextBox.Text);
                 CameraPositionArrayList.Add(cameraPosition);
 
@@ -254,7 +251,7 @@ namespace Bounce_Companion.Code.Camera_Tool
             }
             catch (Exception ex)
             {
-                utility.PrintToConsole(ex.ToString());
+                main.Utility.PrintToConsole(ex.ToString());
             }
         }
         private void InsertStackPanel(int index, string imageFileName)
@@ -453,7 +450,7 @@ namespace Bounce_Companion.Code.Camera_Tool
         {
             if (imageDataList == null || imageDataList.Count == 0) return;
             float transitionTime = float.Parse(main.TransitionTimeTextBox.Text);
-            float[] cameraPosition = cameraControls.GetCameraData(out byte[] cameraPositionArray);
+            float[] cameraPosition = main.CameraControls.GetCameraData(out byte[] cameraPositionArray);
             bool Face = false;
             bool Spectate = false;
             if (jumpToIndex > -1)
@@ -506,7 +503,7 @@ namespace Bounce_Companion.Code.Camera_Tool
                 try
                 {
                     main.CheckBox_OffsetPlayer.IsChecked = false;
-                    interpolation.Offset_Selected_Player = false;
+                    Interpolation.Offset_Selected_Player = false;
                     List<float[]> cameraPathList = new List<float[]>();
                     List<float> cameraTransitionTImeList = new List<float>();
                     for (int i = 0; i < imageDataList.Count; i++)
@@ -518,7 +515,7 @@ namespace Bounce_Companion.Code.Camera_Tool
                     await Task.Run(async () =>
                     {
                         // This code will run on a separate thread.
-                        await interpolation.MoveCameraSmoothly(cameraPathList, cameraTransitionTImeList);
+                        await Interpolation.MoveCameraSmoothly(cameraPathList, cameraTransitionTImeList);
                     });
                 }
                 catch (Exception ex) { MessageBox.Show("Error:" + ex.Message); rollCamera = false; }
@@ -570,11 +567,11 @@ namespace Bounce_Companion.Code.Camera_Tool
             if (main.isAppLoading)
                 return;
 
-            if (!string.IsNullOrEmpty(settingsWindow.TextBox_FlySpeed.Text) && utility.ContainsOnlyNumbersOrDecimals(settingsWindow.TextBox_FlySpeed.Text)) cameraControls.c_moveSpeed = float.Parse(settingsWindow.TextBox_FlySpeed.Text);
-            if (!string.IsNullOrEmpty(settingsWindow.TextBox_Turnspeed.Text) && utility.ContainsOnlyNumbersOrDecimals(settingsWindow.TextBox_Turnspeed.Text)) cameraControls.c_turnSpeed = float.Parse(settingsWindow.TextBox_Turnspeed.Text);
-            if (!string.IsNullOrEmpty(settingsWindow.TextBox_Pitchspeed.Text) && utility.ContainsOnlyNumbersOrDecimals(settingsWindow.TextBox_Pitchspeed.Text)) cameraControls.c_pitchSpeed = float.Parse(settingsWindow.TextBox_Pitchspeed.Text);
-            if (!string.IsNullOrEmpty(settingsWindow.TextBox_Heightspeed.Text) && utility.ContainsOnlyNumbersOrDecimals(settingsWindow.TextBox_Heightspeed.Text)) cameraControls.c_heightSpeed = float.Parse(settingsWindow.TextBox_Heightspeed.Text);
-            if (!string.IsNullOrEmpty(settingsWindow.TextBox_Rollspeed.Text) && utility.ContainsOnlyNumbersOrDecimals(settingsWindow.TextBox_Rollspeed.Text)) cameraControls.c_rollSpeed = float.Parse(settingsWindow.TextBox_Rollspeed.Text);
+            if (!string.IsNullOrEmpty(main.settingsWindow.TextBox_FlySpeed.Text) && main.Utility.ContainsOnlyNumbersOrDecimals(main.settingsWindow.TextBox_FlySpeed.Text)) main.CameraControls.c_moveSpeed = float.Parse(main.settingsWindow.TextBox_FlySpeed.Text);
+            if (!string.IsNullOrEmpty(main.settingsWindow.TextBox_Turnspeed.Text) && main.Utility.ContainsOnlyNumbersOrDecimals(main.settingsWindow.TextBox_Turnspeed.Text)) main.CameraControls.c_turnSpeed = float.Parse(main.settingsWindow.TextBox_Turnspeed.Text);
+            if (!string.IsNullOrEmpty(main.settingsWindow.TextBox_Pitchspeed.Text) && main.Utility.ContainsOnlyNumbersOrDecimals(main.settingsWindow.TextBox_Pitchspeed.Text)) main.CameraControls.c_pitchSpeed = float.Parse(main.settingsWindow.TextBox_Pitchspeed.Text);
+            if (!string.IsNullOrEmpty(main.settingsWindow.TextBox_Heightspeed.Text) && main.Utility.ContainsOnlyNumbersOrDecimals(main.settingsWindow.TextBox_Heightspeed.Text)) main.CameraControls.c_heightSpeed = float.Parse(main.settingsWindow.TextBox_Heightspeed.Text);
+            if (!string.IsNullOrEmpty(main.settingsWindow.TextBox_Rollspeed.Text) && main.Utility.ContainsOnlyNumbersOrDecimals(main.settingsWindow.TextBox_Rollspeed.Text)) main.CameraControls.c_rollSpeed = float.Parse(main.settingsWindow.TextBox_Rollspeed.Text);
         }
         
         public void ToggleDebugMode()
@@ -636,7 +633,7 @@ namespace Bounce_Companion.Code.Camera_Tool
         public void CaptureCameraScene(object sender, RoutedEventArgs e)
         {
             TimeLine cameraScene = new TimeLine();
-            _ = cameraControls.GetCameraData(out byte[] cameraPosition);
+            _ = main.CameraControls.GetCameraData(out byte[] cameraPosition);
             cameraScene.CameraData = cameraPosition;
             cameraScene.transitionTime = 1000;
         }

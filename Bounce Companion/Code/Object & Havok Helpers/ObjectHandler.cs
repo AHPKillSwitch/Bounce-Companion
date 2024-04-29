@@ -9,7 +9,7 @@ using static Bounce_Companion.ControllerKeyBinds;
 
 namespace Bounce_Companion.Code.Object___Havok_Helpers
 {
-    internal class ObjectHandler
+    public class ObjectHandler
     {
         Mem m;
         Utility utility;

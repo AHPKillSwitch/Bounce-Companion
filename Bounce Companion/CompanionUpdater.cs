@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Bounce_Companion.Code.Bounce_Companion_Utility;
 using Octokit;
 
 namespace Bounce_Companion
@@ -14,7 +15,7 @@ namespace Bounce_Companion
     {
         public class UpdateChecker
         {
-            public static async Task<bool> IsNewVersionAvailable(string owner, string repo, string currentVersion, MainWindow main)
+            public static async Task<bool> IsNewVersionAvailable(string owner, string repo, string currentVersion, MainWindow main, Utility utility)
             {
                 var githubClient = new GitHubClient(new Octokit.ProductHeaderValue("Bounce-Companion"));
                 var releases = await githubClient.Repository.Release.GetAll(owner, repo);
@@ -28,7 +29,7 @@ namespace Bounce_Companion
                     // Compare versions
                     if (new Version(latestVersion) > new Version(currentVersion))
                     {
-                        main.PrintToConsole("Version " + latestRelease.TagName + " Found!");
+                        utility.PrintToConsole("Version " + latestRelease.TagName + " Found!");
                         main.newVersion = latestRelease.TagName;
                         return true; // A new version is available
                     }

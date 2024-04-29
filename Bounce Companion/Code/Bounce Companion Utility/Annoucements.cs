@@ -10,13 +10,9 @@ using System.Xml;
 
 namespace Bounce_Companion.Code.Bounce_Companion_Utility
 {
-    internal class Annoucements
+    public class Annoucements
     {
         MainWindow main;
-        Utility utility;
-        GameVolumeGetter volumeGetter;
-        Settings settingsWindow;
-        GameOverlayWindow GOW;
 
 
         private MediaPlayer audio_Player_Main = new MediaPlayer();
@@ -35,13 +31,9 @@ namespace Bounce_Companion.Code.Bounce_Companion_Utility
         private string sfx9 = string.Empty;
         private string sfx10 = string.Empty;
 
-        public Annoucements(MainWindow main, Utility utility, GameVolumeGetter volumeGetter, Settings settingsWindow, GameOverlayWindow gOW)
+        public Annoucements(MainWindow main)
         {
             this.main = main;
-            this.utility = utility;
-            this.volumeGetter = volumeGetter;
-            this.settingsWindow = settingsWindow;
-            GOW = gOW;
 
             
             LoadSFXFromXml();
@@ -54,7 +46,7 @@ namespace Bounce_Companion.Code.Bounce_Companion_Utility
                 string bounceSFX = string.Empty;
                 if (location != "null")
                 {
-                    utility.PrintToConsole(location + " Bounce Hit");
+                    main.Utility.PrintToConsole(location + " Bounce Hit");
                     bounceSFX = GetBounceSFX(11);
                     //await PlayLocationalAudioShowEmblem(location, location);
                     await PlayMultiAudioShowEmblem("null", location, bounceSFX);
@@ -72,7 +64,7 @@ namespace Bounce_Companion.Code.Bounce_Companion_Utility
                             if (bounceSFX != "null") bounceSFX = GetBounceSFX(number);
                         }
 
-                        utility.PrintToConsole(bounceText);
+                        main.Utility.PrintToConsole(bounceText);
                         await PlayMultiAudioShowEmblem(number.ToString(), bounceText, bounceSFX);
                         break;
                     }
@@ -90,13 +82,13 @@ namespace Bounce_Companion.Code.Bounce_Companion_Utility
         List<int> bouncenumber = new List<int> { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 }; // need to remove the bounce number list ts stupid
         private async Task PlayMultiAudioShowEmblem(string bounceNumber, string bounceText, string bounceSFX)
         {
-            _ = GOW.ShowEmblem(bounceNumber, bounceText);
+            _ = main.GOW.ShowEmblem(bounceNumber, bounceText);
             if (!string.IsNullOrEmpty(bounceSFX))
             {
-                PlaySFX(audio_Player_Effect_1, "Content/Audio/SFX/", bounceSFX, volumeGetter.GetGameVolumeLevel(main));
-                await Task.Delay((int)settingsWindow.Slider_DelayAudio.Value);
+                PlaySFX(audio_Player_Effect_1, "Content/Audio/SFX/", bounceSFX, main.volumeGetter.GetGameVolumeLevel(main));
+                await Task.Delay((int)main.settingsWindow.Slider_DelayAudio.Value);
             }
-            PlaySFX(audio_Player_Main, "Content/Audio/MultiBounces/", bounceNumber, volumeGetter.GetGameVolumeLevel(main));
+            PlaySFX(audio_Player_Main, "Content/Audio/MultiBounces/", bounceNumber, main.volumeGetter.GetGameVolumeLevel(main));
         }
 
         private void PlaySFX(MediaPlayer audio_Player, string filePath, string bounceNumber, float audioLevel)

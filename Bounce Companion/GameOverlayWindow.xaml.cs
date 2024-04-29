@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bounce_Companion.Code.Camera_Tool;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
@@ -27,6 +28,7 @@ namespace Bounce_Companion
         static Process p;
         public Slider[] sliders;
         public MainWindow main;
+        CameraControls cameraControls;
 
         private List<Rectangle> rectangles;
         private Rectangle selectedRectangle;
@@ -36,7 +38,7 @@ namespace Bounce_Companion
         public static double canvasHeight = 0;
         public bool activeEmblem = false;
 
-        public GameOverlayWindow(MainWindow Main)
+        public GameOverlayWindow(MainWindow Main, CameraControls cameraControls)
         {
             InitializeComponent();
 
@@ -54,6 +56,7 @@ namespace Bounce_Companion
             rectangles = new List<Rectangle>();
 
             Loaded += MainWindow_Loaded;
+            this.cameraControls = cameraControls;
         }
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -337,7 +340,7 @@ namespace Bounce_Companion
         {
             while (en)
             {
-                float[] CameraPosition = main.GetCameraData(out byte[] cameraData);
+                float[] CameraPosition = cameraControls.GetCameraData(out byte[] cameraData);
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {

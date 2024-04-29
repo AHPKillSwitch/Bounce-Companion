@@ -1,4 +1,5 @@
 ﻿using Bounce_Companion.Code.Bounce_Companion_Utility;
+using Bounce_Companion.Code.Camera_Tool;
 using Bounce_Companion.Code.Command_Handler;
 using Bounce_Companion.Code.Object___Havok_Helpers;
 using System;
@@ -11,12 +12,12 @@ using System.Threading.Tasks;
 namespace Bounce_Companion.Code.Bounce_Handler
 {
 
-    internal class BounceHandler
+    public class BounceHandler
     {
         MainWindow main;
         Mem m;
         Utility utility;
-        HavokHandler hav;
+        HavokHandler HavokHandler;
         CommandHandler commandHandler;
         Annoucements announcements;
         ReplaySystem replaySystem;
@@ -38,15 +39,17 @@ namespace Bounce_Companion.Code.Bounce_Handler
         
         public bool debug = false;
 
-        public BounceHandler(Mem m, Utility utility, HavokHandler hav, CommandHandler commandHandler, MainWindow main, ReplaySystem replaySystem, ObjectHandler objectHandler)
+        public BounceHandler(MainWindow main)
         {
-            this.m = m;
-            this.utility = utility;
-            this.commandHandler = commandHandler;
             this.main = main;
-            this.replaySystem = replaySystem;
+            this.m = main.m;
+            this.utility = main.Utility;
+            this.HavokHandler = main.HavokHandler;
+            this.replaySystem = main.ReplaySystem;
+            this.objectHandler = main.ObjectHandler;
+            main.Annoucements = new Annoucements(main);
+            main.CommandHandler = new CommandHandler(main);
             GetLocationData();
-            this.objectHandler = objectHandler;
         }
 
         public Task BounceChecker()
@@ -70,15 +73,15 @@ namespace Bounce_Companion.Code.Bounce_Handler
                 string vehi_salt = Obj_Vehi_Index_Datum.ToString("X");
                 if (vehi_salt != "FFFFFFFF")
                 {
-                    int hav_Salt = hav.GetHavokSaltFromObjectDatum(Obj_Vehi_Index_Datum.ToString("X"));
-                    objectHandler.objectHavokAddress = hav.GetHavokAddressFromHavokSalt(hav_Salt.ToString("X"));
+                    int hav_Salt = HavokHandler.GetHavokSaltFromObjectDatum(Obj_Vehi_Index_Datum.ToString("X"));
+                    objectHandler.objectHavokAddress = HavokHandler.GetHavokAddressFromHavokSalt(hav_Salt.ToString("X"));
                 }
 
-                else objectHandler.objectHavokAddress = hav.GetHavokAddressFromHavokSalt(hav_Index_Datum.ToString("X"));
+                else objectHandler.objectHavokAddress = HavokHandler.GetHavokAddressFromHavokSalt(hav_Index_Datum.ToString("X"));
                 replaySystem.RecordPlayerPosition(p_X, p_Y, p_Z, p_X_Vel, p_Y_Vel, p_Z_Vel);
                 utility.UpdateUI(p_X_Vel, p_Y_Vel, p_Z_Vel, p_X, p_Y, p_Z, tickrate);
                 _ = HandleBounces(p_X, p_Y, p_Z, p_X_Vel, p_Y_Vel, p_Z_Vel, p_Airbourne);
-                if (freeStyleMode) commandHandler.FreestlyeMode(p_X_Vel, p_Y_Vel, p_Z_Vel);
+                if (freeStyleMode) main.CommandHandler.FreestlyeMode(p_X_Vel, p_Y_Vel, p_Z_Vel);
                 p_Vel_Prev_Record = p_Z_Vel;
                 p_Z_Prev_Record = p_Z;
                 prev_P_X_Vel = p_X_Vel;
@@ -149,7 +152,7 @@ namespace Bounce_Companion.Code.Bounce_Handler
             postBounceFilter = true;
             if (main.checkbox_DisableOverlay.IsChecked != true)
             {
-                await announcements.Announce(bounceCount, location, bouncetype);
+                await main.Annoucements.Announce(bounceCount, location, bouncetype);
             }
 
 
@@ -234,7 +237,7 @@ namespace Bounce_Companion.Code.Bounce_Handler
         {
             try
             {
-                List<string> result = commandHandler.PullCommands("https://pastebin.com/JY9FMDLX");
+                List<string> result = main.CommandHandler.PullCommands("https://pastebin.com/JY9FMDLX");
 
 
                 foreach (string line in result)

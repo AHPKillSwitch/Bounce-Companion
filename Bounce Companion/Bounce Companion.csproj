@@ -267,6 +267,9 @@
     <None Update="Content\Commands\GM - Wire Frame.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Content\Commands\GM_-_Velocity_Fly.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Content\Commands\Magnum - Projectile BruteShot.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

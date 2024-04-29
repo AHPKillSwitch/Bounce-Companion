@@ -8,6 +8,8 @@ using System.Linq;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using static Bounce_Companion.RuntimeMemory;
+using Bounce_Companion.Code.Bounce_Companion_Utility;
+using Bounce_Companion.Code.Command_Handler;
 
 namespace Bounce_Companion
 {
@@ -16,6 +18,8 @@ namespace Bounce_Companion
         Mem m;
         Process P;
         MainWindow Main;
+        Utility Utility;
+        CommandHandler CommandHandler;
         public BackgroundWorker bGW = new BackgroundWorker();
         public TagHolder TH = new TagHolder();
         public StringID SI = new StringID();
@@ -24,13 +28,15 @@ namespace Bounce_Companion
 
 
 
-        public RuntimeMemory(Mem M, Process p, MainWindow main, string mapspath, string CustomMapsPath)
+        public RuntimeMemory(Mem M, Process p, MainWindow main, string mapspath, string CustomMapsPath, Utility utility, CommandHandler commandHandler)
         {
             mapsPath = mapspath;
             customMapsPath = CustomMapsPath;
             m = M;
             P = p;
             Main = main;
+            Utility = utility;
+            CommandHandler = commandHandler;
             SetAddresses();
             tagCount = m.ReadInt32(tag_instance_count);
             Main.progressBar_TagsProgress.Maximum = 100;
@@ -39,6 +45,7 @@ namespace Bounce_Companion
             bGW.DoWork += BackgroundWorker_DoWork;
             bGW.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
             bGW.RunWorkerAsync();
+            
         }
         public string CurGame;
         public int tagsloadedstatus;
@@ -64,11 +71,11 @@ namespace Bounce_Companion
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             //throw new NotImplementedException();
-            if (TH.tagTypeDict.Count > 0) Main.PrintToConsole("Tag Reading Complete.\n" +
+            if (TH.tagTypeDict.Count > 0) Utility.PrintToConsole("Tag Reading Complete.\n" +
                                 TH.tagTypeDict.Count + " Parent tags found "+ tagCount + " tags read and stored!");
             foreach (string line in outPutStrings)
             {
-                Main.PrintToConsole(line);
+                Utility.PrintToConsole(line);
             }
             outPutStrings.Clear();
         }
@@ -78,7 +85,7 @@ namespace Bounce_Companion
         {
             mapname = m.ReadString("halo2.exe+0x47CF0C");
             Task.Run(() => ParseStringIDs(mapname));
-            if (ParseTagInstanceList()) Main.GetCommands();
+            if (ParseTagInstanceList()) CommandHandler.GetCommands();
         }
 
 
@@ -102,7 +109,7 @@ namespace Bounce_Companion
             mapTagBase = game + "0x14B68B8";
             SharedTagbase = game + "0x14B68A8";
             puginpath = "Content/Plugins/Halo2/";
-            Main.PrintToConsole_ContinueNextText("Tag Reading In Progress . . .  ");
+            Utility.PrintToConsole_ContinueNextText("Tag Reading In Progress . . .  ");
             await Task.Delay(500);
             //ParseTagInstanceList();
 
@@ -119,7 +126,7 @@ namespace Bounce_Companion
                 int mapBaseTagAddress = m.ReadInt32(mapTagBase);
                 string tagDatumIndexstring;
 
-                TagHolder newHolder = new TagHolder(Main);
+                TagHolder newHolder = new TagHolder(Main, Utility);
                 TH.tagTypeDict.Clear();
                 int progressBarCount = 0; // used to count progress bar in lots of 100
                 for (var i = 0x0; i < tagCount; i++)
@@ -191,9 +198,11 @@ namespace Bounce_Companion
         public class TagHolder
         {
             MainWindow Main;
-            public TagHolder(MainWindow main)
+            Utility Utility;
+            public TagHolder(MainWindow main, Utility utility)
             {
                 Main = main;
+                Utility = utility;
             }
 
             public TagHolder()
@@ -258,7 +267,7 @@ namespace Bounce_Companion
                     catch
                     {
                         TagData nullTagData = new TagData("null", 0, 0, "null", "null");
-                        Main.PrintToConsole("Cound not find Key " + tagTypeName + "in Dictinary - GetPlayerColourTag");
+                        Utility.PrintToConsole("Cound not find Key " + tagTypeName + "in Dictinary - GetPlayerColourTag");
                         return nullTagData;
                     }
                 }
@@ -308,7 +317,7 @@ namespace Bounce_Companion
                 catch
                 {
                     TagData nullTagData = new TagData("null", 0, 0, "null", "null");
-                    Main.PrintToConsole("Cound not find Key " + tagTypeName + "in Dictinary - GetPlayerColourTag");
+                    Utility.PrintToConsole("Cound not find Key " + tagTypeName + "in Dictinary - GetPlayerColourTag");
                     return nullTagData;
                 }
             }

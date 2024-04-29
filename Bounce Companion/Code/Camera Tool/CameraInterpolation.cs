@@ -15,16 +15,10 @@ using static Bounce_Companion.MainWindow;
 
 namespace Bounce_Companion.Code.Camera_Tool
 {
-    internal class CameraInterpolation
+    public class CameraInterpolation
     {
         private Mem m;
         private MainWindow main;
-        private ObjectHandler obj_Handler;
-        private HavokHandler havokHandler;
-        private Settings settingsWindow;
-        private CameraControls cameraControls;
-        private CameraTool cameraTool;
-        private Utility utility;
         private CameraTool.ImageData selectedImageData = new CameraTool.ImageData();
 
 
@@ -34,14 +28,10 @@ namespace Bounce_Companion.Code.Camera_Tool
         public bool noClip = false;
         public int jumpToIndex = 0;
 
-        public CameraInterpolation(MainWindow main, ObjectHandler obj_Handler, Mem m, CameraControls cameraControls, Utility utility, CameraTool cameraTool)
+        public CameraInterpolation(MainWindow main, CameraTool cameraTool)
         {
             this.main = main;
-            this.obj_Handler = obj_Handler;
-            this.m = m;
-            this.cameraControls = cameraControls;
-            this.utility = utility;
-            this.cameraTool = cameraTool;
+            this.m = main.m;
         }
 
             
@@ -50,8 +40,8 @@ namespace Bounce_Companion.Code.Camera_Tool
         {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            cameraControls.SetCameraAddresses();
-            cameraTool.rollCamera = true;
+            main.CameraControls.SetCameraAddresses();
+            main.CameraTool.rollCamera = true;
             double total_time = 0;
             double[] transition_mappings = new double[fixedSpeeds.Count];
             int numPoints = positions.Count;
@@ -95,7 +85,7 @@ namespace Bounce_Companion.Code.Camera_Tool
             int c = 0;
             while (currentTime < total_time)
             {
-                if (!cameraTool.rollCamera) return;
+                if (!main.CameraTool.rollCamera) return;
                 double t = currentTime;
 
                 stopwatch.Restart();
@@ -115,17 +105,17 @@ namespace Bounce_Companion.Code.Camera_Tool
                     {
                         if (selectedImageData.FacePlayer)
                         {
-                            salt = obj_Handler.GetPlayerNameSalt(main.ComboBox_SceneData_Playernames.Text);
+                            salt = main.ObjectHandler.GetPlayerNameSalt(main.ComboBox_SceneData_Playernames.Text);
                         }
                         else
                         {
-                            salt = obj_Handler.GetPlayerNameSalt(main.ComboBox_Playernames.Text);
+                            salt = main.ObjectHandler.GetPlayerNameSalt(main.ComboBox_Playernames.Text);
                         }
                     });
                     int obj_List_Memory_Address;
                     float p_X, p_Y, p_Z, p_X_Vel, p_Y_Vel, p_Z_Vel, p_pitch, p_Yaw, p_Shields;
-                    obj_Handler.ReadObjectXYZ(salt, out obj_List_Memory_Address, out p_X, out p_Y, out p_Z, out p_X_Vel, out p_Y_Vel, out p_Z_Vel, out p_pitch, out p_Yaw, out p_Shields);
-                    float[] blah = cameraControls.GetCameraData(out byte[] cameraPositionArray1);
+                    main.ObjectHandler.ReadObjectXYZ(salt, out obj_List_Memory_Address, out p_X, out p_Y, out p_Z, out p_X_Vel, out p_Y_Vel, out p_Z_Vel, out p_pitch, out p_Yaw, out p_Shields);
+                    float[] blah = main.CameraControls.GetCameraData(out byte[] cameraPositionArray1);
                     float[] objectPosition = { p_X, p_Y, p_Z };
                     UpdateCameraAngleinternal(objectPosition, blah, 1f);
                 }
@@ -142,29 +132,29 @@ namespace Bounce_Companion.Code.Camera_Tool
 
                 MoveCameraAsyncinternal(finalPosition[0], finalPosition[1], finalPosition[2], finalPosition[3], finalPosition[4], finalPosition[5]);
             }
-            cameraTool.rollCamera = false;
-            if (cameraTool.loopCamera)
+            main.CameraTool.rollCamera = false;
+            if (main.CameraTool.loopCamera)
             {
                 //MoveCameraAsyncinternal((float)positionsX[0], (float)positionsX[0], (float)positionsX[0], (float)yawValues[0], (float)pitchValues[0], (float)rollValues[0]);
                 //await Task.Delay(loopDelayTime);
                 await Application.Current.Dispatcher.Invoke(async () =>
                 {
-                    await cameraTool.StartCameraRoll();
+                    await main.CameraTool.StartCameraRoll();
                 });
             }
             void MoveCameraAsyncinternal(float x, float y, float z, float yaw, float pitch, float roll)
             {
                 if (selectedImageData.FacePlayer) face_Selected_Player = true;
                 // Write the camera position and rotation values to memory
-                m.WriteToMemory(cameraControls.xAddress, "float", x.ToString());
-                m.WriteToMemory(cameraControls.yAddress, "float", y.ToString());
-                m.WriteToMemory(cameraControls.zAddress, "float", z.ToString());
+                m.WriteToMemory(main.CameraControls.xAddress, "float", x.ToString());
+                m.WriteToMemory(main.CameraControls.yAddress, "float", y.ToString());
+                m.WriteToMemory(main.CameraControls.zAddress, "float", z.ToString());
 
                 if (!face_Selected_Player) // if we are not facing the player, Set the camera anlge
                 {
-                    m.WriteToMemory(cameraControls.yawAddress, "float", yaw.ToString());
-                    m.WriteToMemory(cameraControls.pitchAddress, "float", pitch.ToString());
-                    m.WriteToMemory(cameraControls.rollAddress, "float", roll.ToString());
+                    m.WriteToMemory(main.CameraControls.yawAddress, "float", yaw.ToString());
+                    m.WriteToMemory(main.CameraControls.pitchAddress, "float", pitch.ToString());
+                    m.WriteToMemory(main.CameraControls.rollAddress, "float", roll.ToString());
                 }
             }
             void UpdateCameraAngleinternal(float[] objectPosition, float[] a_CameraPosition, float t)
@@ -205,8 +195,8 @@ namespace Bounce_Companion.Code.Camera_Tool
                 float pitchRad = smoothedPitch;
 
                 // Write the new camera angle to the memory address
-                m.WriteToMemory(cameraControls.yawAddress, "float", yawRad.ToString());
-                m.WriteToMemory(cameraControls.pitchAddress, "float", pitchRad.ToString());
+                m.WriteToMemory(main.CameraControls.yawAddress, "float", yawRad.ToString());
+                m.WriteToMemory(main.CameraControls.pitchAddress, "float", pitchRad.ToString());
 
             }
         }
@@ -251,7 +241,7 @@ namespace Bounce_Companion.Code.Camera_Tool
 
                 int obj_List_Memory_Address;
                 float p_X, p_Y, p_Z, p_X_Vel, p_Y_Vel, p_Z_Vel, p_pitch, p_Yaw, p_Shields;
-                obj_Handler.ReadObjectXYZ(salt, out obj_List_Memory_Address, out p_X, out p_Y, out p_Z, out p_X_Vel, out p_Y_Vel, out p_Z_Vel, out p_pitch, out p_Yaw, out p_Shields);
+                main.ObjectHandler.ReadObjectXYZ(salt, out obj_List_Memory_Address, out p_X, out p_Y, out p_Z, out p_X_Vel, out p_Y_Vel, out p_Z_Vel, out p_pitch, out p_Yaw, out p_Shields);
 
                 cameraX = p_X;
                 cameraY = p_Y;
@@ -261,8 +251,8 @@ namespace Bounce_Companion.Code.Camera_Tool
             }
             else
             {
-                cameraControls.SetCameraAddresses();
-                float[] cameraPosition = cameraControls.GetCameraData(out byte[] cameraPositionArray1);
+                main.CameraControls.SetCameraAddresses();
+                float[] cameraPosition = main.CameraControls.GetCameraData(out byte[] cameraPositionArray1);
                 cameraX = cameraPosition[0];
                 cameraY = cameraPosition[1];
                 cameraZ = cameraPosition[2];
@@ -272,9 +262,9 @@ namespace Bounce_Companion.Code.Camera_Tool
             }
 
             // Apply the controller input to the camera yaw, pitch, and roll
-            cameraYaw -= controllerXInput * (cameraControls.c_turnSpeed / 100);
-            cameraPitch -= controllerYInput * (cameraControls.c_pitchSpeed / 100);
-            cameraRoll += (rightShoulderPressed ? 1 : 0) * (cameraControls.c_rollSpeed / 100) - (leftShoulderPressed ? 1 : 0) * (cameraControls.c_rollSpeed / 100);
+            cameraYaw -= controllerXInput * (main.CameraControls.c_turnSpeed / 100);
+            cameraPitch -= controllerYInput * (main.CameraControls.c_pitchSpeed / 100);
+            cameraRoll += (rightShoulderPressed ? 1 : 0) * (main.CameraControls.c_rollSpeed / 100) - (leftShoulderPressed ? 1 : 0) * (main.CameraControls.c_rollSpeed / 100);
 
             //// Normalize the yaw value to stay within the range of -π to π
             //if (cameraYaw < -Math.PI)
@@ -286,8 +276,8 @@ namespace Bounce_Companion.Code.Camera_Tool
             //cameraPitch = (float)Math.Clamp(cameraPitch, -Math.PI / 2, Math.PI / 2);
 
             // Calculate movement based on left joystick inputs
-            float moveX = xAxisInput * (cameraControls.c_moveSpeed / 100);
-            float moveY = yAxisInput * (cameraControls.c_moveSpeed / 100);
+            float moveX = xAxisInput * (main.CameraControls.c_moveSpeed / 100);
+            float moveY = yAxisInput * (main.CameraControls.c_moveSpeed / 100);
 
             // Calculate the forward vector based on the camera's yaw
             float forwardX = (float)Math.Sin(cameraYaw);
@@ -296,7 +286,7 @@ namespace Bounce_Companion.Code.Camera_Tool
             // Update the camera position, yaw, pitch, and height based on input
             cameraX += forwardX * moveY - forwardY * moveX;
             cameraY -= forwardY * moveY + forwardX * moveX;
-            cameraZ -= (leftTrigger - rightTrigger) * (cameraControls.c_heightSpeed / 100);
+            cameraZ -= (leftTrigger - rightTrigger) * (main.CameraControls.c_heightSpeed / 100);
 
             // Write the updated camera position to memory
 
@@ -310,10 +300,10 @@ namespace Bounce_Companion.Code.Camera_Tool
                 {
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        baseCoordinate = int.Parse(settingsWindow.Textbox_P_Address_replay.Text);
+                        baseCoordinate = int.Parse(main.settingsWindow.Textbox_P_Address_replay.Text);
                     });
                 }
-                else baseCoordinate = cameraControls.xAddress;
+                else baseCoordinate = main.CameraControls.xAddress;
                 // Write the camera position and rotation values to memory
                 m.WriteToMemory(baseCoordinate, "float", x.ToString());
                 m.WriteToMemory(baseCoordinate + 4, "float", y.ToString());
@@ -322,9 +312,9 @@ namespace Bounce_Companion.Code.Camera_Tool
                 if (!face_Selected_Player || !selectedImageData.FacePlayer) // if we are not facing the player, Set the camera anlge
                 {
                     if (noClip) return;
-                    m.WriteToMemory(cameraControls.yawAddress, "float", yaw.ToString());
-                    m.WriteToMemory(cameraControls.pitchAddress, "float", pitch.ToString());
-                    m.WriteToMemory(cameraControls.rollAddress, "float", roll.ToString());
+                    m.WriteToMemory(main.CameraControls.yawAddress, "float", yaw.ToString());
+                    m.WriteToMemory(main.CameraControls.pitchAddress, "float", pitch.ToString());
+                    m.WriteToMemory(main.CameraControls.rollAddress, "float", roll.ToString());
                 }
             }
 
@@ -338,8 +328,8 @@ namespace Bounce_Companion.Code.Camera_Tool
                 {
                     int obj_List_Memory_Address;
                     float p_X, p_Y, p_Z, p_X_Vel, p_Y_Vel, p_Z_Vel, p_Yaw, p_pitch, p_Shields;
-                    obj_Handler.ReadObjectXYZ(salt, out obj_List_Memory_Address, out p_X, out p_Y, out p_Z, out p_X_Vel, out p_Y_Vel, out p_Z_Vel, out p_Yaw, out p_pitch, out p_Shields);
-                    float[] cameraPosition = cameraControls.GetCameraData(out byte[] cameraPositionArray1);
+                    main.ObjectHandler.ReadObjectXYZ(salt, out obj_List_Memory_Address, out p_X, out p_Y, out p_Z, out p_X_Vel, out p_Y_Vel, out p_Z_Vel, out p_Yaw, out p_pitch, out p_Shields);
+                    float[] cameraPosition = main.CameraControls.GetCameraData(out byte[] cameraPositionArray1);
                     float[] objectPosition = { p_X, p_Y, p_Z };
                     if (face_Selected_Player)
                     {
@@ -360,7 +350,7 @@ namespace Bounce_Companion.Code.Camera_Tool
             // Calculate the offset position
             if (!CTO_OffsetPlayer)
             {
-                selectedImageData = cameraTool.imageDataList[jumpToIndex];
+                selectedImageData = main.CameraTool.imageDataList[jumpToIndex];
                 if (selectedImageData.SpectatePlayer)
                 {
                     offsetPosition[0] = objectPosition[0] + RemoveNonDigitChars(selectedImageData.CameraOffsetsArray[0]);
@@ -416,8 +406,8 @@ namespace Bounce_Companion.Code.Camera_Tool
             float pitchRad = smoothedPitch;
 
             // Write the new camera angle to the memory address
-            m.WriteToMemory(cameraControls.yawAddress, "float", yawRad.ToString());
-            m.WriteToMemory(cameraControls.pitchAddress, "float", pitchRad.ToString());
+            m.WriteToMemory(main.CameraControls.yawAddress, "float", yawRad.ToString());
+            m.WriteToMemory(main.CameraControls.pitchAddress, "float", pitchRad.ToString());
         }
         public float RemoveNonDigitChars(string input)
         {
@@ -436,9 +426,9 @@ namespace Bounce_Companion.Code.Camera_Tool
         }
         private Task WriteOffsetPositionToMemory(float[] offsetPosition)
         {
-            m.WriteToMemory(cameraControls.xAddress, "float", offsetPosition[0].ToString());
-            m.WriteToMemory(cameraControls.yAddress, "float", offsetPosition[1].ToString());
-            m.WriteToMemory(cameraControls.zAddress, "float", offsetPosition[2].ToString());
+            m.WriteToMemory(main.CameraControls.xAddress, "float", offsetPosition[0].ToString());
+            m.WriteToMemory(main.CameraControls.yAddress, "float", offsetPosition[1].ToString());
+            m.WriteToMemory(main.CameraControls.zAddress, "float", offsetPosition[2].ToString());
 
             return Task.CompletedTask;
         }

@@ -19,6 +19,7 @@ using System.Windows.Shapes;
 using static Bounce_Companion.KeyBoardBinds;
 using static Bounce_Companion.MainWindow;
 using System.Windows.Automation;
+using Bounce_Companion.Code.Command_Handler;
 //using System.Windows.Forms;
 
 namespace Bounce_Companion
@@ -200,7 +201,7 @@ namespace Bounce_Companion
             if (keybind.Action == "Disable Mod") action = false;
             if (keybind.Action == "Toggle Mod") action = !togglestate; // Toggle the state
             keybind.Toggle = action;
-            main.ApplyMods(action, keybind.Mod);
+            main.CommandHandler.ApplyMods(action, keybind.Mod);
         }
         public delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
         public static class KeyboardHook

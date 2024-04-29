@@ -14,12 +14,12 @@ using Bounce_Companion.Code.Command_Handler;
 
 namespace Bounce_Companion.Code.Camera_Tool
 {
-    internal class CameraControls
+    public class CameraControls
     {
         private Mem m;
+        MainWindow main;
         private Controller xboxController;
         private CameraInterpolation interpolation;
-        private CommandHandler c_Handler;
         private CameraTool cameraTool;
         private System.Threading.Timer toggleTimer;
 
@@ -46,9 +46,10 @@ namespace Bounce_Companion.Code.Camera_Tool
         public float c_rollSpeed = 0f;
 
 
-        public CameraControls(Mem M, CameraInterpolation Interpolation)
+        public CameraControls(Mem M, CameraInterpolation Interpolation, MainWindow main)
         {
             m = M;
+            this.main = main;
             interpolation = Interpolation;
             toggleTimer = new System.Threading.Timer(ToggleCallback, null, Timeout.Infinite, Timeout.Infinite);
 
@@ -116,7 +117,7 @@ namespace Bounce_Companion.Code.Camera_Tool
                             bool rightShoulderPressed = controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.RightShoulder);
                             if (xAxisInput != 0 || yAxisInput != 0 || yawAxisInput != 0 || pitchAxisInput != 0 || leftTrigger != 0 || rightTrigger != 0 || leftShoulderPressed || rightShoulderPressed)
                             {
-                                if (!cameraTool.rollCamera && flyCamControl)
+                                if (!main.CameraTool.rollCamera && flyCamControl)
                                 {
                                     await interpolation.MoveCameraPositionAsync(xAxisInput, yAxisInput, yawAxisInput, pitchAxisInput, leftTrigger, rightTrigger, leftShoulderPressed, rightShoulderPressed);
                                 }
@@ -288,7 +289,7 @@ namespace Bounce_Companion.Code.Camera_Tool
 
                 if (keybindActive && !isTimerRunning)
                 {
-                    c_Handler.ApplyMods(action, command);
+                    main.CommandHandler.ApplyMods(action, command);
                     obj.c_toggle = action;
                     toggleTimer.Change(500, Timeout.Infinite); // Adjust the delay as needed (e.g., 1000 milliseconds)
                     isTimerRunning = true;

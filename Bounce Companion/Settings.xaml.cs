@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Bounce_Companion.Code.Camera_Tool;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,17 +22,21 @@ namespace Bounce_Companion
     public partial class Settings : Window
     {
         private MainWindow main;
-        public Settings(MainWindow Main)
+        CameraTool CameraTool;
+        CameraControls CameraControls;
+        public Settings(MainWindow Main, CameraTool cameraTool, CameraControls cameraControls)
         {
             main = Main;
             InitializeComponent();
             PopulateProcessComboBox();
+            CameraTool = cameraTool;
+            CameraControls = cameraControls;
             //UpdateTextBoxesFromJson();
         }
 
         private void UpdateCameraSpeed(object sender, RoutedEventArgs e)
         {
-            main.UpdateCameraSpeed();
+            CameraTool.UpdateCameraSpeed();
             _ = main.UpdateConfigWithNewOptions();
         }
 
@@ -48,17 +53,17 @@ namespace Bounce_Companion
 
         private void ReplaySystemRecord_Click(object sender, RoutedEventArgs e)
         {
-            main.replaySystem.StartRecording();
+            main.ReplaySystem.StartRecording();
         }
 
         private void ReplaySystemRecordingStop_Click(object sender, RoutedEventArgs e)
         {
-            main.replaySystem.StopRecording();
+            main.ReplaySystem.StopRecording();
         }
 
         private void ReplaySystemReplay_Click(object sender, RoutedEventArgs e)
         {
-            _ = main.replaySystem.ReplayPlayerMovements();
+            _ = main.ReplaySystem.ReplayPlayerMovements();
         }
 
         private void SliderSFXChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -83,7 +88,7 @@ namespace Bounce_Companion
 
         private void UpdateLoopDelayTime(object sender, RoutedEventArgs e)
         {
-            main.loopDelayTime = int.Parse(Textbox_LoopDelay.Text);
+            CameraControls.loopDelayTime = int.Parse(Textbox_LoopDelay.Text);
         }
 
         private void ProcessSelection_SelectionChanged(object sender, SelectionChangedEventArgs e)

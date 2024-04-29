@@ -46,29 +46,34 @@ namespace Bounce_Companion
     public partial class MainWindow : Window
     {
         //GameOverlayWindow overlayWindow = new GameOverlayWindow();
-        public string currentVersion = "1.0.24 "; // Change this to your current application version
+        public string currentVersion = "1.5.24 "; // Change this to your current application version
         public string newVersion = string.Empty;
         public Mem m;
         public Mem mp2;
         public Process p;
         public RuntimeMemory rm;
         private GameChatWindow gameChatWindow;
-        CommandExecution CE;
+        public CommandExecution CE;
 
-        CameraInterpolation cam_interp;
-        CameraControls cameraControls;
-        CameraTool cameraTool;
-        CommandHandler commandHandler;
-        ObjectHandler objectHandler;
-        Utility utility;
-        BounceHandler BH;
-        CameraInterpolation interpolation;
+        public BounceHandler BounceHandler;
+        public Annoucements Annoucements;
+        public Utility Utility;
+
+        public CameraControls CameraControls;
+        public CameraInterpolation Interpolation;
+        public CameraTool CameraTool;
+
+        public CommandHandler CommandHandler;
+
+        public ObjectHandler ObjectHandler;
+        public HavokHandler HavokHandler;
+        public ReplayPlayerVelocity ReplayPlayerVelocity;
 
 
         HandleChallenges CH;
-        
-        GameOverlayWindow GOW;
-        public ReplaySystem replaySystem;
+
+        public GameOverlayWindow GOW;
+        public ReplaySystem ReplaySystem;
         public Settings settingsWindow;
         public ControllerKeyBinds controllerKeyBindsWindow;
         public KeyBoardBinds keyboardKeyBindsWindow;
@@ -108,12 +113,7 @@ namespace Bounce_Companion
         public MainWindow()
         {
             InitializeComponent();
-            
-            
-            
             staackPanel_CameraTool.Visibility = Visibility.Hidden;
-            controllerKeyBindsWindow = new ControllerKeyBinds(this);
-            controllerKeyBindsWindow.Closed += Window_Closed;
             SizeChanged += MainWindow_SizeChanged;
             m = new Mem();
         }
@@ -139,15 +139,10 @@ namespace Bounce_Companion
 
             public static bool userTextChanged = true;
 
-
-
             //Bounce Tracker Stats
             public static float prev_P_X_Vel = 0.0f;
             public static float prev_P_Y_Vel = 0.0f;
             public static float prev_P_Z_Vel = 0.0f;
-
-
-
 
         }
 
@@ -164,24 +159,25 @@ namespace Bounce_Companion
                 //attempt to attach
                 AttachToProcess(0);
                 GetCommansFromFile();
-                utility.PrintToConsole_ContinueNextText("Checking Config . . . ");
+                InitializeClasses();
+                PrintToConsole_ContinueNextText("Checking Config . . . ");
                 await CheckAndSetMapFiles();
                 SetupConfig();
-
+                
 
                 if (attached)
                 {
                     LabStatus.Foreground = Brushes.Green;
                     LabStatus.Content = "Process: Attached";
-                    GOW = new GameOverlayWindow(this);
+                    GOW = new GameOverlayWindow(this, CameraControls);
                     GOW.EnablePlayerInfoTab(false);
                     GOW.Show();
                     if (settingsWindow == null)
                     {
-                        settingsWindow = new Settings(this);
+                        settingsWindow = new Settings(this, CameraTool, CameraControls);
                         settingsWindow.Closed += SettingsWindow_Closed; // Handle window closed event
                     }
-                    replaySystem = new ReplaySystem(m, this);
+                    
                     SetWindowPos();
                     // Attach an event handler to the GotFocus event of the "Camera Tool" tab
                     TabItem_CameraTool.GotFocus += TabItem_CameraTool_GotFocus;
@@ -208,9 +204,31 @@ namespace Bounce_Companion
 
         }
 
+        private void InitializeClasses()
+        {
+            Utility = new Utility(m, this);
+            ReplaySystem = new ReplaySystem(m, this);
+            ObjectHandler = new ObjectHandler(m, Utility);
+            HavokHandler = new HavokHandler(m);
+            CameraTool = new CameraTool(this);
+            CameraControls = new CameraControls(m, CameraTool.Interpolation, this);
+            BounceHandler = new BounceHandler(this);
+            controllerKeyBindsWindow = new ControllerKeyBinds(this);
+            controllerKeyBindsWindow.Closed += Window_Closed;
+        }
+        public void PrintToConsole_ContinueNextText(string input)
+        {
+            ConsoleOut.AppendText(input);
+            ConsoleOut.ScrollToEnd();
+        }
+        public void PrintToConsole(string input)
+        {
+            ConsoleOut.AppendText(input + "\n");
+            ConsoleOut.ScrollToEnd();
+        }
         private async Task<bool> CheckForNewVersion()
         {
-            utility.PrintToConsole_ContinueNextText("Checking for newer Versions . . .  ");
+            PrintToConsole_ContinueNextText("Checking for newer Versions . . .  ");
             string owner = "AHPKillSwitch";
             string repo = "Bounce-Companion";
 
@@ -221,21 +239,21 @@ namespace Bounce_Companion
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    utility.PrintToConsole("Download Starting!");
+                    PrintToConsole("Download Starting!");
                     CompanionUpdater.UpdateChecker.DownloadLatestZipRelease(owner, repo);
-                    utility.PrintToConsole("Download Complete: \n" +
+                    PrintToConsole("Download Complete: \n" +
                         "New Version can be found in your current Bounce Companion root folder, Its called Bounce Companion " + newVersion + ".zip");
                 }
                 else
                 {
-                    utility.PrintToConsole("Update Found: User Denied!");
+                    PrintToConsole("Update Found: User Denied!");
                     return false;
 
                 }
             }
             else
             {
-                utility.PrintToConsole("Current Version is up-to date!");
+                PrintToConsole("Current Version is up-to date!");
             }
             return isNewVersionAvailable;
         }
@@ -248,17 +266,17 @@ namespace Bounce_Companion
             }
             catch
             {
-                utility.PrintToConsole("Error in bounce checker.");
+                Utility.PrintToConsole("Error in bounce checker.");
             }
         }
         private void SetCameraFlySpeeds()
         {
-            settingsWindow.TextBox_FlySpeed.Text = cameraControls.c_moveSpeed.ToString();
-            settingsWindow.TextBox_Turnspeed.Text = cameraControls.c_turnSpeed.ToString();
-            settingsWindow.TextBox_Pitchspeed.Text = cameraControls.c_pitchSpeed.ToString();
-            settingsWindow.TextBox_Heightspeed.Text = cameraControls.c_heightSpeed.ToString();
-            settingsWindow.TextBox_Rollspeed.Text = cameraControls.c_rollSpeed.ToString();
-            GlobalTransitionTimeTextBox.Text = cameraControls.c_GlobalTransitionTime.ToString();
+            settingsWindow.TextBox_FlySpeed.Text = CameraControls.c_moveSpeed.ToString();
+            settingsWindow.TextBox_Turnspeed.Text = CameraControls.c_turnSpeed.ToString();
+            settingsWindow.TextBox_Pitchspeed.Text = CameraControls.c_pitchSpeed.ToString();
+            settingsWindow.TextBox_Heightspeed.Text = CameraControls.c_heightSpeed.ToString();
+            settingsWindow.TextBox_Rollspeed.Text = CameraControls.c_rollSpeed.ToString();
+            GlobalTransitionTimeTextBox.Text = CameraControls.c_GlobalTransitionTime.ToString();
             int tickrate = m.ReadByte("halo2.exe+0x004C06E4,0x02");
             settingsWindow.Textbox_Tickrate.Text = tickrate.ToString();
         }
@@ -284,12 +302,12 @@ namespace Bounce_Companion
             customMapsPath = configJson.CustomMapsPath;
             serverPlaylistPath = configJson.ServerPlaylistPath;
 
-            cameraControls.c_moveSpeed = float.Parse(configJson.MoveSpeed);
-            cameraControls.c_turnSpeed = float.Parse(configJson.TurnSpeed);
-            cameraControls.c_pitchSpeed = float.Parse(configJson.PitchSpeed);
-            cameraControls.c_heightSpeed = float.Parse(configJson.HeightSpeed);
-            cameraControls.c_rollSpeed = float.Parse(configJson.RollSpeed);
-            cameraControls.c_GlobalTransitionTime = float.Parse(configJson.globalTransitionTime);
+            CameraControls.c_moveSpeed = float.Parse(configJson.MoveSpeed);
+            CameraControls.c_turnSpeed = float.Parse(configJson.TurnSpeed);
+            CameraControls.c_pitchSpeed = float.Parse(configJson.PitchSpeed);
+            CameraControls.c_heightSpeed = float.Parse(configJson.HeightSpeed);
+            CameraControls.c_rollSpeed = float.Parse(configJson.RollSpeed);
+            CameraControls.c_GlobalTransitionTime = float.Parse(configJson.globalTransitionTime);
             return configJson;
         }
         private async Task UpdateConfig(ConfigJson config)
@@ -344,7 +362,7 @@ namespace Bounce_Companion
 
             if (string.IsNullOrWhiteSpace(config.MapsPath) || string.IsNullOrWhiteSpace(config.CustomMapsPath) || !config.MapsPath.Contains("Halo 2 Project Cartographer\\maps") || !config.CustomMapsPath.Contains("Documents\\My Games\\Halo 2\\Maps"))
             {
-                utility.PrintToConsole("Invalid Config Found.");
+                Utility.PrintToConsole("Invalid Config Found.");
 
                 // Show a custom dialog with a message and "Select Halo 2 Executable" button
                 MessageBoxResult result = MessageBox.Show(
@@ -370,7 +388,7 @@ namespace Bounce_Companion
                         // Check if the maps folder exists within the selected game folder
                         if (System.IO.Directory.Exists(mapsFolderPath))
                         {
-                            utility.PrintToConsole("Maps Folder Set");
+                            Utility.PrintToConsole("Maps Folder Set");
 
                             config.MapsPath = mapsFolderPath;
 
@@ -389,7 +407,7 @@ namespace Bounce_Companion
                         }
                         else
                         {
-                            utility.PrintToConsole("Invalid Maps Folder. Please select the correct game folder.");
+                            Utility.PrintToConsole("Invalid Maps Folder. Please select the correct game folder.");
                             Environment.Exit(0);
                         }
                     }
@@ -404,7 +422,7 @@ namespace Bounce_Companion
                 }
             }
 
-            utility.PrintToConsole("Config Is Valid.");
+            Utility.PrintToConsole("Config Is Valid.");
         }
 
 
@@ -423,12 +441,12 @@ namespace Bounce_Companion
 
             try
             {
-                utility.PrintToConsole_ContinueNextText("Attempting to attach to the Halo 2 game process . . .  ");
+                PrintToConsole_ContinueNextText("Attempting to attach to the Halo 2 game process . . .  ");
                 Process[] processes = Process.GetProcessesByName("halo2");
                 if (selectedIndex < processes.Length)
                 {
                     p = processes[selectedIndex];
-                    utility.PrintToConsole("Success.");
+                    PrintToConsole("Success.");
                     ToolSetting.currentGame = "halo2";
                     currentGameMainWindow = "halo2";
                     ToolSetting.currentGameDLL = "halo2";
@@ -441,14 +459,14 @@ namespace Bounce_Companion
                         p = processes[0];
                         m.OpenProcessHandle(p);
                         selectedProcessindex = selectedIndex;
-                        utility.PrintToConsole("Main Process Success.");
+                        PrintToConsole("Main Process Success.");
                         attached = true;
                         if (selectedIndex < 0)
                         {
                             p = processes[1];
                             mp2.OpenProcessHandle(p);
                             player2Attched = true;
-                            utility.PrintToConsole("Second Process Success.");
+                            PrintToConsole("Second Process Success.");
                         }
                     }
                     else
@@ -456,10 +474,10 @@ namespace Bounce_Companion
                         p = processes[0];
                         mp2.OpenProcessHandle(p);
                         selectedProcessindex = selectedIndex;
-                        utility.PrintToConsole("Second Process Success.");
+                        PrintToConsole("Second Process Success.");
                         p = processes[1];
                         m.OpenProcessHandle(p);
-                        utility.PrintToConsole("Main Process Success.");
+                        PrintToConsole("Main Process Success.");
                         attached = true;
                         player2Attched = true;
                     }
@@ -467,13 +485,13 @@ namespace Bounce_Companion
                 }
                 else
                 {
-                    utility.PrintToConsole("Failed, the selected process does not exist.");
+                    PrintToConsole("Failed, the selected process does not exist.");
                 }
 
             }
             catch
             {
-                utility.PrintToConsole("Failed, make sure game is running");
+                PrintToConsole("Failed, make sure game is running");
             }
         }
         public bool player2Attched = false;
@@ -488,19 +506,19 @@ namespace Bounce_Companion
             if (!tagscurrentlyloaded && tags_Loaded_Status) //Check if tags are loaded if not load them
             {
                 tagscurrentlyloaded = true;
-                utility.PrintToConsole_ContinueNextText("Checking Game Session . . . ");
+                PrintToConsole_ContinueNextText("Checking Game Session . . . ");
                 if (GameTypeValidCheck())
                 {
-                    utility.PrintToConsole("Valid Session Found!");
+                    PrintToConsole("Valid Session Found!");
                     HideMods(false);
-                    rm = new RuntimeMemory(m, p, this, mapspath, customMapsPath);
+                    rm = new RuntimeMemory(m, p, this, mapspath, customMapsPath, Utility, CommandHandler);
                     CE = new CommandExecution(rm, m, this);
                     CH = new HandleChallenges(this); //challenge handler
-                    if (auto_warpFix) _ = commandHandler.ApplyGameMod("warpfix", true);
+                    if (auto_warpFix) _ = CommandHandler.ApplyGameMod("warpfix", true);
                 }
                 else
                 {
-                    utility.PrintToConsole("Invalid Session Found! " +
+                    PrintToConsole("Invalid Session Found! " +
                         "Mods Disabled." +
                         "This tool will only work in OGH2 or Glitch Lobbies!");
 
@@ -528,7 +546,7 @@ namespace Bounce_Companion
                 Bttn_on.Visibility = Visibility.Hidden;
                 Bttn_off.Visibility = Visibility.Hidden;
                 modsEnabledMaster = false;
-                _ = commandHandler.ApplyGameMod("//debugcamera", false);
+                _ = CommandHandler.ApplyGameMod("//debugcamera", false);
                 button_DebugCamera.Visibility = Visibility.Hidden;
             }
             else
@@ -557,7 +575,7 @@ namespace Bounce_Companion
         {
             while (true)
             {
-                if (!cameraTool.rollCamera || !cameraTool.debugCameraToggle && attached)
+                if (!CameraTool.rollCamera || !CameraTool.debugCameraToggle && attached)
                 {
                     if (System.Windows.Application.Current == null)
                     {
@@ -572,7 +590,7 @@ namespace Bounce_Companion
                     {
                         System.Windows.Application.Current.Dispatcher.Invoke(() =>
                         {
-                            _ = objectHandler.UpdatePlayerList();
+                            _ = ObjectHandler.UpdatePlayerList();
                         });
                     }
 
@@ -580,14 +598,14 @@ namespace Bounce_Companion
                     {
                         System.Windows.Application.Current.Dispatcher.Invoke(() =>
                         {
-                           BH.BounceChecker();
+                           BounceHandler.BounceChecker();
                         });
                     }
 
                 }
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
-                    float[] cameraPosition = cameraControls.GetCameraData(out byte[] cameraPositionArray);
+                    float[] cameraPosition = CameraControls.GetCameraData(out byte[] cameraPositionArray);
                     UpdateUICameraCoordinates(cameraPosition[0], cameraPosition[1], cameraPosition[2], cameraPosition[3], cameraPosition[4], cameraPosition[5]);
                 });
                 await Task.Delay(33); // Milliseconds
@@ -612,17 +630,17 @@ namespace Bounce_Companion
                         float originalZ = float.Parse(parts[6]);
 
                         string output = $"{locationName}: ({originalX}, {originalY}, {originalZ})";
-                        utility.PrintToConsole(output);
+                        Utility.PrintToConsole(output);
                     }
                 }
                 else
                 {
-                    utility.PrintToConsole("No bounce locations found.");
+                    Utility.PrintToConsole("No bounce locations found.");
                 }
             }
             catch (Exception ex)
             {
-                utility.PrintToConsole($"Error: {ex.Message}");
+                Utility.PrintToConsole($"Error: {ex.Message}");
             }
         }
         
@@ -630,19 +648,19 @@ namespace Bounce_Companion
 
         private void playerInfoTabClick(object sender, RoutedEventArgs e)
         {
-            if (checkbox_DisableOverlay.IsChecked == true) utility.PrintToConsole("Screen Overlay is Disabled - Please Enable it to see Player Info Bar.");
+            if (checkbox_DisableOverlay.IsChecked == true) Utility.PrintToConsole("Screen Overlay is Disabled - Please Enable it to see Player Info Bar.");
             else if (checkbox_EnableBounceStats.IsChecked == true)
             {
                 follow = true;
                 GOW.EnablePlayerInfoTab(true);
-                utility.PrintToConsole("Player Info Bar: Enabled \nNote: Click and drag the Player Info Bar to place it in a new position. ");
+                Utility.PrintToConsole("Player Info Bar: Enabled \nNote: Click and drag the Player Info Bar to place it in a new position. ");
                 //FollowCam();
             }
             else
             {
                 follow = false;
                 GOW.EnablePlayerInfoTab(false);
-                utility.PrintToConsole("Player Info Bar: Disabled");
+                Utility.PrintToConsole("Player Info Bar: Disabled");
             }
         }
 
@@ -678,18 +696,18 @@ namespace Bounce_Companion
                 if (checkbox_DisableOverlay.IsChecked == true)
                 {
                     GOW.Hide();
-                    utility.PrintToConsole("Overlay: Disabled");
+                    Utility.PrintToConsole("Overlay: Disabled");
                 }
                 else
                 {
                     GOW.Show();
-                    utility.PrintToConsole("Overlay: Enabled");
+                    Utility.PrintToConsole("Overlay: Enabled");
                 }
             }
             catch
             {
                 GOW.Activate();
-                utility.PrintToConsole("Overlay: Enabled");
+                Utility.PrintToConsole("Overlay: Enabled");
             }
         }
 
@@ -697,7 +715,7 @@ namespace Bounce_Companion
         {
             if (checkbox_Credits.IsChecked == true)
             {
-                utility.PrintToConsole("" +
+                Utility.PrintToConsole("" +
                     "Credits: \n" +
                     "KillSwitch: UI Design, Emblem Concept, Bounce Detection Code, Tag Editing Code, Camera Tool, General Programming\n" +
                     "Luke: Announcements Design, Creative Vision, Emblem Design and Concept, Audio Design \n" +
@@ -732,8 +750,8 @@ namespace Bounce_Companion
                     result.Add("/?" + index.ToString() + ".cont.[Point States:0].Color Upper Bound=" + playerData.Split(':')[3]);
                     foreach (string command in result)
                     {
-                        commandHandler.GetCommandsFromString("", command);
-                        utility.PrintToConsole(rm.outPutStrings);
+                        CommandHandler.GetCommandsFromString("", command);
+                        Utility.PrintToConsole(rm.outPutStrings);
                         rm.outPutStrings.Clear();
 
                     }
@@ -808,7 +826,7 @@ namespace Bounce_Companion
         }
         public void PokeCommands(string consoleInputString)
         {
-            commandHandler.GetCommandsFromString(consoleInputString, "");
+            CommandHandler.GetCommandsFromString(consoleInputString, "");
         }
         private void GetCommansFromFile()
         {
@@ -826,11 +844,11 @@ namespace Bounce_Companion
 
         private void ApplyDDLModOn(object sender, RoutedEventArgs e)
         {
-            commandHandler.ApplyMods(true, ComboBox_Mods.SelectionBoxItem.ToString());
+            CommandHandler.ApplyMods(true, ComboBox_Mods.SelectionBoxItem.ToString());
         }
         private void ApplyDDLModOff(object sender, RoutedEventArgs e)
         {
-            commandHandler.ApplyMods(false, ComboBox_Mods.SelectionBoxItem.ToString());
+            CommandHandler.ApplyMods(false, ComboBox_Mods.SelectionBoxItem.ToString());
         }
 
 
@@ -853,7 +871,7 @@ namespace Bounce_Companion
             {
                 foreach (string commandLine in System.IO.File.ReadLines(filename.ToString()))
                 {
-                    string command = utility.CleanString(commandLine);
+                    string command = Utility.CleanString(commandLine);
                     result.Add(command);
 
                     foreach (string line in result)
@@ -882,7 +900,7 @@ namespace Bounce_Companion
                 }
                 catch
                 {
-                    utility.PrintToConsole("Failed to Register Hotkey. Key: " + keyBindBttn);
+                    Utility.PrintToConsole("Failed to Register Hotkey. Key: " + keyBindBttn);
                 }
 
             }
@@ -908,12 +926,12 @@ namespace Bounce_Companion
             if (checkbox_DisableAutoPoking.IsChecked == true)
             {
                 modsEnabledMaster = false;
-                utility.PrintToConsole("Auto-Poking: Disabled");
+                Utility.PrintToConsole("Auto-Poking: Disabled");
             }
             else
             {
                 modsEnabledMaster = true;
-                utility.PrintToConsole("Auto-Poking: Enabled");
+                Utility.PrintToConsole("Auto-Poking: Enabled");
             }
         }
         public static List<string> p_colour = new List<string>();
@@ -946,7 +964,7 @@ namespace Bounce_Companion
             {
                 foreach (string line in System.IO.File.ReadLines("Content/Commands/" + modName + ".txt"))
                 {
-                    string command = utility.CleanString(line);
+                    string command = Utility.CleanString(line);
                     result.Add(command);
                 }
                 foreach (string command in result)
@@ -1047,31 +1065,31 @@ namespace Bounce_Companion
         
         private void ToggleDebugCamera(object sender, RoutedEventArgs e)
         {
-            cameraTool.ToggleDebugMode();
+            CameraTool.ToggleDebugMode();
         }
         private void JumpToSceneButton_Click(object sender, RoutedEventArgs e)
         {
-            cameraTool.JumpCameraToScene(-1);
+            CameraTool.JumpCameraToScene(-1);
         }
         
         private void ClearTimelineButton_Click(object sender, RoutedEventArgs e)
         {
-            cameraTool.ClearTimeline();
+            CameraTool.ClearTimeline();
         }
         
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            cameraTool.CaptureScene();
+            CameraTool.CaptureScene();
         }
         private void NewProjectButton_Click(object sender, RoutedEventArgs e)
         {
-            cameraTool.CreateNewProject();
+            CameraTool.CreateNewProject();
         }
         private void OpenSettingsButton_Click(object sender, RoutedEventArgs e)
         {
             if (settingsWindow == null)
             {
-                settingsWindow = new Settings(this);
+                settingsWindow = new Settings(this, CameraTool, CameraControls);
                 settingsWindow.Closed += SettingsWindow_Closed; // Handle window closed event
             }
             if (!settingsWindow.IsActive) settingsWindow.Activate();
@@ -1090,28 +1108,28 @@ namespace Bounce_Companion
 
         private void SaveSceneDataToFile_click(object sender, RoutedEventArgs e)
         {
-            cameraTool.SaveSceneDataToFile(cameraTool.imageDataList);
+            CameraTool.SaveSceneDataToFile(CameraTool.imageDataList);
         }
 
         private void LoadScenarioDataFromFile_click(object sender, RoutedEventArgs e)
         {
-            cameraTool.ClearTimeline();
-            cameraTool.imageDataList = cameraTool.LoadSceneData();
-            cameraTool.LoadSceneFromFile();
+            CameraTool.ClearTimeline();
+            CameraTool.imageDataList = CameraTool.LoadSceneData();
+            CameraTool.LoadSceneFromFile();
         }
 
         private void InsertSceneBeforeSelected_Click(object sender, RoutedEventArgs e)
         {
-            cameraTool.InsertSceneAtSelected(cameraTool.jumpToIndex, true);
+            CameraTool.InsertSceneAtSelected(CameraTool.jumpToIndex, true);
         }
 
         private void InsertSceneAfterSelected_Click(object sender, RoutedEventArgs e)
         {
-            cameraTool.InsertSceneAtSelected(cameraTool.jumpToIndex, false);
+            CameraTool.InsertSceneAtSelected(CameraTool.jumpToIndex, false);
         }
         private async void StartCamera(object sender, RoutedEventArgs e)
         {
-            await cameraTool.StartCameraRoll();
+            await CameraTool.StartCameraRoll();
         }
         
         
@@ -1129,7 +1147,7 @@ namespace Bounce_Companion
 
         private void UpdateScene_Click(object sender, RoutedEventArgs e)
         {
-            cameraTool.UpdateImageDataIndex(false);
+            CameraTool.UpdateImageDataIndex(false);
         }
         public static class Mathf
         {
@@ -1153,18 +1171,18 @@ namespace Bounce_Companion
 
         private void UpdateScene_Click(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
-            cameraTool.UpdateImageDataIndex(false);
+            if (!isAppLoading) CameraTool.UpdateImageDataIndex(false);
 
         }
 
         private void ResetScene_Click(object sender, RoutedEventArgs e)
         {
-            cameraTool.UpdateImageDataIndex(true);
+            CameraTool.UpdateImageDataIndex(true);
         }
 
         private void StopCamera(object sender, RoutedEventArgs e)
         {
-            cameraTool.rollCamera = false;
+            CameraTool.rollCamera = false;
         }
 
 
@@ -1248,13 +1266,13 @@ namespace Bounce_Companion
         private void TabItem_CameraTool_GotFocus(object sender, RoutedEventArgs e)
         {
             // The "Camera Tool" tab has been selected
-            cameraControls.flyCamControl = true;
+            CameraControls.flyCamControl = true;
         }
 
         private void TabItem_CameraTool_LostFocus(object sender, RoutedEventArgs e)
         {
             // The "Camera Tool" tab has been unselected
-            cameraControls.flyCamControl = false;
+            CameraControls.flyCamControl = false;
         }
         public struct p_List_Info
         {
@@ -1273,9 +1291,9 @@ namespace Bounce_Companion
         {
             ComboBox_Playernames.Items.Clear();
             ComboBox_SceneData_Playernames.Items.Clear();
-            objectHandler.p_List.Clear();
-            objectHandler.UpdatePlayerList();
-            foreach (var key in objectHandler.p_List)
+            ObjectHandler.p_List.Clear();
+            ObjectHandler.UpdatePlayerList();
+            foreach (var key in ObjectHandler.p_List)
             {
                 ObjectHandler.p_List_Info info = key.Value;
                 ComboBox_Playernames.Items.Add(info.p_Name.ToString());
@@ -1289,11 +1307,11 @@ namespace Bounce_Companion
             {
                 //CheckBox_OffsetPlayer.IsChecked = false;
                 //Offset_Selected_Player = false;
-                interpolation.face_Selected_Player = true;
+                Interpolation.face_Selected_Player = true;
             }
             else
             {
-                interpolation.face_Selected_Player = false;
+                Interpolation.face_Selected_Player = false;
             }
         }
         
@@ -1308,14 +1326,14 @@ namespace Bounce_Companion
                     return;
                 }
                 //CheckBox_TrackPlayer.IsChecked = false;
-                interpolation.CTO_OffsetPlayer = true;
-                interpolation.Offset_Selected_Player = true;
-                string salt = objectHandler.GetPlayerNameSalt(ComboBox_Playernames.Text);
-                await interpolation.OffsetObjectPositionContinuous(salt);
+                Interpolation.CTO_OffsetPlayer = true;
+                Interpolation.Offset_Selected_Player = true;
+                string salt = ObjectHandler.GetPlayerNameSalt(ComboBox_Playernames.Text);
+                await Interpolation.OffsetObjectPositionContinuous(salt);
             }
             else
             {
-                interpolation.Offset_Selected_Player = false;
+                Interpolation.Offset_Selected_Player = false;
             }
         }
         //public async Task OffsetObjectPositionContinuous(string salt)
@@ -1428,7 +1446,7 @@ namespace Bounce_Companion
                 float x = float.Parse(n);
                 float y = (float)Math.Round((x + 0.2), 1);
                 textBox.Text = (y).ToString();
-                cameraTool.UpdateImageDataIndex(false);
+                CameraTool.UpdateImageDataIndex(false);
             }
         }
 
@@ -1444,7 +1462,7 @@ namespace Bounce_Companion
                 float x = float.Parse(n);
                 float y = (float)Math.Round((x - 0.2), 1);
                 textBox.Text = (y).ToString();
-                cameraTool.UpdateImageDataIndex(false);
+                CameraTool.UpdateImageDataIndex(false);
             }
         }
 
@@ -1521,7 +1539,7 @@ namespace Bounce_Companion
         public bool loopCamera = false;
         private void LoopCamera(object sender, RoutedEventArgs e)
         {
-            cameraTool.LoopCamerapath();
+            CameraTool.LoopCamerapath();
         }
 
         
@@ -1545,7 +1563,7 @@ namespace Bounce_Companion
             if ((bool)checkbox_AutoWarpFix.IsChecked)
             {
                 auto_warpFix = true;
-                _ = commandHandler.ApplyGameMod("//warpfix", true);
+                _ = CommandHandler.ApplyGameMod("//warpfix", true);
             }
             else
             {
@@ -1557,7 +1575,7 @@ namespace Bounce_Companion
         {
             if (controllerKeyBindsWindow == null)
             {
-                controllerKeyBindsWindow = new ControllerKeyBinds(this);
+                //controllerKeyBindsWindow = new ControllerKeyBinds(this);
                 controllerKeyBindsWindow.Closed += Window_Closed;
             }
             else
@@ -1590,17 +1608,17 @@ namespace Bounce_Companion
 
         private void UpdateTransitionTimes(object sender, RoutedEventArgs e)
         {
-            cameraTool.imageDataList.ForEach(imageData => imageData.TransitionTime = float.Parse(GlobalTransitionTimeTextBox.Text));
+            CameraTool.imageDataList.ForEach(imageData => imageData.TransitionTime = float.Parse(GlobalTransitionTimeTextBox.Text));
         }
 
         private void ResetPositionButton(object sender, RoutedEventArgs e)
         {
-            cameraControls.ResetOrientation(true);
+            CameraControls.ResetOrientation(true);
         }
 
         private void ResetorientationButto(object sender, RoutedEventArgs e)
         {
-            cameraControls.ResetOrientation(false);
+            CameraControls.ResetOrientation(false);
         }
 
         private void UpdateCommands(object sender, EventArgs e)
@@ -1653,6 +1671,11 @@ namespace Bounce_Companion
                 gameChatWindow.Left = this.Left + this.Width;
                 gameChatWindow.Top = this.Top;
             }
+        }
+
+        private void DeleteScene(object sender, RoutedEventArgs e)
+        {
+            
         }
     }
 

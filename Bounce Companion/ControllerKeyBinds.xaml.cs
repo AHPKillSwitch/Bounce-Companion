@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using System.Threading.Channels;
 using static Bounce_Companion.ControllerKeyBinds;
 using System.Linq;
+using Bounce_Companion.Code.Camera_Tool;
 
 namespace Bounce_Companion
 {
@@ -206,12 +207,12 @@ namespace Bounce_Companion
                     // Add or remove the item from the list based on checkbox state
                     if (checkBox.IsChecked == true)
                     {
-                        main.c_List_Infos_L.Add(new C_List_Info(comboBoxmods.SelectionBoxItem.ToString(), KeyBinds, comboBoxEnableState.SelectionBoxItem.ToString(), false));
+                        main.CameraControls.c_List_Infos_L.Add(new C_List_Info(comboBoxmods.SelectionBoxItem.ToString(), KeyBinds, comboBoxEnableState.SelectionBoxItem.ToString(), false));
                     }
                     else
                     {
                         // Remove the item from the list
-                        main.c_List_Infos_L.RemoveAll(item =>
+                        main.CameraControls.c_List_Infos_L.RemoveAll(item =>
                             item.c_Name == comboBoxmods.SelectionBoxItem.ToString() &&
                             item.c_KeyBind.SequenceEqual(KeyBinds));
                     }
@@ -221,7 +222,7 @@ namespace Bounce_Companion
                 else
                 {
                     // Remove the item from the list
-                    main.c_List_Infos_L.RemoveAll(item =>
+                    main.CameraControls.c_List_Infos_L.RemoveAll(item =>
                         item.c_Name == comboBoxmods.SelectionBoxItem.ToString() &&
                         item.c_KeyBind.SequenceEqual(KeyBinds));
                     SaveUserPreferences();
@@ -286,7 +287,7 @@ namespace Bounce_Companion
             {
                 userPreferences.CheckboxStates[checkBox.Name] = checkBox.IsChecked ?? false;
             }
-            userPreferences.ActivekeyBind = main.c_List_Infos_L;
+            userPreferences.ActivekeyBind = main.CameraControls.c_List_Infos_L;
 
 
 
@@ -335,7 +336,7 @@ namespace Bounce_Companion
                     }
                 }
 
-                main.c_List_Infos_L = userPreferences.ActivekeyBind;
+                main.CameraControls.c_List_Infos_L = userPreferences.ActivekeyBind;
 
             }
         }

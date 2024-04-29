@@ -16,35 +16,21 @@ using static Bounce_Companion.MainWindow;
 
 namespace Bounce_Companion.Code.Command_Handler
 {
-    internal class CommandHandler
+    public class CommandHandler
     {
         MainWindow main;
-        Annoucements annoucements;
-        Utility utility;
         Mem m;
-        BounceHandler bounceHandler;
-        CameraTool cameraTool;
-        CameraControls cameraControls;
-        RuntimeMemory RM;
-        CommandExecution CE;
-        ObjectHandler ObjectHandler;
 
         public List<Command> Commands = new List<Command>();
 
         private bool FreezeVelocity = true;
         private float freezeValue = 0;
-        public CommandHandler(MainWindow main, Utility utility, Mem m, BounceHandler bounceHandler, RuntimeMemory RM, CommandExecution CE, Annoucements annoucements, CameraControls cameraControls, ObjectHandler ObjectHandler) 
+        private bool bindPitch = false;
+        public CommandHandler(MainWindow main) 
         {
 
-            this.m = m; 
             this.main = main;
-            this.utility = utility; 
-            this.bounceHandler = bounceHandler;
-            this.RM = RM;
-            this.CE = CE;
-            this.annoucements = annoucements;
-            this.cameraControls = cameraControls;
-            this.ObjectHandler = ObjectHandler;
+            this.m = main.m; 
         }
         public struct Command
         {
@@ -70,7 +56,7 @@ namespace Bounce_Companion.Code.Command_Handler
             var commandlineList = commandboxHtml[0].Descendants("div")
                 .Where(node => node.GetAttributeValue("class", "")
                 .Contains("de1")).ToList();
-            string[] STRList = commandlineList.Select(s => utility.CleanString(s.InnerHtml)).ToArray();
+            string[] STRList = commandlineList.Select(s => main.Utility.CleanString(s.InnerHtml)).ToArray();
             STRList = STRList.Where(s => s != "").ToArray();
             httpClient.Dispose();
             return STRList.ToList();
@@ -110,7 +96,7 @@ namespace Bounce_Companion.Code.Command_Handler
                         }
                         catch
                         {
-                            utility.PrintToConsole("Failed to apply command. " + command);
+                            main.Utility.PrintToConsole("Failed to apply command. " + command);
                         }
                     }
                     return true;
@@ -119,7 +105,7 @@ namespace Bounce_Companion.Code.Command_Handler
                 {
                     foreach (string line in System.IO.File.ReadLines("Content/Commands/" + url.Split(':')[1] + ".txt"))
                     {
-                        string command = utility.CleanString(line);
+                        string command = main.Utility.CleanString(line);
                         result.Add(command);
                     }
                     foreach (string command in result)
@@ -131,8 +117,8 @@ namespace Bounce_Companion.Code.Command_Handler
                         else
                         {
                             GetCommandsFromString("", command);
-                            utility.PrintToConsole(RM.outPutStrings);
-                            RM.outPutStrings.Clear();
+                            main.Utility.PrintToConsole(main.rm.outPutStrings);
+                            main.rm.outPutStrings.Clear();
                         }
                     }
                     foreach (string command in result)
@@ -158,7 +144,7 @@ namespace Bounce_Companion.Code.Command_Handler
             List<string> result = new List<string>();
             foreach (string line in System.IO.File.ReadLines("Content/Commands/" + modName + ".txt"))
             {
-                string command = utility.CleanString(line);
+                string command = main.Utility.CleanString(line);
                 result.Add(command);
             }
             foreach (string command in result)
@@ -182,10 +168,10 @@ namespace Bounce_Companion.Code.Command_Handler
                         else
                         {
                             GetCommandsFromString("", command.Split("able:")[1]);
-                            utility.PrintToConsole(RM.outPutStrings);
-                            RM.outPutStrings.Clear();
+                            main.Utility.PrintToConsole(main.rm.outPutStrings);
+                            main.rm.outPutStrings.Clear();
                         }
-                        utility.PrintToConsole(disableModsTextOutput);
+                        main.Utility.PrintToConsole(disableModsTextOutput);
                     }
                 }
                 else
@@ -199,10 +185,10 @@ namespace Bounce_Companion.Code.Command_Handler
                         else
                         {
                             GetCommandsFromString("", command.Split("able:")[1]);
-                            utility.PrintToConsole(RM.outPutStrings);
-                            RM.outPutStrings.Clear();
+                            main.Utility.PrintToConsole(main.rm.outPutStrings);
+                            main.rm.outPutStrings.Clear();
                         }
-                        utility.PrintToConsole(enableModsTextOutput);
+                        main.Utility.PrintToConsole(enableModsTextOutput);
                     }
                 }
                 await Task.Delay(delayTime);
@@ -292,8 +278,8 @@ namespace Bounce_Companion.Code.Command_Handler
                 com.value = finalLine;
                 Commands.Add(com);
                 var currentcommand = Commands[Commands.Count - 1];
-                CE.c = currentcommand;
-                CE.TagBlockProcessing(m);
+                main.CE.c = currentcommand;
+                main.CE.TagBlockProcessing(m);
                 string output =
                     "Tag Type: " + "\t" + com.TagType + "\n" +
                     "Tag Name: " + "\t" + com.TagName + "\n" +
@@ -302,8 +288,8 @@ namespace Bounce_Companion.Code.Command_Handler
                     "New value: " + "\t" + com.value;
 
 
-                RM.outPutStrings.Add(output);
-                RM.outPutStrings.Add(strcommand);
+                main.rm.outPutStrings.Add(output);
+                main.rm.outPutStrings.Add(strcommand);
             }
 
         }
@@ -326,17 +312,17 @@ namespace Bounce_Companion.Code.Command_Handler
             {
                 case "//addbounce":
                     {
-                        bounceHandler.debug = true;
-                        bounceHandler.bounceCount++;
-                        utility.PrintToConsole("+1 Added to bounce count.");
-                        _ = annoucements.Announce(bounceHandler.bounceCount, "null", "standard");
+                        main.BounceHandler.debug = true;
+                        main.BounceHandler.bounceCount++;
+                        main.Utility.PrintToConsole("+1 Added to bounce count.");
+                        _ = main.Annoucements.Announce(main.BounceHandler.bounceCount, "null", "standard");
                         break;
                     }
                 case "//clearbounce":
                     {
-                        bounceHandler.debug = false;
-                        bounceHandler.bounceCount = 0;
-                        utility.PrintToConsole("Bounce count reset.");
+                        main.BounceHandler.debug = false;
+                        main.BounceHandler.bounceCount = 0;
+                        main.Utility.PrintToConsole("Bounce count reset.");
                         break;
                     }
                 case "//wireframe":
@@ -413,17 +399,17 @@ namespace Bounce_Companion.Code.Command_Handler
                     }
                 case "//capturescene":
                     {
-                        cameraTool.CaptureScene();
+                        main.CameraTool.CaptureScene();
                         break;
                     }
                 case "//startcamera":
                     {
-                        await cameraTool.StartCameraRoll();
+                        await main.CameraTool.StartCameraRoll();
                         break;
                     }
                 case "//stopcamera":
                     {
-                        cameraTool.rollCamera = false;
+                        main.CameraTool.rollCamera = false;
                         break;
                     }
                 case "//jumptoscene":
@@ -431,12 +417,12 @@ namespace Bounce_Companion.Code.Command_Handler
                         int index = 0;
                         if (string.IsNullOrEmpty(prefix)) index = 0;
                         else index = int.Parse(prefix);
-                        cameraTool.JumpCameraToScene(index);
+                        main.CameraTool.JumpCameraToScene(index);
                         break;
                     }
                 case "//debugcamera":
                     {
-                        cameraTool.ToggleDebugMode();
+                        main.CameraTool.ToggleDebugMode();
                         //isCameraToolOpen = true;
                         break;
                     }
@@ -444,11 +430,11 @@ namespace Bounce_Companion.Code.Command_Handler
                     {
                         if (on)
                         {
-                            cameraControls.flyCamControl = true;
+                            main.CameraControls.flyCamControl = true;
                         }
                         else
                         {
-                            cameraControls.flyCamControl = false;
+                            main.CameraControls.flyCamControl = false;
                         }
                         break;
                     }
@@ -469,51 +455,59 @@ namespace Bounce_Companion.Code.Command_Handler
                         if (prefix == "true")
                         {
                             FreezeVelocity = true;
-                            freezeValue = m.ReadFloat((ObjectHandler.objectHavokAddress - 0x28));
+                            freezeValue = m.ReadFloat((main.ObjectHandler.objectHavokAddress - 0x28));
                             Task.Run(() => StartAsyncFreezeVelocity());
 
                         }
-                        else
+                        else if (prefix == "false")
                         {
                             FreezeVelocity = false;
+                            bindPitch = false;
+                        }
+                        else if (prefix == "pitch")
+                        {
+                            FreezeVelocity = true;
+                            bindPitch = true;
+                            freezeValue = m.ReadFloat((main.ObjectHandler.objectHavokAddress - 0x28));
+                            Task.Run(() => StartAsyncFreezeVelocity());
                         }
                         break;
                     }
                 case "//setvelocity":
                     {
                         float velocity = float.Parse(prefix);
-                        m.WriteToMemory((ObjectHandler.objectHavokAddress - 0x28), "float", (0.6 * velocity).ToString());
+                        m.WriteToMemory((main.ObjectHandler.objectHavokAddress - 0x28), "float", (0.6 * velocity).ToString());
                         await Task.Delay(222);
-                        m.WriteToMemory((ObjectHandler.objectHavokAddress - 0x28), "float", velocity.ToString());
+                        m.WriteToMemory((main.ObjectHandler.objectHavokAddress - 0x28), "float", velocity.ToString());
                         break;
                     }
                 case "//addvelocity":
                     {
-                        freezeValue = m.ReadFloat((ObjectHandler.objectHavokAddress - 0x28));
+                        freezeValue = m.ReadFloat((main.ObjectHandler.objectHavokAddress - 0x28));
                         freezeValue += float.Parse(prefix);
-                        m.WriteToMemory((ObjectHandler.objectHavokAddress - 0x28), "float", (0.6 * freezeValue).ToString());
+                        m.WriteToMemory((main.ObjectHandler.objectHavokAddress - 0x28), "float", (0.6 * freezeValue).ToString());
                         await Task.Delay(222);
-                        m.WriteToMemory((ObjectHandler.objectHavokAddress - 0x28), "float", freezeValue.ToString());
+                        m.WriteToMemory((main.ObjectHandler.objectHavokAddress - 0x28), "float", freezeValue.ToString());
                         break;
                     }
                 case "//autocrouch":
                     {
-                        float p_z = m.ReadFloat((ObjectHandler.objectHavokAddress + 0x8));
-                        m.WriteToMemory((ObjectHandler.objectHavokAddress + 0x8), "float", (p_z - 0.2).ToString());
+                        float p_z = m.ReadFloat((main.ObjectHandler.objectHavokAddress + 0x8));
+                        m.WriteToMemory((main.ObjectHandler.objectHavokAddress + 0x8), "float", (p_z - 0.2).ToString());
                         break;
                     }
                 case "//moveplayer_z":
                     {
                         float player_Z = float.Parse(fullCommand);
-                        float p_z = m.ReadFloat((ObjectHandler.objectHavokAddress + 0x8));
-                        if (prefix == "minus") m.WriteToMemory((ObjectHandler.objectHavokAddress + 0x8), "float", (p_z - player_Z).ToString());
-                        if (prefix == "add") m.WriteToMemory((ObjectHandler.objectHavokAddress + 0x8), "float", (p_z + player_Z).ToString());
+                        float p_z = m.ReadFloat((main.ObjectHandler.objectHavokAddress + 0x8));
+                        if (prefix == "minus") m.WriteToMemory((main.ObjectHandler.objectHavokAddress + 0x8), "float", (p_z - player_Z).ToString());
+                        if (prefix == "add") m.WriteToMemory((main.ObjectHandler.objectHavokAddress + 0x8), "float", (p_z + player_Z).ToString());
                         break;
                     }
                 case "//freestylemode":
                     {
-                        if (on) bounceHandler.freeStyleMode = true;
-                        else bounceHandler.freeStyleMode = false;
+                        if (on) main.BounceHandler.freeStyleMode = true;
+                        else main.BounceHandler.freeStyleMode = false;
                         break;
                     }
                 case "//markposition"://MarkPosition Test Standard
@@ -577,16 +571,22 @@ namespace Bounce_Companion.Code.Command_Handler
                 float p_Z = m.ReadFloat((obj_List_Memory_Address + 0xE * 0x4));
 
                 string bouncelocation = "/" + location + ":" + type + ":" + (Math.Round(p_X - 0.4, 2)).ToString() + ":" + (Math.Round(p_X + 0.4, 2)).ToString() + ":" + (Math.Round(p_Y - 0.4, 2)).ToString() + ":" + (Math.Round(p_Y + 0.4, 2)).ToString() + ":0:0:0:" + Velocity;
-                utility.PrintToConsole(bouncelocation);
-                utility.WriteBouncePositionToString(bouncelocation);
+                main.Utility.PrintToConsole(bouncelocation);
+                main.Utility.WriteBouncePositionToString(bouncelocation);
             }
-            catch { utility.PrintToConsole("Error: Failed to get player position."); }
+            catch { main.Utility.PrintToConsole("Error: Failed to get player position."); }
         }
         public async Task StartAsyncFreezeVelocity()
         {
             while (FreezeVelocity)
             {
-                m.WriteToMemory((ObjectHandler.objectHavokAddress - 0x28), "float", freezeValue.ToString());
+                if (bindPitch)
+                {
+                    float pitch = m.ReadFloat(MemoryAddresses.Addresses.player_Camera_Pitch_Address);
+                    if (pitch > 0.3 || pitch > -0.3) freezeValue = pitch * 12;
+                    freezeValue = m.ReadFloat(MemoryAddresses.Addresses.player_Camera_Pitch_Address) * 8;
+                }
+                m.WriteToMemory((main.ObjectHandler.objectHavokAddress - 0x28), "float", freezeValue.ToString());
 
                 await Task.Delay(29);
             }

@@ -1,0 +1,23 @@
+﻿LeftButtonText:Freeze
+RightButtonText:Unfreeze
+KeyBindButton:
+EnableModTextOutPut:Velocity Locked!
+DisableModTextOutPut:Velocity Unlocked!
+Enable://lockvelocity pitch
+Enable:/globals\globals.matg.[Player Information:0].Walking Speed=11
+Enable:/globals\globals.matg.[Player Information:0].Run Forward=11
+Enable:/globals\globals.matg.[Player Information:0].Run Backward=11
+Enable:/globals\globals.matg.[Player Information:0].Run Sideways=11
+Enable:/globals\globals.matg.[Player Information:0].Run Acceleration=99999
+Enable:/globals\globals.matg.[Player Information:0].Airborne Acceleration=99999
+Enable:/objects\characters\masterchief\masterchief.hlmt.[New Damage Info:0].Flags=Cannot Die From Damage:true
+Enable:/objects\characters\masterchief\masterchief.hlmt.Collision Model=null
+Disable:/objects\characters\masterchief\masterchief.hlmt.Collision Model=objects\characters\masterchief\masterchief.coll
+Disable://lockvelocity false
+Disable:/globals\globals.matg.[Player Information:0].Walking Speed=0.512
+Disable:/globals\globals.matg.[Player Information:0].Run Forward=2.25
+Disable:/globals\globals.matg.[Player Information:0].Run Backward=2
+Disable:/globals\globals.matg.[Player Information:0].Run Sideways=2
+Disable:/globals\globals.matg.[Player Information:0].Run Acceleration=9.6
+Disable:/globals\globals.matg.[Player Information:0].Airborne Acceleration=1.05
+Disable:/objects\characters\masterchief\masterchief.hlmt.[New Damage Info:0].Flags=Cannot Die From Damage:false

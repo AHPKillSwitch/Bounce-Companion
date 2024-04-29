@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Bounce_Companion.Code.Addresses___Offsets
 {
-    internal class MemoryAddresses
+    public class MemoryAddresses
     {
         public static string OffsetAddress(string address, string offset)
         {
@@ -36,6 +36,7 @@ namespace Bounce_Companion.Code.Addresses___Offsets
         {
             public static string tickRate = "halo2.exe+0x004C06E4,0x02";
             public static string player_Obj_Index = "halo2.exe+4E7C88";
+            public static string player_Camera_Pitch_Address = "halo2.exe+4A8534";
         }
         public static class Offsets
         {

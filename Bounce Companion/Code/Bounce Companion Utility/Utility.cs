@@ -11,7 +11,7 @@ using static Bounce_Companion.MainWindow;
 
 namespace Bounce_Companion.Code.Bounce_Companion_Utility
 {
-    internal class Utility
+    public class Utility
     {
         Mem m;
         MainWindow main;
@@ -85,8 +85,8 @@ namespace Bounce_Companion.Code.Bounce_Companion_Utility
             {
                 PrintToConsole($"Player XYZ Velocity: {p_X_Vel}, {p_Y_Vel}, {p_Z_Vel}    Player XYZ Position: {p_X}, {p_Y}, {p_Z}");
             }
-            GOW.UpdateStatusBar(bounceHandler.bounceCount, p_Z_Vel, p_X, p_Y, p_Z, tr);
-            GOW.UpdateSliders(p_X_Vel, p_Y_Vel, p_Z_Vel);
+            main.GOW.UpdateStatusBar(main.BounceHandler.bounceCount, p_Z_Vel, p_X, p_Y, p_Z, tr);
+            main.GOW.UpdateSliders(p_X_Vel, p_Y_Vel, p_Z_Vel);
         }
         public string CleanString(string str)
         {
