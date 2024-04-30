@@ -35,6 +35,14 @@ namespace Bounce_Companion.Code.Bounce_Handler
         float prev_P_X_Vel;
         float prev_P_Y_Vel;
         float prev_P_Z_Vel;
+
+        public float p_X = 0;
+        public float p_Y = 0;
+        public float p_Z = 0;
+        public float p_X_Vel = 0;
+        public float p_Y_Vel = 0;
+        public float p_Z_Vel = 0;
+
         public bool freeStyleMode = false;
         
         public bool debug = false;
@@ -61,12 +69,12 @@ namespace Bounce_Companion.Code.Bounce_Handler
                 int obj_List_Address = m.ReadInt32("halo2.exe+0x4E461C,0x44");
                 int obj_List_Memory_Address = m.ReadInt32(obj_List_Address + p_Index * 0xC + 0x8);
 
-                float p_X = utility.ReadPlayerFloat(obj_List_Memory_Address, 0xC * 0x4);
-                float p_Y = utility.ReadPlayerFloat(obj_List_Memory_Address, 0xD * 0x4);
-                float p_Z = utility.ReadPlayerFloat(obj_List_Memory_Address, 0xE * 0x4);
-                float p_X_Vel = utility.ReadPlayerFloat(obj_List_Memory_Address, 0x22 * 0x4);
-                float p_Y_Vel = utility.ReadPlayerFloat(obj_List_Memory_Address, 0x23 * 0x4);
-                float p_Z_Vel = utility.ReadPlayerFloat(obj_List_Memory_Address, 0x24 * 0x4);
+                p_X = utility.ReadPlayerFloat(obj_List_Memory_Address, 0xC * 0x4);
+                p_Y = utility.ReadPlayerFloat(obj_List_Memory_Address, 0xD * 0x4);
+                p_Z = utility.ReadPlayerFloat(obj_List_Memory_Address, 0xE * 0x4);
+                p_X_Vel = utility.ReadPlayerFloat(obj_List_Memory_Address, 0x22 * 0x4);
+                p_Y_Vel = utility.ReadPlayerFloat(obj_List_Memory_Address, 0x23 * 0x4);
+                p_Z_Vel = utility.ReadPlayerFloat(obj_List_Memory_Address, 0x24 * 0x4);
                 int p_Airbourne = utility.ReadPlayerByte(obj_List_Memory_Address, 0xD8 * 0x4);
                 int hav_Index_Datum = m.ReadInt32(obj_List_Memory_Address + 0xB4);
                 int Obj_Vehi_Index_Datum = m.ReadInt32(obj_List_Memory_Address + 0x14);

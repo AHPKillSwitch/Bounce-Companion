@@ -75,8 +75,9 @@
                     <Grid Background="#FF202020">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Width="881">
-                                <Button x:Name="NewProjectButton" Content="New Project" Width="442" Click="NewProjectButton_Click"/>
-                                <Button Content="Load Project" Width="442" Click="LoadScenarioDataFromFile_click"/>
+                                <Button x:Name="NewProjectButton" Content="New Project" Width="294" Click="NewProjectButton_Click"/>
+                                <Button x:Name="FreeCamButton" Content="FreeCam" Width="294" Click="FreeCamButtonPress"/>
+                                <Button Content="Load Project" Width="294" Click="LoadScenarioDataFromFile_click"/>
                             </StackPanel>
                             <StackPanel x:Name="staackPanel_CameraTool" Background="#FF202020" Margin="10,0,10,2" Grid.ColumnSpan="2" Visibility="Visible">
                                 <!-- Large Image Panel -->

@@ -1,0 +1,7 @@
+﻿KeyBindButton:0x70
+LeftButtonText:Apply
+RightButtonText:Disable
+EnableModTextOutPut:Bottomless Clip Enabled!
+DisableModTextOutPut:Bottomless Clip Disabled!
+Enable:/objects\weapons\pistol\magnum\magnum.weap.[Barrels:0].Magazine Index=-1
+Disable:/objects\weapons\pistol\magnum\magnum.weap.[Barrels:0].Magazine Index=0

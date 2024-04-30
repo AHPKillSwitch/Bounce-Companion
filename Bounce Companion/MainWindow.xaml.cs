@@ -496,7 +496,7 @@ namespace Bounce_Companion
         }
         public bool player2Attched = false;
         bool tagscurrentlyloaded;
-        public bool UpdateTagStatus()
+        public async Task<bool> UpdateTagStatus()
         {
             string tags_Loaded = m.ReadString("halo2.exe+47CF0C");
             bool tags_Loaded_Status = tags_Loaded != "mainmenu";
@@ -511,6 +511,7 @@ namespace Bounce_Companion
                 {
                     PrintToConsole("Valid Session Found!");
                     HideMods(false);
+                    await Task.Delay(200);
                     rm = new RuntimeMemory(m, p, this, mapspath, customMapsPath, Utility, CommandHandler);
                     CE = new CommandExecution(rm, m, this);
                     CH = new HandleChallenges(this); //challenge handler
@@ -535,7 +536,7 @@ namespace Bounce_Companion
             SetWindowPos();
 
 
-
+            await Task.Delay(4000);
             return tags_Loaded_Status;
         }
         private void HideMods(bool hide)
@@ -582,9 +583,13 @@ namespace Bounce_Companion
                         Environment.Exit(1); // You can choose an appropriate exit code
                     }
                     bool tags_Loaded_Status = false;
-                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    await System.Windows.Application.Current.Dispatcher.Invoke(async () =>
                     {
-                        tags_Loaded_Status = UpdateTagStatus();
+                        // Await the asynchronous method and get the result
+                        bool updateResult = await UpdateTagStatus();
+
+                        // Now you can use the result as needed
+                        tags_Loaded_Status = updateResult;
                     });
                     if (customContrails)
                     {
@@ -1113,7 +1118,7 @@ namespace Bounce_Companion
 
         private void LoadScenarioDataFromFile_click(object sender, RoutedEventArgs e)
         {
-            CameraTool.ClearTimeline();
+            //CameraTool.ClearTimeline();
             CameraTool.imageDataList = CameraTool.LoadSceneData();
             CameraTool.LoadSceneFromFile();
         }
@@ -1676,6 +1681,11 @@ namespace Bounce_Companion
         private void DeleteScene(object sender, RoutedEventArgs e)
         {
             
+        }
+
+        private void FreeCamButtonPress(object sender, RoutedEventArgs e)
+        {
+            staackPanel_CameraTool.Visibility = Visibility.Visible;
         }
     }
 

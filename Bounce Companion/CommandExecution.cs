@@ -193,11 +193,6 @@ namespace Bounce_Companion
                         switch (type)
                         {
                             case "/rangef":
-                                { // Code flow ----->
-                                    float value1 = float.Parse(value.Split(':')[0]); WriteMemory(Tagruntimeaddress, "float", value1.ToString());
-                                    float value2 = float.Parse(value.Split(':')[1]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", value2.ToString());
-                                    break;
-                                }
                             case "/ranged":
                                 { // Code flow ----->
                                     float value1 = float.Parse(value.Split(':')[0]); WriteMemory(Tagruntimeaddress, "float", value1.ToString());
@@ -208,238 +203,111 @@ namespace Bounce_Companion
                                 { // Code flow ----->
                                     int runtimeaddress = Tagruntimeaddress;
                                     WriteMemory(runtimeaddress, "float", GetColorF(value.Substring(0, 2))); //alpha
-                                    WriteMemory(runtimeaddress += 0x4, "float", GetColorF(value.Substring(2, 2))); //R
-                                    WriteMemory(runtimeaddress += 0x4, "float", GetColorF(value.Substring(4, 2))); //G
-                                    WriteMemory(runtimeaddress += 0x4, "float", GetColorF(value.Substring(6, 2))); //B
+                                    WriteMemory(runtimeaddress + 4, "float", GetColorF(value.Substring(2, 2))); //R
+                                    WriteMemory(runtimeaddress + 8, "float", GetColorF(value.Substring(4, 2))); //G
+                                    WriteMemory(runtimeaddress + 12, "float", GetColorF(value.Substring(6, 2))); //B
                                     break;
                                 }
                             case "/tagRef":
                                 {
-                                    string tagname = string.Empty;
-                                    string tagtype = string.Empty;
                                     if (value != "null")
                                     {
+                                        string[] parts = value.Split('.');
+                                        string tagname = parts[0];
+                                        string tagtype = parts[1];
 
-                                        if (c.value.Contains("?*"))
+                                        TD = TH.GetTag(tagtype, tagname);
+
+                                        if (ReferenceEquals(TD, null)) // Check if TD is null
                                         {
-                                            int i = int.Parse(c.value.Split('.')[1]);
-                                            TD = TH.GetPlayerColourTag(c.TagType, i);
-                                        }
-                                        else if (c.TagName.Contains("?*"))
-                                        {
-                                            int i = int.Parse(c.TagName.Split('?')[1]);
-                                            TD = TH.GetPlayerColourTag(c.TagType, i);
-                                        }
-                                        else
-                                        {
-                                            tagname = value.Split('.')[0];
-                                            tagtype = value.Split('.')[1];
-                                            TD = TH.GetTag(tagtype, tagname);
-                                        }
-                                        TD.ToString();
-                                        string game = rm.CurGame;
-                                        string datumindex = TD.tagRef;
-                                        if (datumindex != "null")
-                                        {
-                                            RTETagRef(memory, tagtype, Tagruntimeaddress, datumindex, game);
-                                        }
-                                        else
-                                        {
+                                            // Handle the case where TD is null
+                                            // For example:
                                             ErrorOutput_TagNotFound(tagname, tagtype);
+                                        }
+                                        else
+                                        {
+                                            string datumindex = TD.tagRef;
+
+                                            if (datumindex != "null")
+                                            {
+                                                RTETagRef(memory, tagtype, Tagruntimeaddress, datumindex, rm.CurGame);
+                                            }
+                                            else
+                                            {
+                                                // Handle the case where datumindex is "null"
+                                                // For example:
+                                                ErrorOutput_TagNotFound(tagname, tagtype);
+                                            }
                                         }
                                     }
                                     else
                                     {
-                                        int runtimeaddress = Tagruntimeaddress;
-                                        WriteMemory(runtimeaddress, "int", Convert.ToInt32("0xFFFFFFFF", 16).ToString());
-                                        runtimeaddress += 4;
-                                        WriteMemory(runtimeaddress, "int", Convert.ToInt32("0xFFFFFFFF", 16).ToString());
+                                        WriteMemory(Tagruntimeaddress, "int32", "0xFFFFFFFF");
+                                        WriteMemory(Tagruntimeaddress + 4, "int32", "0xFFFFFFFF");
                                     }
                                     break;
                                 }
+
                             case "/int8":
                                 {
-
-                                    WriteMemory(Tagruntimeaddress, "byte", sbyte.Parse(value).ToString());
-
-                                    //WriteMemory(Tagruntimeaddress.ToString("X"), "int", value);
+                                    WriteMemory(Tagruntimeaddress, "byte", value);
                                     break;
                                 }
                             case "/int16":
                                 {
-                                    string output = string.Empty;
-                                    byte[] bytes = BitConverter.GetBytes(Convert.ToInt16(value));
-                                    for (int i = 0; i < bytes.Length; i++)
+                                    short intValue;
+                                    if (short.TryParse(value, out intValue))
                                     {
-                                        output += "0x" + bytes[i].ToString("X");
-                                        if (i != bytes.Length - 1) output += ",";
+                                        WriteMemory(Tagruntimeaddress, "int16", intValue.ToString());
                                     }
-                                    WriteMemory(Tagruntimeaddress, "bytes", output);
-
-                                    //WriteMemory(Tagruntimeaddress.ToString("X"), "int", value);
+                                    else
+                                    {
+                                        throw new ArgumentException("Invalid value for int16 conversion");
+                                    }
                                     break;
                                 }
+
                             case "/int32":
-                                {
-                                    WriteMemory(Tagruntimeaddress, "int", value);
-                                    break;
-                                }
                             case "/enum8":
-                                {
-                                    foreach (var off1 in from XmlNode node in innerNodes
-                                                         where node.Attributes[0].Value == method
-                                                         from XmlNode option in node
-                                                         where _node.Attributes[0].Value == method && option.Attributes[0].Value == value
-                                                         let tmpflagindex = option.Attributes[1].Value
-                                                         let off1 = Convert.ToInt32(tmpflagindex, 16)
-                                                         select off1)
-                                    {
-                                        WriteMemory(Tagruntimeaddress, "int", off1.ToString());
-                                        return 0;
-                                    }
-
-                                    break;
-                                }
                             case "/enum16":
-                                {
-                                    foreach (var off1 in from XmlNode node in innerNodes
-                                                         where node.Attributes[0].Value == method
-                                                         from XmlNode option in node
-                                                         where _node.Attributes[0].Value == method && option.Attributes[0].Value == value
-                                                         let tmpflagindex = option.Attributes[1].Value
-                                                         let off1 = Convert.ToInt32(tmpflagindex, 16)
-                                                         select off1)
-                                    {
-                                        WriteMemory(Tagruntimeaddress, "int", off1.ToString());
-                                        return 0;
-                                    }
-
-                                    break;
-                                }
                             case "/enum32":
-                                {
-                                    foreach (var off1 in from XmlNode node in innerNodes
-                                                         where node.Attributes[0].Value == method
-                                                         from XmlNode option in node
-                                                         where _node.Attributes[0].Value == method && option.Attributes[0].Value == value
-                                                         let tmpflagindex = option.Attributes[1].Value
-                                                         let off1 = Convert.ToInt32(tmpflagindex, 16)
-                                                         select off1)
-                                    {
-                                        WriteMemory(Tagruntimeaddress, "int", off1.ToString());
-                                        return 0;
-                                    }
-
-                                    break;
-                                }
                             case "/float32":
                                 {
-                                    float v1 = float.Parse(value);
-                                    WriteMemory(Tagruntimeaddress, "float", v1.ToString());
+                                    WriteMemory(Tagruntimeaddress, type.Substring(1), value);
                                     break;
                                 }
                             case "/point2":
-                                { // Code flow ----->
-                                    float v1 = float.Parse(value.Split(':')[0]); WriteMemory(Tagruntimeaddress, "float", v1.ToString());
-                                    float v2 = float.Parse(value.Split(':')[1]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", v2.ToString());
-                                    break;
-                                }
                             case "/point3":
-                                { // Code flow ----->
-                                    float v1 = float.Parse(value.Split(':')[0]); WriteMemory(Tagruntimeaddress, "float", v1.ToString());
-                                    float v2 = float.Parse(value.Split(':')[1]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", v2.ToString());
-                                    float v3 = float.Parse(value.Split(':')[1]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", v3.ToString());
-                                    break;
-                                }
                             case "/degree":
-                                { // Code flow ----->
-                                    int v1 = int.Parse(value.Split(':')[0]); float v1_2 = ConvertDegreesToRadians(v1); WriteMemory(Tagruntimeaddress, "float", v1_2.ToString());
-                                    break;
-                                }
                             case "/degree2":
-                                { // Code flow ----->
-                                    int v1 = int.Parse(value.Split(':')[0]); float v1_2 = ConvertDegreesToRadians(v1); WriteMemory(Tagruntimeaddress, "float", v1_2.ToString());
-                                    int v2 = int.Parse(value.Split(':')[1]); float v2_2 = ConvertDegreesToRadians(v2); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", v2_2.ToString());
-                                    break;
-                                }
                             case "/vector3":
-                                { // Code flow ----->
-                                    float v1 = float.Parse(value.Split(':')[0]); WriteMemory(Tagruntimeaddress, "float", v1.ToString());
-                                    float v2 = float.Parse(value.Split(':')[1]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", v2.ToString());
-                                    float v3 = float.Parse(value.Split(':')[2]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", v3.ToString());
-                                    break;
-                                }
                             case "/vector4":
                                 { // Code flow ----->
-                                    float v1 = float.Parse(value.Split(':')[0]); WriteMemory(Tagruntimeaddress, "float", v1.ToString());
-                                    float v2 = float.Parse(value.Split(':')[1]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", v2.ToString());
-                                    float v3 = float.Parse(value.Split(':')[2]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", v3.ToString());
-                                    float v4 = float.Parse(value.Split(':')[3]); Tagruntimeaddress += 4; WriteMemory(Tagruntimeaddress, "float", v4.ToString());
+                                    string[] parts = value.Split(':');
+                                    for (int i = 0; i < parts.Length; i++)
+                                    {
+                                        float v = float.Parse(parts[i]);
+                                        WriteMemory(Tagruntimeaddress + i * 4, "float", v.ToString());
+                                    }
                                     break;
                                 }
                             case "/stringId":
                                 { // Code flow ----->
-
                                     stringID = rm.GetStringID(value);
                                     if (stringID.index == "")
                                     {
-                                        WriteMemory(Tagruntimeaddress, "int", "0");
+                                        WriteMemory(Tagruntimeaddress, "int32", "0");
                                     }
                                     else
                                     {
-                                        WriteMemory(Tagruntimeaddress, "int", stringID.index.Length.ToString("X") + stringID.index);
+                                        string indexHex = stringID.index.Length.ToString("X") + stringID.index;
+                                        WriteMemory(Tagruntimeaddress, "int32", indexHex);
                                     }
                                     break;
                                 }
-                            case "/flags8": //
-                                {
-                                    string myOption = value.Split(':')[0];
-                                    bool settrue = bool.Parse(value.Split(':')[1]);
-
-                                    int flagindex = 0;
-                                    foreach (var (Tagruntimeaddress1, tmpflagindex) in from XmlNode node in innerNodes
-                                                                                       where node.Attributes[0].Value == method
-                                                                                       from XmlNode option in node
-                                                                                       where _node.Attributes[0].Value == method && option.Attributes[0].Value == myOption
-                                                                                       let hexOffset1 = node.Attributes[1].Value
-                                                                                       let off1 = Convert.ToInt32(hexOffset1, 16)
-                                                                                       let Tagruntimeaddress1 = RunTimeAddress1 + off1
-                                                                                       let tmpflagindex = option.Attributes[1].Value
-                                                                                       select (Tagruntimeaddress1, tmpflagindex))
-                                    {
-                                        flagindex = int.Parse(tmpflagindex);
-                                        int readFlags = memory.ReadByte(Tagruntimeaddress1);
-                                        RTEFlags(memory, Tagruntimeaddress1, readFlags, flagindex, settrue);
-                                        return 0;
-                                    }
-
-                                    break;
-                                }
-                            case "/flags16": //
-                                {
-                                    string myOption = value.Split(':')[0];
-                                    bool settrue = bool.Parse(value.Split(':')[1]);
-
-                                    int flagindex = 0;
-                                    foreach (var (Tagruntimeaddress1, tmpflagindex) in from XmlNode node in innerNodes
-                                                                                       where node.Attributes[0].Value == method
-                                                                                       from XmlNode option in node
-                                                                                       where _node.Attributes[0].Value == method && option.Attributes[0].Value == myOption
-                                                                                       let hexOffset1 = node.Attributes[1].Value
-                                                                                       let off1 = Convert.ToInt32(hexOffset1, 16)
-                                                                                       let Tagruntimeaddress1 = RunTimeAddress1 + off1
-                                                                                       let tmpflagindex = option.Attributes[1].Value
-                                                                                       select (Tagruntimeaddress1, tmpflagindex))
-                                    {
-                                        flagindex = int.Parse(tmpflagindex);
-                                        int readFlags = memory.ReadInt16(Tagruntimeaddress1);
-                                        RTEFlags(memory, Tagruntimeaddress1, readFlags, flagindex, settrue);
-                                        return 0;
-                                    }
-
-                                    break;
-                                }
-                            case "/flags32": //
+                            case "/flags8":
+                            case "/flags16":
+                            case "/flags32":
                                 {
                                     string myOption = value.Split(':')[0];
                                     bool settrue = bool.Parse(value.Split(':')[1]);

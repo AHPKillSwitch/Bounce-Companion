@@ -583,7 +583,8 @@ namespace Bounce_Companion.Code.Command_Handler
                 if (bindPitch)
                 {
                     float pitch = m.ReadFloat(MemoryAddresses.Addresses.player_Camera_Pitch_Address);
-                    if (pitch > 0.3 || pitch > -0.3) freezeValue = pitch * 12;
+                    if (pitch > 0.3 || pitch > -0.3 && main.BounceHandler.p_X_Vel > 1 || main.BounceHandler.p_X_Vel < -1 || main.BounceHandler.p_Y_Vel > 1 || main.BounceHandler.p_Y_Vel < -1) freezeValue = pitch * 12;
+
                     freezeValue = m.ReadFloat(MemoryAddresses.Addresses.player_Camera_Pitch_Address) * 8;
                 }
                 m.WriteToMemory((main.ObjectHandler.objectHavokAddress - 0x28), "float", freezeValue.ToString());

@@ -190,7 +190,10 @@ namespace Bounce_Companion
                     string[] byteStrings = value.Split(' ');
                     buffer = new byte[byteStrings.Length];
                     for (int i = 0; i < byteStrings.Length; i++)
-                        buffer[i] = Convert.ToByte(byteStrings[i], 16);
+                    {
+                        if (!string.IsNullOrEmpty(byteStrings[i]))
+                            buffer[i] = Convert.ToByte(byteStrings[i], 16);
+                    }
                     break;
                 case "int32":
                     buffer = BitConverter.GetBytes(Convert.ToInt32(value));
@@ -202,6 +205,9 @@ namespace Bounce_Companion
                     buffer = BitConverter.GetBytes(Convert.ToInt16(value));
                     break;
                 case "float":
+                    buffer = BitConverter.GetBytes(Convert.ToSingle(value));
+                    break;
+                case "float32":
                     buffer = BitConverter.GetBytes(Convert.ToSingle(value));
                     break;
                 case "string":

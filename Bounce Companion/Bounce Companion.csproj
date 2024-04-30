@@ -315,6 +315,9 @@
     <None Update="Content\Commands\TM - Advanced Wire Frame.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Content\Commands\TM - Magnum - Bottomless Clip.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Content\Commands\TM - Remove Fall Timer.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -341,6 +344,9 @@
     </None>
     <None Update="Content\Commands\TM - Test Contrails.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\Commands\TM-1_Button_God.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Content\Commands\Warp Fix.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

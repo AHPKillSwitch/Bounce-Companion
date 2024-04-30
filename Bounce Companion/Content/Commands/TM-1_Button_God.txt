@@ -1,0 +1,27 @@
+﻿KeyBindButton:0x70
+LeftButtonText:Apply
+RightButtonText:Disable
+EnableModTextOutPut:Unlimited Ammo Enabled
+DisableModTextOutPut:Unlimited Ammo Disabled
+Enable:/globals\globals.matg.[Grenades:0].Maximum Count=99
+Enable:/globals\globals.matg.[Grenades:1].Maximum Count=99
+Enable:/objects\characters\masterchief\masterchief_mp.hlmt.[New Damage Info:0].Flags=Cannot Die From Damage:true
+Enable:/?0.scnr.[Scenario Kill Triggers:0].clear=null
+Enable:/objects\weapons\pistol\magnum\magnum.weap.[Barrels:0].Magazine Index=-1
+Enable:/objects\weapons\rifle\battle_rifle\battle_rifle.weap.[Barrels:0].Magazine Index=-1
+Enable:/objects\weapons\rifle\sniper_rifle\sniper_rifle.weap.[Barrels:0].Magazine Index=-1
+Enable:/objects\weapons\support_high\rocket_launcher\rocket_launcher.weap.[Barrels:0].Magazine Index=-1
+Enable:/objects\weapons\rifle\beam_rifle\beam_rifle.weap.[Barrels:0].Age Generated Per Round=0
+Enable:/objects\weapons\pistol\plasma_pistol\plasma_pistol.weap.[Barrels:0].Age Generated Per Round=0
+Enable:/objects\weapons\pistol\plasma_pistol\plasma_pistol.weap.[Barrels:1].Age Generated Per Round=0
+Disable:/globals\globals.matg.[Grenades:0].Maximum Count=4
+Disable:/globals\globals.matg.[Grenades:1].Maximum Count=4
+Disable:/objects\characters\masterchief\masterchief_mp.hlmt.[New Damage Info:0].Flags=Cannot Die From Damage:false
+Disable:/?0.scnr.[Scenario Kill Triggers:0].Set=5
+Disable:/objects\weapons\pistol\magnum\magnum.weap.[Barrels:0].Magazine Index=0
+Disable:/objects\weapons\rifle\battle_rifle\battle_rifle.weap.[Barrels:0].Magazine Index=0
+Disable:/objects\weapons\rifle\sniper_rifle\sniper_rifle.weap.[Barrels:0].Magazine Index=0
+Disable:/objects\weapons\support_high\rocket_launcher\rocket_launcher.weap.[Barrels:0].Magazine Index=0
+Disable:/objects\weapons\rifle\beam_rifle\beam_rifle.weap.[Barrels:0].Age Generated Per Round=0.05556
+Disable:/objects\weapons\pistol\plasma_pistol\plasma_pistol.weap.[Barrels:0].Age Generated Per Round=0.004
+Disable:/objects\weapons\pistol\plasma_pistol\plasma_pistol.weap.[Barrels:1].Age Generated Per Round=0.15
